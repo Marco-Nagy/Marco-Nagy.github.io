@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'image_ref.dart';
+import 'media_ref.dart';
 import 'shot_background.dart';
 import 'showcase_panel.dart';
 
@@ -23,8 +23,10 @@ abstract class PersonalProject with _$PersonalProject {
     @Default('') String category,
     @Default('') String categoryAr,
 
-    /// Thumbnail used by the list row's hover reveal.
-    @Default(ImageRef()) ImageRef cover,
+    /// What the list row's hover reveal shows, and the detail view leads
+    /// with. A still, a looping GIF, a screen recording or a YouTube
+    /// walkthrough — see [MediaRef].
+    @Default(MediaRef()) MediaRef cover,
 
     /// Composed showcase panels shown in the detail view.
     @Default(<ShowcasePanel>[]) List<ShowcasePanel> panels,

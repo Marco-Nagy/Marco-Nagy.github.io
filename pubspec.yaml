@@ -38,6 +38,14 @@ dependencies:
   # Debug-only image picking for admin forms
   image_picker:
 
+  # Project media: mp4/webm screen recordings, composited by Flutter so they
+  # survive the hover reveal's rotation
+  video_player:
+
+  # YouTube walkthroughs. A platform view, so it is only used on flat upright
+  # surfaces — never inside a transformed preview
+  youtube_player_iframe:
+
   # Models
   freezed_annotation:
   json_annotation: ^4.12.0

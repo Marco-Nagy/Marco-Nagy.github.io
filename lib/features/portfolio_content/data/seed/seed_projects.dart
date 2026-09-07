@@ -1,5 +1,5 @@
 import '../../../../core/styles/app_images.dart';
-import '../../domain/entities/image_ref.dart';
+import '../../domain/entities/media_ref.dart';
 import '../../domain/entities/media_shot.dart';
 import '../../domain/entities/personal_project.dart';
 import '../../domain/entities/shot_background.dart';
@@ -26,7 +26,7 @@ class SeedProjects {
       order: order,
       shots: <MediaShot>[
         MediaShot(
-          image: ImageRef.asset(assetPath),
+          image: MediaRef.asset(assetPath),
           frame: frame,
           // Slightly oversized so the device crops at the panel's bottom edge,
           // the way the reference store graphics do.
@@ -67,7 +67,7 @@ class SeedProjects {
         'معالجة مدفوعات آمنة',
         'إشعارات التوصيل',
       ],
-      cover: ImageRef.asset(AppImages.floweryStoreShots.first),
+      cover: MediaRef.asset(AppImages.floweryStoreShots.first),
       showcaseBackground: const ShotBackground(
         style: ShotBackgroundStyle.linearGradient,
         colorHex: 'FF6FA5',
@@ -114,7 +114,7 @@ class SeedProjects {
         'إدارة الطلبات',
         'تسجيل تلقائي للسائقين (مسح الهوية والرخصة)',
       ],
-      cover: ImageRef.asset(AppImages.floweryDeliveryShots.first),
+      cover: MediaRef.asset(AppImages.floweryDeliveryShots.first),
       showcaseBackground: const ShotBackground(
         style: ShotBackgroundStyle.linearGradient,
         colorHex: 'E91E63',
@@ -163,7 +163,7 @@ class SeedProjects {
         'مساعدة عبر شات بوت ذكاء اصطناعي',
         'تتبع التقدم',
       ],
-      cover: ImageRef.asset(AppImages.fitnessAppShots.first),
+      cover: MediaRef.asset(AppImages.fitnessAppShots.first),
       showcaseBackground: const ShotBackground(
         style: ShotBackgroundStyle.linearGradient,
         colorHex: '3A1C71',

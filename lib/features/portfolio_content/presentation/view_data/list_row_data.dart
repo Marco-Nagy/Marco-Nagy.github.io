@@ -1,5 +1,5 @@
 import '../../domain/entities/custom_section_item.dart';
-import '../../domain/entities/image_ref.dart';
+import '../../domain/entities/media_ref.dart';
 import '../../domain/entities/shot_background.dart';
 import '../../domain/entities/showcase_panel.dart';
 import '../../domain/entities/personal_project.dart';
@@ -18,7 +18,7 @@ class ListRowData {
     this.category = '',
     this.description = '',
     this.features = const <String>[],
-    this.cover = const ImageRef(),
+    this.cover = const MediaRef(),
     this.panels = const <ShowcasePanel>[],
     this.background = const ShotBackground(),
     this.accentHex = '4CC9F0',
@@ -33,7 +33,7 @@ class ListRowData {
   final String category;
   final String description;
   final List<String> features;
-  final ImageRef cover;
+  final MediaRef cover;
   final List<ShowcasePanel> panels;
 
   /// Default background the panels render on.
@@ -76,7 +76,9 @@ class ListRowData {
       category: pickText(isArabic, item.tagEn, item.tagAr),
       description: pickText(isArabic, item.descriptionEn, item.descriptionAr),
       features: pickList(isArabic, item.bulletsEn, item.bulletsAr),
-      cover: item.images.isEmpty ? const ImageRef() : item.images.first,
+      cover: item.images.isEmpty
+          ? const MediaRef()
+          : MediaRef.still(item.images.first),
       accentHex: item.accentHex,
       linkUrl: item.linkUrl,
     );

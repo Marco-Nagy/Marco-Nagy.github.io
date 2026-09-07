@@ -15,6 +15,7 @@ class UnderlineTextField extends StatelessWidget {
     this.maxLines = 1,
     this.hint,
     this.textInputAction,
+    this.onChanged,
     super.key,
   });
 
@@ -25,6 +26,10 @@ class UnderlineTextField extends StatelessWidget {
   final int maxLines;
   final String? hint;
   final TextInputAction? textInputAction;
+
+  /// Lets a field that mirrors non-text state — an [ImageRef], a parsed
+  /// number — react as it is typed rather than only on save.
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,7 @@ class UnderlineTextField extends StatelessWidget {
         keyboardType: keyboardType,
         maxLines: maxLines,
         textInputAction: textInputAction,
+        onChanged: onChanged,
         style: MyFonts.regular16.copyWith(color: colors.onNavy),
         cursorColor: colors.accent,
         decoration: InputDecoration(
