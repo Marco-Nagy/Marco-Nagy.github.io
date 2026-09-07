@@ -92,6 +92,12 @@ class Motion {
   /// 0.88 means it starts animating slightly before it is fully on screen.
   static const double revealThreshold = 0.88;
 
+  /// One down-and-back cycle of the section header's scroll-cue chevron.
+  static const Duration chevronBobPeriod = Duration(milliseconds: 1100);
+
+  /// How far the chevron travels downward each cycle, in logical pixels.
+  static const double chevronBobDistance = 8;
+
   /// Honours the OS "reduce motion" setting — animations become instant
   /// rather than being faked at a shorter duration.
   static bool reducedMotion(BuildContext context) =>

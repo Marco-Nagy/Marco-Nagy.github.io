@@ -59,6 +59,18 @@ class _RevealTriggerState extends State<RevealTrigger>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _check());
+
+    // `pushReplacementNamed` (used by the top nav, see `replaceNamed`) can
+    // leave the incoming route's animation never actually ticking a listener
+    // added from this page's very first frame, so `_onCurtain` below never
+    // fires and the reveal is stranded until an unrelated scroll notification
+    // bails it out. A one-shot recheck timed to when the curtain is
+    // guaranteed to be done closes that gap without depending on catching an
+    // exact animation tick.
+    Future<void>.delayed(Motion.curtain * 2 + const Duration(milliseconds: 50), () {
+      if (!mounted) return;
+      _check();
+    });
   }
 
   @override
