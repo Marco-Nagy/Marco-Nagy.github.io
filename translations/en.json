@@ -21,6 +21,10 @@
   "hero_role_tags": "Flutter Developer / Mobile Engineer / Clean Architecture",
   "hero_cta": "See my work",
   "hero_scroll_down": "Scroll down",
+  "home_works_headline": "Crafted with love.",
+  "home_works_subtitle": "Here is a selection of my recent work.",
+  "home_works_more_label": "There's more",
+  "home_works_view_all": "View all projects",
 
   "about_title": "About",
   "about_lead": "I build production Flutter apps that people use every day.",

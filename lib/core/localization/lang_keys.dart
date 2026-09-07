@@ -27,6 +27,11 @@ class LangKeys {
   static const String heroCta = 'hero_cta';
   static const String heroScrollDown = 'hero_scroll_down';
 
+  static const String homeWorksHeadline = 'home_works_headline';
+  static const String homeWorksSubtitle = 'home_works_subtitle';
+  static const String homeWorksMoreLabel = 'home_works_more_label';
+  static const String homeWorksViewAll = 'home_works_view_all';
+
   static const String aboutTitle = 'about_title';
   static const String aboutLead = 'about_lead';
   static const String aboutSkillsTitle = 'about_skills_title';

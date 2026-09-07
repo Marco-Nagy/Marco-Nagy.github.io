@@ -8,15 +8,14 @@ import '../../../../core/constants/tech_badges.dart';
 import '../../../../core/styles/app_images.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
-import '../../../../core/widgets/common/hatched_circle.dart';
 import '../../../../core/widgets/common/safe_asset_image.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 
 /// The headshot on its circular backdrop, with tech badges revolving around it.
 ///
-/// A single controller drives the whole orbit: seven badges sharing one ticker
-/// rather than each running its own, and only the badge layer rebuilds per
-/// frame — the photo and rings are passed through untouched.
+/// A single controller drives the whole orbit: every badge shares one ticker
+/// rather than running its own, and only the badge layer rebuilds per frame —
+/// the photo and its backdrop are passed through untouched.
 class HeroPhoto extends StatefulWidget {
   const HeroPhoto({required this.diameter, super.key});
 
@@ -27,6 +26,19 @@ class HeroPhoto extends StatefulWidget {
 }
 
 class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
+  /// Per-badge multipliers against the base orbit radius and chip size.
+  ///
+  /// The reference scatters its marks through the space around the portrait
+  /// instead of threading them onto one clean circle, so each badge sits a
+  /// little nearer or further out and reads a little larger or smaller. Fixed
+  /// rather than random: the field has to look identical on every rebuild.
+  static const List<double> _radiusFactors = <double>[
+    1.00, 0.86, 1.12, 0.92, 1.06, 0.82, 1.15, 0.96, 1.08, 0.88, 1.02,
+  ];
+  static const List<double> _sizeFactors = <double>[
+    1.00, 0.82, 1.14, 0.90, 1.06, 0.86, 1.18, 0.94, 1.10, 0.84, 1.02,
+  ];
+
   /// Revolves the badges around the photo.
   late final AnimationController _orbit = AnimationController(
     vsync: this,
@@ -84,7 +96,10 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            // Soft bloom so the portrait separates from the page gradient.
+            // The only backdrop now that the rings are gone, so it carries
+            // more of the reference's broad soft disc: the middle stop holds
+            // the glow out wide before it falls away, rather than fading
+            // straight from the centre.
             SizedBox.square(
               dimension: canvasSize,
               child: DecoratedBox(
@@ -92,17 +107,14 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: <Color>[
-                      colors.accent.withValues(alpha: 0.22),
+                      colors.accent.withValues(alpha: 0.20),
+                      colors.accent.withValues(alpha: 0.07),
                       colors.transparent,
                     ],
+                    stops: const <double>[0, 0.62, 1],
                   ),
                 ),
               ),
-            ),
-            OutlineRing(diameter: widget.diameter + 96.w, dashed: true),
-            OutlineRing(
-              diameter: widget.diameter + 28.w,
-              color: colors.accent.withValues(alpha: 0.45),
             ),
             _PhotoDisc(diameter: widget.diameter),
             for (var i = 0; i < badges.length; i++)
@@ -110,17 +122,22 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
                 animation: _orbit,
                 // The chip is built once and carried through, so a frame only
                 // recomputes the transform.
-                child: TechBadgeChip(badge: badges[i]),
+                child: TechBadgeChip(
+                  badge: badges[i],
+                  size: 46.r * _sizeFactors[i % _sizeFactors.length],
+                ),
                 builder: (context, child) {
                   // Evenly spaced around the circle, all advancing together.
                   final angle =
                       (i / badges.length) * 2 * math.pi -
                       math.pi / 2 +
                       _orbit.value * 2 * math.pi;
+                  final radius =
+                      orbitRadius * _radiusFactors[i % _radiusFactors.length];
                   return Transform.translate(
                     offset: Offset(
-                      math.cos(angle) * orbitRadius,
-                      math.sin(angle) * orbitRadius,
+                      math.cos(angle) * radius,
+                      math.sin(angle) * radius,
                     ),
                     child: child,
                   );
