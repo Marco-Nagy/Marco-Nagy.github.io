@@ -10,7 +10,7 @@ import '../../../../core/utils/hex_color.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 import '../../../../core/widgets/admin/admin_item_actions.dart';
-import '../../../../core/widgets/common/app_image.dart';
+import '../../../../core/widgets/common/app_media.dart';
 import '../../../../core/widgets/common/pill_button.dart';
 import '../../../../core/widgets/common/safe_asset_image.dart';
 import '../../../portfolio_content/presentation/view_data/list_row_data.dart';
@@ -106,6 +106,10 @@ class _ProjectListRowState extends State<ProjectListRow> {
             ),
           ),
           child: Stack(
+            // The preview is taller than the row and leans out of it, exactly
+            // as the reference does — clipping it to the row bounds would saw
+            // the corners off the rotated card.
+            clipBehavior: Clip.none,
             children: <Widget>[
               // The accent block slides in behind the row content.
               Positioned.fill(
@@ -183,8 +187,12 @@ class _RevealBlock extends StatelessWidget {
             child: Transform.rotate(
               angle: -8 * math.pi / 180,
               child: Container(
-                width: 120.w,
-                height: 84.h,
+                // Sized against the 1440 design width the desktop breakpoint
+                // uses: the reference gives this preview roughly a quarter of
+                // the viewport, where 120.w was leaving it at eight percent —
+                // a thumbnail rather than the artwork the row is selling.
+                width: context.isMobile ? 190.w : 340.w,
+                height: context.isMobile ? 130.h : 220.h,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.r),
                   border: Border.all(color: accent.withValues(alpha: 0.6)),
@@ -198,8 +206,12 @@ class _RevealBlock extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(9.r),
-                  child: AppImage(
-                    image: data.cover,
+                  child: AppMedia(
+                    media: data.cover,
+                    // The reveal is rotated, so no platform view survives here;
+                    // a YouTube cover degrades to its poster.
+                    playing: revealed,
+                    allowPlatformView: false,
                     fallback: AssetPlaceholder(label: data.title),
                   ),
                 ),

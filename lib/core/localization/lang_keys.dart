@@ -55,6 +55,29 @@ class LangKeys {
   static const String projectsKeyFeatures = 'projects_key_features';
   static const String projectsScreenshots = 'projects_screenshots';
   static const String projectsBack = 'projects_back';
+  static const String projectLinkGithub = 'project_link_github';
+  static const String projectLinkPlayStore = 'project_link_play_store';
+  static const String projectLinkAppStore = 'project_link_app_store';
+  static const String projectLinkWeb = 'project_link_web';
+  static const String projectLinkApk = 'project_link_apk';
+  static const String projectSkills = 'project_skills';
+  static const String projectTechnologies = 'project_technologies';
+  static const String projectTools = 'project_tools';
+  static const String fieldSkillsEn = 'field_skills_en';
+  static const String fieldSkillsAr = 'field_skills_ar';
+  static const String fieldTechnologies = 'field_technologies';
+  static const String fieldTools = 'field_tools';
+  static const String mediaLayerFeatureGraphic = 'media_layer_feature_graphic';
+  static const String mediaLayerScreenshots = 'media_layer_screenshots';
+  static const String mediaLayerVideo = 'media_layer_video';
+  static const String mediaLayerGif = 'media_layer_gif';
+  static const String adminAddFeatureGraphic = 'admin_add_feature_graphic';
+  static const String adminAddScreenshot = 'admin_add_screenshot';
+  static const String adminAddVideo = 'admin_add_video';
+  static const String adminAddGif = 'admin_add_gif';
+  static const String fieldProjectLinks = 'field_project_links';
+  static const String fieldLinkUrl = 'field_link_url';
+  static const String adminAddLink = 'admin_add_link';
   static const String projectsOverview = 'projects_overview';
 
   static const String certificatesTitle = 'certificates_title';
@@ -138,6 +161,21 @@ class LangKeys {
   static const String fieldCategoryEn = 'field_category_en';
   static const String fieldCategoryAr = 'field_category_ar';
   static const String fieldCoverImage = 'field_cover_image';
+  static const String fieldMediaImagePath = 'field_media_image_path';
+  static const String fieldMediaPick = 'field_media_pick';
+  static const String fieldMediaPin = 'field_media_pin';
+  static const String fieldMediaHeavyEmbed = 'field_media_heavy_embed';
+  static const String fieldMediaVideoUrl = 'field_media_video_url';
+  static const String fieldMediaYoutubeUnresolved =
+      'field_media_youtube_unresolved';
+  static const String fieldMediaHostUnsupported =
+      'field_media_host_unsupported';
+  static const String fieldMediaLinkNormalized = 'field_media_link_normalized';
+  static const String fieldMediaNeedsPublicLink =
+      'field_media_needs_public_link';
+  static const String mediaKindImage = 'media_kind_image';
+  static const String mediaKindVideoFile = 'media_kind_video_file';
+  static const String mediaKindVideoEmbed = 'media_kind_video_embed';
   static const String fieldScreenshots = 'field_screenshots';
   static const String fieldAccentColor = 'field_accent_color';
   static const String fieldOrder = 'field_order';
@@ -163,6 +201,65 @@ class LangKeys {
   static const String fieldUnitTimeDays = 'field_unit_time_days';
   static const String fieldHasCounter = 'field_has_counter';
   static const String fieldNumberInvalid = 'field_number_invalid';
+
+  static const String formAddPanel = 'form_add_panel';
+  static const String formEditPanel = 'form_edit_panel';
+  static const String formAddShot = 'form_add_shot';
+  static const String formEditShot = 'form_edit_shot';
+  static const String formEditBackground = 'form_edit_background';
+
+  static const String adminAddShot = 'admin_add_shot';
+  static const String adminAddPanel = 'admin_add_panel';
+  static const String adminEmptyItem = 'admin_empty_item';
+
+  static const String fieldProjectPanels = 'field_project_panels';
+  static const String fieldProjectBackground = 'field_project_background';
+  static const String fieldPanelFormat = 'field_panel_format';
+  static const String fieldPanelShots = 'field_panel_shots';
+  static const String fieldPanelBackground = 'field_panel_background';
+  static const String fieldPanelBackgroundOverride =
+      'field_panel_background_override';
+  static const String fieldPanelBackgroundInherited =
+      'field_panel_background_inherited';
+  static const String fieldCaptionEn = 'field_caption_en';
+  static const String fieldCaptionAr = 'field_caption_ar';
+  static const String fieldSubtitleEn = 'field_subtitle_en';
+  static const String fieldSubtitleAr = 'field_subtitle_ar';
+  static const String fieldCaptionPlacement = 'field_caption_placement';
+  static const String fieldCaptionColor = 'field_caption_color';
+  static const String fieldShotMedia = 'field_shot_media';
+  static const String fieldShotFrame = 'field_shot_frame';
+  static const String fieldShotScale = 'field_shot_scale';
+  static const String fieldShotRotation = 'field_shot_rotation';
+  static const String fieldShotOffsetX = 'field_shot_offset_x';
+  static const String fieldShotOffsetY = 'field_shot_offset_y';
+  static const String fieldBackgroundStyle = 'field_background_style';
+  static const String fieldBackgroundColor = 'field_background_color';
+  static const String fieldBackgroundColor2 = 'field_background_color2';
+  static const String fieldBackgroundGradient = 'field_background_gradient';
+  static const String fieldBackgroundImage = 'field_background_image';
+  static const String fieldBackgroundOverlay = 'field_background_overlay';
+  static const String fieldBackgroundBlur = 'field_background_blur';
+
+  static const String panelFormatScreenshot = 'panel_format_screenshot';
+  static const String panelFormatFeatureGraphic =
+      'panel_format_feature_graphic';
+  static const String panelFormatFree = 'panel_format_free';
+  static const String captionTop = 'caption_top';
+  static const String captionBottom = 'caption_bottom';
+  static const String captionStart = 'caption_start';
+  static const String captionEnd = 'caption_end';
+  static const String captionNone = 'caption_none';
+  static const String frameNone = 'frame_none';
+  static const String frameLaptop = 'frame_laptop';
+  static const String frameIphone = 'frame_iphone';
+  static const String frameSamsung = 'frame_samsung';
+  static const String backgroundNone = 'background_none';
+  static const String backgroundSolid = 'background_solid';
+  static const String backgroundLinear = 'background_linear';
+  static const String backgroundRadial = 'background_radial';
+  static const String backgroundBlob = 'background_blob';
+  static const String backgroundImage = 'background_image';
 
   static const String commonRetry = 'common_retry';
   static const String commonLoading = 'common_loading';

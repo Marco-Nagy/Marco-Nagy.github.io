@@ -3,8 +3,8 @@
 class ProfileInfo {
   const ProfileInfo._();
 
-  static const String fullName = 'Marco Nagy Louka';
-  static const String fullNameAr = 'ماركو ناجي لوقا';
+  static const String fullName = 'Marco Nagy';
+  static const String fullNameAr = 'ماركو ناجي';
   static const String monogram = 'MN';
   static const String role = 'Flutter Developer';
   static const String roleAr = 'مطوّر تطبيقات Flutter';

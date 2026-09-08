@@ -17,7 +17,7 @@ import '../../../portfolio_content/presentation/view_data/list_row_data.dart';
 import '../view_model/projects_actions.dart';
 import '../view_model/projects_states.dart';
 import '../view_model/projects_view_model.dart';
-import 'project_form_sheet.dart';
+import 'project_form_screen.dart';
 import 'project_list_row.dart';
 
 /// The numbered project rows, shared by the Projects page and the Home page's
@@ -127,7 +127,7 @@ Future<void> _editProject(
   ProjectsViewModelCubit cubit,
   PersonalProject? project,
 ) async {
-  final built = await ProjectFormSheet.open(context, project: project);
+  final built = await ProjectFormScreen.open(context, project: project);
   if (built == null || !context.mounted) return;
 
   cubit.doAction(SaveProject(built));

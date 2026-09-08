@@ -8,8 +8,8 @@ part of 'media_shot.dart';
 
 _MediaShot _$MediaShotFromJson(Map<String, dynamic> json) => _MediaShot(
   image: json['image'] == null
-      ? const ImageRef()
-      : ImageRef.fromJson(json['image'] as Map<String, dynamic>),
+      ? const MediaRef()
+      : MediaRef.fromJson(json['image'] as Map<String, dynamic>),
   frame:
       $enumDecodeNullable(_$DeviceFrameTypeEnumMap, json['frame']) ??
       DeviceFrameType.none,

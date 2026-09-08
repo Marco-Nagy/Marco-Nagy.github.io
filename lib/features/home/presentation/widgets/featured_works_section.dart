@@ -39,8 +39,9 @@ class FeaturedWorksSection extends StatelessWidget {
             children: <Widget>[
               BlockRevealText(
                 context.translate(LangKeys.homeWorksHeadline),
-                style: (context.isMobile ? MyFonts.display36 : MyFonts.display48)
-                    .copyWith(color: colors.onNavy),
+                style:
+                    (context.isMobile ? MyFonts.display36 : MyFonts.display48)
+                        .copyWith(color: colors.onNavy),
               ),
               SizedBox(height: 16.h),
               BlockRevealText(
@@ -99,15 +100,12 @@ class _ViewAllLinkState extends State<_ViewAllLink> {
                   AnimatedDefaultTextStyle(
                     duration: Motion.quick,
                     curve: Curves.easeOut,
-                    style: (context.isMobile
-                            ? MyFonts.bold22
-                            : MyFonts.display36)
-                        .copyWith(
-                          color: _hovered ? colors.accent : colors.onNavy,
-                        ),
-                    child: Text(
-                      context.translate(LangKeys.homeWorksViewAll),
-                    ),
+                    style:
+                        (context.isMobile ? MyFonts.bold22 : MyFonts.display36)
+                            .copyWith(
+                              color: _hovered ? colors.accent : colors.onNavy,
+                            ),
+                    child: Text(context.translate(LangKeys.homeWorksViewAll)),
                   ),
                   AnimatedContainer(
                     duration: Motion.quick,

@@ -73,9 +73,10 @@ JSON keys stable.
 ### Why `MediaRef.fromJson` is hand-written
 
 `cover` and `MediaShot.image` already hold bare `ImageRef` payloads in visitors'
-local storage. A missing key would silently blank every existing screenshot, and
-the repository's `_readList` fallback only catches parse errors, not missing
-fields. So `fromJson` accepts both shapes:
+local storage. Without a hand-written factory nothing would even throw:
+json_serializable finds no `image` key, falls back to the `@Default`, and every
+stored screenshot silently becomes blank. `_readList` only rescues payloads that
+fail to parse, and this one parses perfectly. So `fromJson` takes both shapes:
 
 ```dart
 factory MediaRef.fromJson(Map<String, dynamic> json) =>
@@ -108,6 +109,52 @@ that one cannot tell them apart.
 - **Pushing to `main` deploys the live site** — see
   `.github/workflows/github_pages.yaml`. Work on branches.
 
+## Player patterns
+
+All three renderers keep `AppImage`'s contract: a broken source degrades to the
+`fallback` widget, it never throws and never shows a black box.
+
+**`AppMedia`** dispatches on `kind` and takes `playing` from its parent — a
+player never decides on its own whether to run. `allowPlatformView: false` makes
+`videoEmbed` render its poster instead, which is what keeps YouTube out of
+transformed surfaces.
+
+**GIF — no package, no widget, but not free either.** Flutter animates GIFs in
+`Image.asset`/`.network`/`.memory` and cannot pause them. `_RevealBlock` lives
+inside an `AnimatedOpacity` at `opacity: 0`, so it stays mounted and painting:
+every project's GIF would loop invisibly, forever, and a hover would catch one
+mid-loop. So `AppMedia` mounts an animated source only while `playing` — which
+also makes each hover start at frame one. Detect it by extension (`.gif`), or by
+the data URI's mime for an embedded ref.
+
+**`video_player` — `VideoFileView`.** Create the controller lazily, on the first
+`playing == true`, never in `initState` or `build`: the projects page has a row
+per project and each would otherwise open its own decoder. React to the parent
+in `didUpdateWidget`; dispose in `dispose`. Show `media.image` as the poster
+until `initialize()` resolves, and keep showing it forever if that call throws.
+`BoxFit.cover` without distortion is
+`ClipRect(FittedBox(cover, SizedBox.fromSize(size: value.size, VideoPlayer)))`.
+Browsers refuse unmuted autoplay, so an unmuted `autoplay` ref must catch the
+rejected `play()` and rest on its poster rather than looking broken.
+
+**`youtube_player_iframe` — `VideoEmbedView`.** Deliberately lazier still:
+poster plus a play badge, and the controller is built on the first tap. Each one
+is an iframe on web and a WebView on mobile, so a five-panel detail view must
+not boot five of them for a visitor who opens none. If the URL yields no video
+id, fall back to the poster and an external `url_launcher` link.
+
+Its API has moved across major versions (`fromVideoId` vs `initialVideoId`,
+`close()` vs `dispose()`), so read the installed version out of pub-cache before
+writing that file rather than recalling it. `video_player`'s API is stable.
+
+Where each is allowed:
+
+| Surface | Transformed | Allowed |
+|---|---|---|
+| `_RevealBlock` hover preview | yes, rotated | GIF, `videoFile` |
+| Detail panel / inside a device frame | no | all three |
+| Admin form previews | no | poster only — never boot a player in the editor |
+
 ## Implementation order (this is the part that went wrong)
 
 Switching the entities first breaks three render sites at once and leaves the
@@ -121,10 +168,22 @@ tree only goes red for the length of one step:
    `video_file_view.dart`, `video_embed_view.dart`.
 3. Add `media_ref.dart`; run `dart run build_runner build --delete-conflicting-outputs`.
 4. Switch `PersonalProject.cover` and `MediaShot.image` to `MediaRef`; regenerate.
-5. Migrate consumers in one pass: `seed_projects.dart`, `list_row_data.dart`,
-   `device_frame.dart` (`image` param type), `showcase_panel_view.dart:124`,
-   `project_list_row.dart:202` (`AppMedia(playing: _revealed)`),
-   `project_detail_view.dart`.
+5. Migrate consumers in one pass. This list was re-checked against the tree on
+   2026-09-07; every entry is a real call site:
+   - `seed_projects.dart` — three `cover:` plus the shot built in `_panel`
+   - `list_row_data.dart` — the field type, and line 79 becomes
+     `MediaRef.still(item.images.first)`; custom-section items stay `ImageRef`
+   - `device_frame.dart` — the `image` parameter type
+   - `showcase_panel_view.dart:124`
+   - `project_list_row.dart:202` — `AppMedia(playing: revealed)`. `_RevealBlock`
+     already takes `revealed`, so this is a one-line wire
+   - `project_form_sheet.dart` — reads `cover.value` at lines 77 and 115, which
+     `MediaRef` does not have. A mechanical fix (`cover.image.value`,
+     `MediaRef.still(...)`) belongs in *this* step; the real media editor comes
+     later. Without it, step 6 cannot go green.
+
+   `project_detail_view.dart` needs no change — it hands `data` straight to
+   `ShowcasePanelView` and never touches `cover` or `shot.image`.
 6. `flutter analyze` — expect green here, before any form work starts.
 
 ## Admin editor, after the above is green

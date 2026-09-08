@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../features/portfolio_content/domain/entities/image_ref.dart';
+import '../../../features/portfolio_content/domain/entities/media_ref.dart';
 import '../../utils/extension/context_extensions.dart';
 import '../../../features/portfolio_content/domain/entities/media_shot.dart';
-import '../common/app_image.dart';
+import '../common/app_media.dart';
 import '../common/safe_asset_image.dart';
 
 /// Draws a screenshot inside a device bezel.
@@ -17,15 +17,20 @@ class DeviceFrame extends StatelessWidget {
     required this.frame,
     required this.width,
     this.label,
+    this.playing = true,
     super.key,
   });
 
-  final ImageRef image;
+  final MediaRef image;
   final DeviceFrameType frame;
 
   /// Drives every other dimension, so a frame scales as one piece.
   final double width;
   final String? label;
+
+  /// Whether a video screen recording inside the bezel should run. Panels that
+  /// are off-screen or unselected pass false so they cost nothing.
+  final bool playing;
 
   /// Screen aspect ratio per device, used to size the whole widget.
   static double aspectRatioOf(DeviceFrameType frame) => switch (frame) {
@@ -37,8 +42,14 @@ class DeviceFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenshot = AppImage(
-      image: image,
+    // allowPlatformView is false because a framed shot is never flat: the panel
+    // rotates and translates it, and the bezel clips it. A YouTube embed is a
+    // platform view that honours none of that, so inside a bezel it shows its
+    // poster and a screen recording has to be a videoFile to actually play.
+    final screenshot = AppMedia(
+      media: image,
+      playing: playing,
+      allowPlatformView: false,
       fallback: AssetPlaceholder(
         icon: frame == DeviceFrameType.laptop
             ? Icons.laptop_mac_outlined

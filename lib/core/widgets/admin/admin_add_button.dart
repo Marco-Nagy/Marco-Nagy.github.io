@@ -9,7 +9,11 @@ import 'admin_gate.dart';
 /// list's own cubit, and a page-level FAB would sit outside that provider —
 /// and be ambiguous on a page that shows more than one editable list.
 class AdminAddButton extends StatelessWidget {
-  const AdminAddButton({required this.label, required this.onPressed, super.key});
+  const AdminAddButton({
+    required this.label,
+    required this.onPressed,
+    super.key,
+  });
 
   final String label;
   final VoidCallback onPressed;

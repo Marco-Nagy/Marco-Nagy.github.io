@@ -33,10 +33,30 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
   /// little nearer or further out and reads a little larger or smaller. Fixed
   /// rather than random: the field has to look identical on every rebuild.
   static const List<double> _radiusFactors = <double>[
-    1.00, 0.86, 1.12, 0.92, 1.06, 0.82, 1.15, 0.96, 1.08, 0.88, 1.02,
+    1.00,
+    0.86,
+    1.12,
+    0.92,
+    1.06,
+    0.82,
+    1.15,
+    0.96,
+    1.08,
+    0.88,
+    1.02,
   ];
   static const List<double> _sizeFactors = <double>[
-    1.00, 0.82, 1.14, 0.90, 1.06, 0.86, 1.18, 0.94, 1.10, 0.84, 1.02,
+    1.00,
+    0.82,
+    1.14,
+    0.90,
+    1.06,
+    0.86,
+    1.18,
+    0.94,
+    1.10,
+    0.84,
+    1.02,
   ];
 
   /// Revolves the badges around the photo.
