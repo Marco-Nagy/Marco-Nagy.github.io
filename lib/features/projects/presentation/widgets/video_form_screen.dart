@@ -10,10 +10,7 @@ import '../../../../core/widgets/admin/admin_form_screen.dart';
 import '../../../../core/widgets/admin/media_ref_field.dart';
 import '../../../../core/widgets/common/app_media.dart';
 import '../../../../core/widgets/common/underline_text_field.dart';
-import '../../../../core/widgets/showcase/device_frame.dart';
-import '../../../../core/widgets/showcase/tappable_video.dart';
 import '../../../portfolio_content/domain/entities/media_ref.dart';
-import '../../../portfolio_content/domain/entities/media_shot.dart';
 import '../../../portfolio_content/domain/entities/project_video.dart';
 
 /// Add/edit screen for one [ProjectVideo] — a screen recording or a YouTube
@@ -21,11 +18,12 @@ import '../../../portfolio_content/domain/entities/project_video.dart';
 ///
 /// Its own screen rather than a case inside a shared media-item form — video
 /// has neither the geometry [ScreenshotFormScreen] tunes nor the flat crop
-/// [FeatureGraphicFormScreen] wants; it is a source, a frame choice and a
-/// caption, with a preview an admin can actually play. The preview reuses
-/// `TappableVideo`, the same tap-to-play chrome the detail page's `VideoCard`
-/// uses, so a chosen source can be checked here before it ever reaches the
-/// live site.
+/// [FeatureGraphicFormScreen] wants; it is a source, a shape and a caption,
+/// with a preview an admin can actually operate. The preview runs the same
+/// transport bar the detail page's `VideoCard` shows, drawn at the chosen
+/// [ProjectVideo.aspectRatio], so the source, the shape and how the clip
+/// actually plays can all be checked here before any of it reaches the live
+/// site.
 class VideoFormScreen extends StatefulWidget {
   const VideoFormScreen({this.video, super.key});
 
@@ -48,6 +46,17 @@ class VideoFormScreen extends StatefulWidget {
 }
 
 class _VideoFormScreenState extends State<VideoFormScreen> {
+  /// The three shapes a showcase video actually arrives in — a landscape
+  /// walkthrough, a phone screen recording, a square social clip. Closed
+  /// presets rather than a free number field: a hand-typed ratio is only a
+  /// way to end up with a card that is subtly the wrong shape, and the
+  /// labels are numerals, so they need no translation.
+  static const List<(double, String)> _ratioPresets = <(double, String)>[
+    (16 / 9, '16:9'),
+    (9 / 16, '9:16'),
+    (1, '1:1'),
+  ];
+
   late final String _id = widget.video?.id ?? IdGenerator.next('video');
 
   late ProjectVideo _video =
@@ -72,11 +81,11 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
     });
   }
 
-  void _setFrame(DeviceFrameType frame) {
-    setState(() {
-      _video = _video.copyWith(frame: frame);
-      _playing = false;
-    });
+  /// Only reshapes the card — playback deliberately keeps running, since the
+  /// point of switching ratios mid-preview is to see the same moment of the
+  /// same clip at another shape.
+  void _setAspectRatio(double ratio) {
+    setState(() => _video = _video.copyWith(aspectRatio: ratio));
   }
 
   @override
@@ -86,13 +95,15 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
     super.dispose();
   }
 
-  String _frameLabel(DeviceFrameType frame) =>
-      context.translate(switch (frame) {
-        DeviceFrameType.none => LangKeys.frameNone,
-        DeviceFrameType.laptop => LangKeys.frameLaptop,
-        DeviceFrameType.iphone => LangKeys.frameIphone,
-        DeviceFrameType.samsungS => LangKeys.frameSamsung,
-      });
+  /// Falls back to the raw ratio for a video stored at some shape outside the
+  /// presets, so an unrecognised value is visible rather than silently shown
+  /// as nothing selected.
+  String _ratioLabel(double ratio) {
+    for (final (value, label) in _ratioPresets) {
+      if (value == ratio) return label;
+    }
+    return ratio.toStringAsFixed(2);
+  }
 
   List<Widget> _fields(BuildContext context) {
     return <Widget>[
@@ -102,12 +113,12 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
         previewAspectRatio: _video.aspectRatio,
         onChanged: _setMedia,
       ),
-      AdminChoiceField<DeviceFrameType>(
-        label: context.translate(LangKeys.fieldShotFrame),
-        value: _video.frame,
-        options: DeviceFrameType.selectable,
-        labelOf: _frameLabel,
-        onChanged: _setFrame,
+      AdminChoiceField<double>(
+        label: context.translate(LangKeys.fieldVideoAspectRatio),
+        value: _video.aspectRatio,
+        options: <double>[for (final (value, _) in _ratioPresets) value],
+        labelOf: _ratioLabel,
+        onChanged: _setAspectRatio,
       ),
       UnderlineTextField(
         label: context.translate(LangKeys.fieldCaptionEn),
@@ -122,25 +133,22 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
     ];
   }
 
-  bool get _isVideoFile => _video.media.kind == MediaKind.videoFile;
-
-  bool get _isFramed => _video.frame != DeviceFrameType.none;
-
-  Widget _bare(BuildContext context) {
+  Widget _player(BuildContext context) {
     final colors = context.colors;
 
-    // A YouTube embed already owns its own tap-to-start badge and ignores
-    // `playing` outright (see VideoEmbedView) — wrapping it in TappableVideo
-    // too would stack a second, disconnected badge on top of it. Only a
-    // video file responds to `playing`, so only that case gets the outer tap
-    // chrome. This box is never rotated or clipped by a parent transform, so
-    // the platform view a YouTube embed needs is safe to allow.
-    final media = AppMedia(
+    // A YouTube embed carries its own player chrome and ignores `playing`
+    // outright (see VideoEmbedView), so `controls` is left off for it rather
+    // than stacking a second, disconnected transport bar over YouTube's own.
+    // This box is never rotated or clipped by a parent transform, so the
+    // platform view an embed needs is safe to allow.
+    return AppMedia(
       media: _video.media,
       fit: BoxFit.cover,
       allowPlatformView: true,
       playing: _playing,
       preload: true,
+      controls: _video.media.kind == MediaKind.videoFile,
+      onPlayingChanged: (playing) => setState(() => _playing = playing),
       fallback: Center(
         child: Icon(
           Icons.play_circle_outline_rounded,
@@ -149,38 +157,10 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
         ),
       ),
     );
-
-    return _isVideoFile
-        ? TappableVideo(
-            playing: _playing,
-            onTap: () => setState(() => _playing = !_playing),
-            child: media,
-          )
-        : media;
-  }
-
-  Widget _framed(BuildContext context) {
-    // DeviceFrame always renders with allowPlatformView false (it is a bezel,
-    // not a flat surface — see its own doc comment), so a YouTube embed shown
-    // inside one rests on its poster here too; only a video file plays.
-    return TappableVideo(
-      playing: _playing,
-      onTap: () => setState(() => _playing = !_playing),
-      child: DeviceFrame(
-        image: _video.media,
-        frame: _video.frame,
-        width: 300.w,
-        playing: _playing,
-      ),
-    );
   }
 
   Widget _preview(BuildContext context) {
     final colors = context.colors;
-
-    if (_isFramed) {
-      return Center(child: _framed(context));
-    }
 
     return AspectRatio(
       aspectRatio: _video.aspectRatio,
@@ -188,7 +168,7 @@ class _VideoFormScreenState extends State<VideoFormScreen> {
         borderRadius: BorderRadius.circular(16.r),
         child: DecoratedBox(
           decoration: BoxDecoration(color: colors.surface),
-          child: _bare(context),
+          child: _player(context),
         ),
       ),
     );

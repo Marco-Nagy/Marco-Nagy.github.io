@@ -13,19 +13,24 @@ part 'project_video.g.dart';
 ///
 /// Deliberately its own entity rather than a [ShowcasePanel]: a panel's
 /// `format`/[MediaShot] machinery (device bezel, rotation, scale, offset) is
-/// modelled on a portrait phone screenshot, and a video is neither always
-/// portrait nor ever rotated or offset inside its frame. Reuses
-/// [DeviceFrameType] for [frame] rather than inventing a parallel enum,
-/// since the choice a video actually needs — "flat landscape", "in a laptop
-/// bezel", "in a phone bezel" — is the same bezel art the screenshot frame
-/// already draws; only [aspectRatio] gives each case a video-appropriate
-/// shape instead of the screenshot's own.
+/// modelled on a portrait phone screenshot, and none of it means anything for
+/// a video. A recording is not composed inside a frame — it is played at
+/// whatever shape it was recorded at.
+///
+/// That shape is [aspectRatio], stored per video rather than fixed for the
+/// entity or derived from a frame choice: one project routinely holds both a
+/// vertical screen recording and a landscape YouTube walkthrough, so the
+/// ratio has to differ between two videos sitting side by side in the same
+/// strip.
 @freezed
 abstract class ProjectVideo with _$ProjectVideo {
   const factory ProjectVideo({
     required String id,
     @Default(MediaRef()) MediaRef media,
-    @Default(DeviceFrameType.none) DeviceFrameType frame,
+
+    /// Width ÷ height. Defaults to a vertical 9:16 — the phone screen
+    /// recording most of these are.
+    @Default(9 / 16) double aspectRatio,
     @Default('') String captionEn,
     @Default('') String captionAr,
     @Default('') String subtitleEn,
@@ -38,20 +43,6 @@ abstract class ProjectVideo with _$ProjectVideo {
     @Default(0) int order,
   }) = _ProjectVideo;
 
-  const ProjectVideo._();
-
   factory ProjectVideo.fromJson(Map<String, dynamic> json) =>
       _$ProjectVideoFromJson(json);
-
-  /// Screen aspect ratio for [frame]. Laptop and phone bezels keep the same
-  /// proportions [DeviceFrame] already draws them at, so the card and the
-  /// bezel agree on the shape; `none` is a bare video with no bezel to match,
-  /// so it gets a video-native 16:9 rather than [DeviceFrameType.none]'s
-  /// screenshot meaning of a flat 9:16 portrait still.
-  double get aspectRatio => switch (frame) {
-    DeviceFrameType.laptop => 16 / 11.2,
-    DeviceFrameType.iphone => 9 / 19.5,
-    DeviceFrameType.samsungS => 9 / 19.5,
-    DeviceFrameType.none => 16 / 9,
-  };
 }

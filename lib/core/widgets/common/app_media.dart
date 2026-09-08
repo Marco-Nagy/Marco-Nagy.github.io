@@ -17,6 +17,8 @@ class AppMedia extends StatelessWidget {
     this.playing = true,
     this.allowPlatformView = true,
     this.preload = false,
+    this.controls = false,
+    this.onPlayingChanged,
     this.fit = BoxFit.cover,
     this.width,
     this.height,
@@ -40,6 +42,15 @@ class AppMedia extends StatelessWidget {
   /// a video opens far enough to show its first frame, and a GIF is drawn.
   /// Admin forms set this so a pasted URL turns into a visible thumbnail.
   final bool preload;
+
+  /// Draws a transport bar — play/pause, scrubber, elapsed clock, mute —
+  /// over a [MediaKind.videoFile]. Ignored by every other kind: a still has
+  /// nothing to transport, and a YouTube embed brings its own player chrome.
+  final bool controls;
+
+  /// Paired with [controls]: reports the viewer pressing play or pause, so
+  /// the parent that owns [playing] can update it.
+  final ValueChanged<bool>? onPlayingChanged;
 
   final BoxFit fit;
   final double? width;
@@ -80,6 +91,8 @@ class AppMedia extends StatelessWidget {
         media: media,
         playing: playing,
         preload: preload,
+        controls: controls,
+        onPlayingChanged: onPlayingChanged,
         poster: _poster(),
         fit: fit,
       ),

@@ -228,6 +228,7 @@ class LangKeys {
   static const String fieldCaptionPlacement = 'field_caption_placement';
   static const String fieldCaptionColor = 'field_caption_color';
   static const String fieldShotMedia = 'field_shot_media';
+  static const String fieldVideoAspectRatio = 'field_video_aspect_ratio';
   static const String fieldShotFrame = 'field_shot_frame';
   static const String fieldShotScale = 'field_shot_scale';
   static const String fieldShotRotation = 'field_shot_rotation';

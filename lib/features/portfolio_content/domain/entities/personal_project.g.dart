@@ -32,6 +32,11 @@ _PersonalProject _$PersonalProjectFromJson(
           ?.map((e) => ShowcasePanel.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <ShowcasePanel>[],
+  videos:
+      (json['videos'] as List<dynamic>?)
+          ?.map((e) => ProjectVideo.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <ProjectVideo>[],
   showcaseBackground: json['showcaseBackground'] == null
       ? const ShotBackground()
       : ShotBackground.fromJson(
@@ -73,6 +78,7 @@ Map<String, dynamic> _$PersonalProjectToJson(_PersonalProject instance) =>
       'categoryAr': instance.categoryAr,
       'cover': instance.cover,
       'panels': instance.panels,
+      'videos': instance.videos,
       'showcaseBackground': instance.showcaseBackground,
       'links': instance.links,
       'skills': instance.skills,

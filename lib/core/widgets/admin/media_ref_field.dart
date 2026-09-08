@@ -222,11 +222,22 @@ class _MediaRefFieldState extends State<MediaRefField> {
       _value.kind == MediaKind.videoFile &&
       MediaUrl.isUnsupportedHost(_value.videoUrl);
 
+  /// Set when what is in the box is not a URL or an asset path at all — a
+  /// half-pasted link, or a clipboard that brought a shell command with it.
+  /// Caught here rather than left to the player, which reports it from deep
+  /// inside the web engine as an "Illegal scheme character".
+  String? get _malformedSource {
+    if (_value.kind != MediaKind.videoFile) return null;
+    if (_value.videoUrl.trim().isEmpty) return null;
+    return MediaUrl.rejectionFor(_value.videoUrl);
+  }
+
   /// A hosted file has to be readable without signing in, because the player is
   /// given no credentials to sign in with.
   bool get _needsPublicLink =>
       _value.kind == MediaKind.videoFile &&
-      _value.videoUrl.trim().startsWith('http');
+      _value.videoUrl.trim().startsWith('http') &&
+      _malformedSource == null;
 
   String get _sourceHint => switch (_value.kind) {
     MediaKind.image => 'assets/images/projects/cover.png',
@@ -288,6 +299,11 @@ class _MediaRefFieldState extends State<MediaRefField> {
                       ),
                       color: colors.danger,
                     ),
+                  // The reason itself, not a translated stand-in: it names
+                  // what is wrong with this exact string, and this whole
+                  // surface is debug-only anyway.
+                  if (_malformedSource != null)
+                    _Note(text: _malformedSource!, color: colors.danger),
                   if (_normalized)
                     _Note(
                       text: context.translate(

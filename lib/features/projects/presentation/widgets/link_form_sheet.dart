@@ -25,12 +25,11 @@ class LinkFormSheet extends StatefulWidget {
   static Future<ProjectLink?> open(
     BuildContext context, {
     ProjectLink? link,
-  }) async {
-    final result = await AdminFormSheet.show<Object?>(
+  }) {
+    return AdminFormSheet.show<ProjectLink>(
       context,
       LinkFormSheet(link: link),
     );
-    return result is ProjectLink ? result : null;
   }
 
   @override
