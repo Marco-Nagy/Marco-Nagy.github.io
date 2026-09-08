@@ -42,6 +42,10 @@ class AdminFormScreen extends StatefulWidget {
   final WidgetBuilder? previewBuilder;
 
   /// Pushes any full-screen form, typed by what that form pops with.
+  ///
+  /// Cancel and the close button pop `null` rather than a "dismissed" flag:
+  /// `MaterialPageRoute<T>.didPop` casts the result to `T?`, so popping any
+  /// value that is not a [T] throws mid-pop and leaves the navigator locked.
   static Future<T?> open<T>(BuildContext context, Widget screen) {
     return Navigator.of(
       context,
@@ -72,7 +76,9 @@ class _AdminFormScreenState extends State<AdminFormScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          // Pops null, not `false`: the route is typed by what the form
+          // returns, so a bool result fails the cast in `didPop` — see [open].
+          onPressed: () => Navigator.of(context).pop(),
           icon: Icon(Icons.close_rounded, color: colors.onNavyMuted),
         ),
         title: Text(
@@ -105,7 +111,7 @@ class _AdminFormScreenState extends State<AdminFormScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
+                        onPressed: () => Navigator.of(context).pop(),
                         child: Text(
                           context.translate(LangKeys.adminCancel),
                           style: MyFonts.semi16.copyWith(

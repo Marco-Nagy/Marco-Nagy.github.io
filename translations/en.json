@@ -214,6 +214,7 @@
   "field_caption_placement": "Caption placement",
   "field_caption_color": "Caption colour",
   "field_shot_media": "Shot media",
+  "field_video_aspect_ratio": "Aspect ratio",
   "field_shot_frame": "Device frame",
   "field_shot_scale": "Scale",
   "field_shot_rotation": "Rotation",

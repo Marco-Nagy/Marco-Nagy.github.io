@@ -28,12 +28,11 @@ class BackgroundFormSheet extends StatefulWidget {
   static Future<ShotBackground?> open(
     BuildContext context, {
     required ShotBackground background,
-  }) async {
-    final result = await AdminFormSheet.show<Object?>(
+  }) {
+    return AdminFormSheet.show<ShotBackground>(
       context,
       BackgroundFormSheet(background: background),
     );
-    return result is ShotBackground ? result : null;
   }
 
   @override

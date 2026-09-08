@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../features/portfolio_content/domain/entities/media_ref.dart';
-import '../../../features/portfolio_content/domain/entities/media_shot.dart';
 import '../../../features/portfolio_content/domain/entities/project_video.dart';
 import '../../../features/portfolio_content/domain/entities/shot_background.dart';
 import '../../utils/extension/context_extensions.dart';
 import '../../utils/hex_color.dart';
 import '../common/app_media.dart';
 import '../common/safe_asset_image.dart';
-import 'device_frame.dart';
 import 'panel_caption.dart';
 import 'shot_background_view.dart';
-import 'tappable_video.dart';
 
-/// One video card: background, the recording, caption on top, tap to play.
+/// One video card: background, the recording, caption on top, and a transport
+/// bar to actually operate it.
 ///
-/// Shape follows [ProjectVideo.frame] rather than a fixed ratio: `none` is a
-/// bare landscape rectangle filling the card edge to edge, same as this
-/// widget always drew; `laptop`/`iphone`/`samsungS` instead draw the
-/// recording inside [DeviceFrame]'s bezel, the same art [ScreenshotCard]
-/// uses, sized to that bezel's own aspect ratio.
+/// Shape comes from [ProjectVideo.aspectRatio] rather than a fixed ratio, so a
+/// portrait screen recording and a landscape walkthrough each render at their
+/// own shape. The recording fills the card edge to edge; there is no device
+/// bezel here — that is [ScreenshotCard]'s job, and a bezel around a video
+/// only crops it to a shape it was never recorded at.
+///
+/// The card clips itself to [radius]. The strip above must not do that
+/// rounding on its behalf: one clip around a whole scrolling row rounds the
+/// *row*, which leaves every card square except whichever two happen to be at
+/// the ends, and moves the rounding around as the row scrolls.
 class VideoCard extends StatefulWidget {
   const VideoCard({
     required this.video,
@@ -41,64 +45,19 @@ class VideoCard extends StatefulWidget {
 
   final double width;
 
+  /// Matches the radius the other media strips round their cards to.
+  static const double radius = 20;
+
   @override
   State<VideoCard> createState() => _VideoCardState();
 }
 
 class _VideoCardState extends State<VideoCard> {
   /// Starts paused rather than autoplaying on arrival: a visitor scrolling
-  /// past should not have sound/motion start without asking.
+  /// past should not have sound and motion start without asking.
   bool _playing = false;
 
   MediaRef get _media => widget.video.media;
-
-  bool get _isVideoFile => _media.kind == MediaKind.videoFile;
-
-  bool get _isFramed => widget.video.frame != DeviceFrameType.none;
-
-  Widget _bare() {
-    // A YouTube embed already owns its own tap-to-start badge and ignores
-    // `playing` outright (see VideoEmbedView) — wrapping it in TappableVideo
-    // too would stack a second, disconnected badge on top of it. Only a
-    // video file responds to `playing`, so only that case gets the outer tap
-    // chrome. Not inside any rotated/clipped ancestor here (see VideoSection),
-    // so the platform view an embed needs is safe to allow.
-    final media = AppMedia(
-      media: _media,
-      fit: BoxFit.cover,
-      allowPlatformView: true,
-      playing: _playing,
-      fallback: const AssetPlaceholder(
-        icon: Icons.play_circle_outline_rounded,
-      ),
-    );
-
-    return _isVideoFile
-        ? TappableVideo(
-            playing: _playing,
-            onTap: () => setState(() => _playing = !_playing),
-            child: media,
-          )
-        : media;
-  }
-
-  Widget _framed() {
-    // DeviceFrame is a bezel, not a flat surface — it always renders its own
-    // AppMedia with allowPlatformView false (see its own doc comment), so a
-    // YouTube embed shown inside one rests on its poster; only a video file
-    // actually plays there, same restriction ScreenshotCard already lives
-    // with for a screen recording inside a frame.
-    return TappableVideo(
-      playing: _playing,
-      onTap: () => setState(() => _playing = !_playing),
-      child: DeviceFrame(
-        image: _media,
-        frame: widget.video.frame,
-        width: widget.width,
-        playing: _playing,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,22 +68,52 @@ class _VideoCardState extends State<VideoCard> {
         width: panelWidth,
         child: AspectRatio(
           aspectRatio: widget.video.aspectRatio,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              ShotBackgroundView(background: widget.background),
-              _isFramed ? _framed() : _bare(),
-              PanelCaption(
-                caption: widget.caption,
-                subtitle: widget.subtitle,
-                placement: widget.video.captionPlacement,
-                color: HexColor.parse(
-                  widget.video.captionColorHex,
-                  context.colors.onNavy,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(VideoCard.radius.r),
+            child: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                ShotBackgroundView(background: widget.background),
+
+                // A YouTube embed carries its own player chrome and ignores
+                // `playing` outright (see VideoEmbedView), so `controls` is
+                // left off for it rather than stacking a second, disconnected
+                // transport bar over YouTube's own. Nothing here sits inside a
+                // rotated or clipped ancestor (see VideoSection), so the
+                // platform view an embed needs is safe to allow.
+                AppMedia(
+                  media: _media,
+                  fit: BoxFit.cover,
+                  allowPlatformView: true,
+                  playing: _playing,
+                  // Opens the file far enough to rest on its first frame. A
+                  // local video has no other thumbnail — nothing can produce
+                  // a still without decoding it — so without this the card
+                  // sits on the fallback icon until someone presses play, and
+                  // reads as a broken asset. Affordable here because a detail
+                  // page holds a handful of videos; the projects list, which
+                  // would open one decoder per row, still leaves it off.
+                  preload: true,
+                  controls: _media.kind == MediaKind.videoFile,
+                  onPlayingChanged: (playing) =>
+                      setState(() => _playing = playing),
+                  fallback: const AssetPlaceholder(
+                    icon: Icons.play_circle_outline_rounded,
+                  ),
                 ),
-                panelWidth: panelWidth,
-              ),
-            ],
+
+                PanelCaption(
+                  caption: widget.caption,
+                  subtitle: widget.subtitle,
+                  placement: widget.video.captionPlacement,
+                  color: HexColor.parse(
+                    widget.video.captionColorHex,
+                    context.colors.onNavy,
+                  ),
+                  panelWidth: panelWidth,
+                ),
+              ],
+            ),
           ),
         ),
       ),

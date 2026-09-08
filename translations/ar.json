@@ -214,6 +214,7 @@
   "field_caption_placement": "مكان التعليق",
   "field_caption_color": "لون التعليق",
   "field_shot_media": "ميديا اللقطة",
+  "field_video_aspect_ratio": "نسبة الأبعاد",
   "field_shot_frame": "إطار الجهاز",
   "field_shot_scale": "الحجم",
   "field_shot_rotation": "الدوران",

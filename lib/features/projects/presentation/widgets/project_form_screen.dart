@@ -46,18 +46,14 @@ class ProjectFormScreen extends StatefulWidget {
   final PersonalProject? project;
 
   /// Opens the screen and resolves to the built project, or null if dismissed.
-  ///
-  /// Typed `Object?` because [AdminFormScreen] pops `false` on cancel —
-  /// typing it `PersonalProject` would throw on that pop.
   static Future<PersonalProject?> open(
     BuildContext context, {
     PersonalProject? project,
-  }) async {
-    final result = await AdminFormScreen.open<Object?>(
+  }) {
+    return AdminFormScreen.open<PersonalProject>(
       context,
       ProjectFormScreen(project: project),
     );
-    return result is PersonalProject ? result : null;
   }
 
   @override
@@ -244,16 +240,24 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     final caption = panel.captionEn.trim();
     if (caption.isNotEmpty) return caption;
     // The section a panel appears in follows `mediaLayer`, not `format` (a
-    // video panel keeps `format: screenshot` for its aspect ratio) — so the
-    // count label must read from `mediaLayer` too, or a video row would say
+    // GIF keeps `format: screenshot` for its aspect ratio) — so the count
+    // label must read from `mediaLayer` too, or a GIF row would say
     // "screenshot".
     final kind = switch (panel.mediaLayer) {
       ProjectMediaLayer.featureGraphic => 'feature graphic',
       ProjectMediaLayer.screenshots => 'screenshot',
-      ProjectMediaLayer.video => 'video',
       ProjectMediaLayer.gif => 'gif',
     };
     return '$shots × $kind';
+  }
+
+  /// A video has no shots to count, so its fallback is its shape rather than
+  /// the panel rows' "n × kind".
+  String _videoSubtitle(ProjectVideo video) {
+    final caption = video.captionEn.trim();
+    if (caption.isNotEmpty) return caption;
+    final kind = video.media.kind == MediaKind.videoEmbed ? 'youtube' : 'video';
+    return '$kind · ${video.aspectRatio.toStringAsFixed(2)}';
   }
 
   List<ShowcasePanel> _panelsFor(ProjectMediaLayer layer) =>
@@ -307,22 +311,23 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     );
   }
 
+  /// Reads `_videos` directly rather than filtering `_panels`: a video is
+  /// never a panel (see [ProjectVideo]), so there is nothing to filter.
   Widget _videoSection() {
-    final inLayer = _panelsFor(ProjectMediaLayer.video);
     return AdminSubList(
       label: context.translate(LangKeys.mediaLayerVideo),
       addLabel: context.translate(LangKeys.adminAddVideo),
       items: <AdminSubListItem>[
-        for (var i = 0; i < inLayer.length; i++)
+        for (var i = 0; i < _videos.length; i++)
           AdminSubListItem(
-            title: '${i + 1}. ${inLayer[i].id}',
-            subtitle: _panelSubtitle(inLayer[i]),
+            title: '${i + 1}. ${_videos[i].id}',
+            subtitle: _videoSubtitle(_videos[i]),
             onEdit: () =>
-                _savePanel(VideoFormScreen.open(context, panel: inLayer[i])),
-            onDelete: () => _deletePanel(inLayer[i].id),
+                _saveVideo(VideoFormScreen.open(context, video: _videos[i])),
+            onDelete: () => _deleteVideo(_videos[i].id),
           ),
       ],
-      onAdd: () => _savePanel(VideoFormScreen.open(context)),
+      onAdd: () => _saveVideo(VideoFormScreen.open(context)),
     );
   }
 
