@@ -1,6 +1,7 @@
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/custom_section_item.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/portfolio_bundle.dart';
 import '../../domain/entities/pricing_add_on.dart';
 import '../../domain/entities/pricing_package.dart';
 import '../../domain/entities/section_definition.dart';
@@ -18,6 +19,25 @@ abstract class PortfolioLocalDataSource {
 
   /// Discards local edits and restores the seeded content.
   Future<void> resetToSeed();
+
+  // Whole-store access --------------------------------------------------------
+  //
+  // The per-entity getters above stay the app's day-to-day interface. These
+  // two exist because Firestore stores all of it as one document: one read
+  // per visitor instead of ~51, and one atomic write per admin save instead
+  // of nine that could tear.
+
+  /// Composes every stored collection, plus the cached version markers, into
+  /// one bundle. Reads from the same in-memory caches the getters use, so
+  /// calling this is not a fresh decode of the whole store.
+  PortfolioBundle readAll();
+
+  /// Replaces the entire local store with [bundle] and records its
+  /// [PortfolioBundle.contentVersion] and [PortfolioBundle.schemaVersion].
+  ///
+  /// Custom-section keys absent from [bundle] are swept, so a section deleted
+  /// remotely does not survive locally as an orphaned key.
+  Future<void> writeAll(PortfolioBundle bundle);
 
   // Built-in section content.
 

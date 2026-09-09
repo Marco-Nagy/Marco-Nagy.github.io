@@ -2,6 +2,7 @@ import '../../../../core/common/data_result.dart';
 import '../entities/certificate.dart';
 import '../entities/custom_section_item.dart';
 import '../entities/personal_project.dart';
+import '../entities/portfolio_bundle.dart';
 import '../entities/pricing_add_on.dart';
 import '../entities/pricing_package.dart';
 import '../entities/section_definition.dart';
@@ -87,4 +88,11 @@ abstract class PortfolioRepo {
   );
 
   Future<DataResult<void>> resetToSeed();
+
+  // Whole-store access.
+
+  /// Every collection as one [PortfolioBundle] — the shape Firestore stores
+  /// and the admin exports. Reads the same in-memory caches the per-entity
+  /// getters use, so this is not a fresh decode of the whole store.
+  Future<DataResult<PortfolioBundle>> readBundle();
 }

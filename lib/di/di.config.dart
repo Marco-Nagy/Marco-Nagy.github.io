@@ -26,10 +26,16 @@ import '../features/portfolio_content/data/data_sources/portfolio_local_data_sou
     as _i275;
 import '../features/portfolio_content/data/data_sources/portfolio_local_data_source_impl.dart'
     as _i420;
+import '../features/portfolio_content/data/data_sources/portfolio_remote_data_source.dart'
+    as _i109;
+import '../features/portfolio_content/data/data_sources/portfolio_remote_data_source_impl.dart'
+    as _i811;
 import '../features/portfolio_content/data/repositories/portfolio_repo_impl.dart'
     as _i432;
 import '../features/portfolio_content/domain/repositories/portfolio_repo.dart'
     as _i1023;
+import '../features/portfolio_content/domain/use_cases/bundle_use_case.dart'
+    as _i120;
 import '../features/portfolio_content/domain/use_cases/certificates_use_case.dart'
     as _i478;
 import '../features/portfolio_content/domain/use_cases/custom_section_use_case.dart'
@@ -64,6 +70,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.sharedPrefHelper,
     );
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
+    gh.lazySingleton<_i109.PortfolioRemoteDataSource>(
+      () => _i811.PortfolioRemoteDataSourceImpl(),
+    );
     gh.factory<_i693.AppCubit>(
       () => _i693.AppCubit(gh<_i668.SharedPrefHelper>()),
     );
@@ -75,6 +84,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1023.PortfolioRepo>(
       () => _i432.PortfolioRepoImpl(gh<_i275.PortfolioLocalDataSource>()),
+    );
+    gh.factory<_i120.BundleUseCase>(
+      () => _i120.BundleUseCase(gh<_i1023.PortfolioRepo>()),
     );
     gh.factory<_i478.CertificatesUseCase>(
       () => _i478.CertificatesUseCase(gh<_i1023.PortfolioRepo>()),

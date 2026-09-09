@@ -4,6 +4,7 @@ import '../../../../core/common/data_result.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/custom_section_item.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/portfolio_bundle.dart';
 import '../../domain/entities/pricing_add_on.dart';
 import '../../domain/entities/pricing_package.dart';
 import '../../domain/entities/section_definition.dart';
@@ -326,4 +327,12 @@ class PortfolioRepoImpl implements PortfolioRepo {
   @override
   Future<DataResult<void>> resetToSeed() =>
       _guard(_local.resetToSeed, 'Could not restore the seeded content');
+
+  // Whole-store access --------------------------------------------------------
+
+  @override
+  Future<DataResult<PortfolioBundle>> readBundle() => _guard(
+    () async => _local.readAll(),
+    'Could not read the content bundle from local storage',
+  );
 }

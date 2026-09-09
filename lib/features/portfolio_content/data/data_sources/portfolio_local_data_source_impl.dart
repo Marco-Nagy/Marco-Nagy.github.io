@@ -7,6 +7,7 @@ import '../../../../core/services/shared_preference/shared_preference_helper.dar
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/custom_section_item.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/portfolio_bundle.dart';
 import '../../domain/entities/pricing_add_on.dart';
 import '../../domain/entities/pricing_package.dart';
 import '../../domain/entities/section_definition.dart';
@@ -88,6 +89,81 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     await saveTechBadges(SeedSkills.techBadges);
     await saveSections(SeedSections.all);
     await _prefs.setBool(key: SharedPrefKeys.seeded, value: true);
+  }
+
+  // Whole-store access --------------------------------------------------------
+
+  @override
+  PortfolioBundle readAll() {
+    return PortfolioBundle(
+      projects: getProjects(),
+      certificates: getCertificates(),
+      workHistory: getWorkHistory(),
+      pricingPackages: getPricingPackages(),
+      pricingAddOns: getPricingAddOns(),
+      siteContent: getSiteContent(),
+      skillGroups: getSkillGroups(),
+      techBadges: getTechBadges(),
+      sections: getSections(),
+      customItems: _readAllCustomItems(),
+      schemaVersion: _prefs.containPreference(key: SharedPrefKeys.schemaVersion)
+          ? _prefs.getInt(key: SharedPrefKeys.schemaVersion)
+          : PortfolioBundle.currentSchemaVersion,
+      contentVersion: _prefs.getInt(key: SharedPrefKeys.contentVersion),
+    );
+  }
+
+  /// Sweeps every `portfolio_custom_items_*` key rather than deriving the ids
+  /// from [getSections]: a section row and its items are separate keys, so
+  /// reading from the sections list would silently drop items whose section
+  /// row is missing — exactly the case worth surfacing rather than hiding.
+  Map<String, List<CustomSectionItem>> _readAllCustomItems() {
+    final prefix = SharedPrefKeys.customSectionItemsPrefix;
+    final result = <String, List<CustomSectionItem>>{};
+    for (final key in _prefs.keysWithPrefix(prefix)) {
+      final sectionId = key.substring(prefix.length);
+      if (sectionId.isEmpty) continue;
+      final items = getCustomItems(sectionId);
+      if (items.isNotEmpty) result[sectionId] = items;
+    }
+    return result;
+  }
+
+  @override
+  Future<void> writeAll(PortfolioBundle bundle) async {
+    // Sweep first: a custom section deleted upstream must not survive here as
+    // an orphaned key that `readAll` would then hand back on the next export.
+    for (final key in _prefs.keysWithPrefix(
+      SharedPrefKeys.customSectionItemsPrefix,
+    )) {
+      await _prefs.removePreference(key: key);
+    }
+    _customItemsCache.clear();
+
+    await saveProjects(bundle.projects);
+    await saveCertificates(bundle.certificates);
+    await saveWorkHistory(bundle.workHistory);
+    await savePricingPackages(bundle.pricingPackages);
+    await savePricingAddOns(bundle.pricingAddOns);
+    await saveSiteContent(bundle.siteContent);
+    await saveSkillGroups(bundle.skillGroups);
+    await saveTechBadges(bundle.techBadges);
+    await saveSections(bundle.sections);
+    for (final entry in bundle.customItems.entries) {
+      await saveCustomItems(entry.key, entry.value);
+    }
+
+    // Written last, so an interrupted write leaves the version *behind* the
+    // content rather than ahead of it. A stale-low version costs one extra
+    // fetch; a stale-high one would pin the visitor to a half-written cache.
+    await _prefs.setInt(
+      key: SharedPrefKeys.schemaVersion,
+      value: bundle.schemaVersion,
+    );
+    await _prefs.setInt(
+      key: SharedPrefKeys.contentVersion,
+      value: bundle.contentVersion,
+    );
   }
 
   // Shared JSON helpers -------------------------------------------------------

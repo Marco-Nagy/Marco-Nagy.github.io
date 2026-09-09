@@ -141,6 +141,17 @@ class LangKeys {
   static const String adminSaved = 'admin_saved';
   static const String adminDeleted = 'admin_deleted';
 
+  // Admin speed-dial. These label a widget rather than describe content, so
+  // they belong here and not in SiteContent — see decision D4 in
+  // docs/firebase-migration-plan.md.
+  static const String adminMenu = 'admin_menu';
+  static const String adminMenuClose = 'admin_menu_close';
+  static const String adminExport = 'admin_export';
+  static const String adminExportCopied = 'admin_export_copied';
+  static const String adminExportFailed = 'admin_export_failed';
+  static const String adminExportOversize = 'admin_export_oversize';
+  static const String adminExportEmbedded = 'admin_export_embedded';
+
   static const String formAddProject = 'form_add_project';
   static const String formEditProject = 'form_edit_project';
   static const String formAddCertificate = 'form_add_certificate';

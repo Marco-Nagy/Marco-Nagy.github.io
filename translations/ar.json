@@ -133,6 +133,13 @@
   "admin_reset_seed_confirm": "هل تريد تجاهل كل التعديلات المحلية واستعادة المحتوى الأصلي؟",
   "admin_saved": "تم الحفظ",
   "admin_deleted": "تم الحذف",
+  "admin_menu": "الإدارة",
+  "admin_menu_close": "إغلاق قائمة الإدارة",
+  "admin_export": "تصدير المحتوى JSON",
+  "admin_export_copied": "تم نسخ محتوى JSON إلى الحافظة",
+  "admin_export_failed": "تعذّر تصدير المحتوى",
+  "admin_export_oversize": "أكبر من أن يُنشر — حد Firestore هو 1024 كيلوبايت للمستند",
+  "admin_export_embedded": "صور ما زالت مضمّنة كـ base64؛ ارفعها قبل النشر",
 
   "form_add_project": "إضافة مشروع",
   "form_edit_project": "تعديل مشروع",

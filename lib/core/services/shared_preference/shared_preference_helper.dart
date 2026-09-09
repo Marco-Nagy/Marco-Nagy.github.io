@@ -37,6 +37,13 @@ class SharedPrefHelper {
   Future<bool> setBool({required String key, required bool value}) =>
       _requirePrefs.setBool(key, value);
 
+  /// Defaults to 0 so a never-written content version compares as older than
+  /// anything Firestore reports, forcing the first fetch.
+  int getInt({required String key}) => _requirePrefs.getInt(key) ?? 0;
+
+  Future<bool> setInt({required String key, required int value}) =>
+      _requirePrefs.setInt(key, value);
+
   Future<bool> removePreference({required String key}) =>
       _requirePrefs.remove(key);
 
