@@ -1,16 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_certificates.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_pricing.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_projects.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_sections.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_site_content.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_skills.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_work_history.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/certificate.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/custom_section_item.dart';
-import 'package:marco_portfolio/features/portfolio_content/domain/entities/image_ref.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/personal_project.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/portfolio_bundle.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/pricing_add_on.dart';
@@ -20,6 +12,8 @@ import 'package:marco_portfolio/features/portfolio_content/domain/entities/site_
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/skill_group_entity.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/tech_badge_entity.dart';
 import 'package:marco_portfolio/features/portfolio_content/domain/entities/work_history_entry.dart';
+
+import 'sample_bundle.dart';
 
 /// Serialisation is the one thing in this migration that can destroy content
 /// silently. A field that does not survive `toJson`/`fromJson` does not throw —
@@ -31,9 +25,10 @@ import 'package:marco_portfolio/features/portfolio_content/domain/entities/work_
 /// a `DateTime`, a `Color`, a raw enum — which a map-only comparison passes
 /// straight over. freezed's structural `==` then makes the assertion free.
 ///
-/// This lands with Phase 0 deliberately: Phase 1 deletes `data/seed/`, and
-/// these seeds are the only realistic content the round trip can be proven
-/// against before they go.
+/// Fixtures come from `sample_bundle.dart` with every field, including nested
+/// ones (a project's panels/shots/links), set away from its default — a
+/// default-valued fixture would pass even if a field never serialised, because
+/// the decoded default and the missing-key default look identical.
 void main() {
   /// Encode → decode → compare, the way Firestore will actually treat it.
   void roundTrips<T>(
@@ -50,144 +45,81 @@ void main() {
     });
   }
 
-  /// Runs [roundTrips] over a whole seeded collection, so every real record is
-  /// covered rather than one hand-picked representative.
-  void eachRoundTrips<T>(
-    String label,
-    List<T> values,
-    Map<String, dynamic> Function(T) toJson,
-    T Function(Map<String, dynamic>) fromJson,
-  ) {
-    test(label, () {
-      expect(values, isNotEmpty, reason: 'seed is empty, so this proves nothing');
-      for (var i = 0; i < values.length; i++) {
-        final decoded = fromJson(
-          json.decode(json.encode(toJson(values[i]))) as Map<String, dynamic>,
-        );
-        expect(decoded, equals(values[i]), reason: '$label[$i]');
-      }
-    });
-  }
-
   group('entity round trip', () {
-    eachRoundTrips<PersonalProject>(
-      'projects',
-      SeedProjects.all,
+    roundTrips<PersonalProject>(
+      'project (nested panels, shots, videos, links)',
+      sampleProject(),
       (p) => p.toJson(),
       PersonalProject.fromJson,
     );
 
-    eachRoundTrips<Certificate>(
-      'certificates',
-      SeedCertificates.all,
+    roundTrips<Certificate>(
+      'certificate',
+      sampleCertificate(),
       (c) => c.toJson(),
       Certificate.fromJson,
     );
 
-    eachRoundTrips<WorkHistoryEntry>(
-      'work history',
-      SeedWorkHistory.all,
+    roundTrips<WorkHistoryEntry>(
+      'work history entry',
+      sampleWorkHistoryEntry(),
       (e) => e.toJson(),
       WorkHistoryEntry.fromJson,
     );
 
-    eachRoundTrips<PricingPackage>(
-      'pricing packages',
-      SeedPricing.packages,
+    roundTrips<PricingPackage>(
+      'pricing package',
+      samplePricingPackage(),
       (p) => p.toJson(),
       PricingPackage.fromJson,
     );
 
-    eachRoundTrips<PricingAddOn>(
-      'pricing add-ons',
-      SeedPricing.addOns,
+    roundTrips<PricingAddOn>(
+      'pricing add-on',
+      samplePricingAddOn(),
       (a) => a.toJson(),
       PricingAddOn.fromJson,
     );
 
-    eachRoundTrips<SkillGroupEntity>(
-      'skill groups',
-      SeedSkills.groups,
+    roundTrips<SkillGroupEntity>(
+      'skill group',
+      sampleSkillGroup(),
       (g) => g.toJson(),
       SkillGroupEntity.fromJson,
     );
 
-    eachRoundTrips<TechBadgeEntity>(
-      'tech badges',
-      SeedSkills.techBadges,
+    roundTrips<TechBadgeEntity>(
+      'tech badge',
+      sampleTechBadge(),
       (b) => b.toJson(),
       TechBadgeEntity.fromJson,
     );
 
-    eachRoundTrips<SectionDefinition>(
-      'sections',
-      SeedSections.all,
+    roundTrips<SectionDefinition>(
+      'section definition',
+      sampleSection(),
       (s) => s.toJson(),
       SectionDefinition.fromJson,
     );
 
     roundTrips<SiteContent>(
       'site content (43 fields)',
-      SeedSiteContent.value,
+      sampleSiteContent(),
       (s) => s.toJson(),
       SiteContent.fromJson,
     );
 
-    // No seed exists for custom sections — they are created in debug — so this
-    // one is built by hand, with every field set away from its default. A
-    // default-valued fixture would pass even if the field never serialised.
     roundTrips<CustomSectionItem>(
       'custom section item',
-      const CustomSectionItem(
-        id: 'item-1',
-        sectionId: 'section-1',
-        titleEn: 'Title',
-        titleAr: 'عنوان',
-        subtitleEn: 'Subtitle',
-        subtitleAr: 'عنوان فرعي',
-        descriptionEn: 'Description',
-        descriptionAr: 'وصف',
-        bulletsEn: <String>['one', 'two'],
-        bulletsAr: <String>['واحد', 'اثنان'],
-        tagEn: 'Tag',
-        tagAr: 'وسم',
-        dateStart: '2024-01',
-        dateEnd: '2025-06',
-        year: '2025',
-        images: <ImageRef>[ImageRef()],
-        accentHex: 'FF00AA',
-        linkUrl: 'https://example.com',
-        order: 3,
-      ),
+      sampleCustomSectionItem(),
       (i) => i.toJson(),
       CustomSectionItem.fromJson,
     );
   });
 
   group('bundle round trip', () {
-    /// The whole store, exactly as Phase 1 will export it to bootstrap
-    /// Firestore. If this passes, that upload cannot lose a field.
-    PortfolioBundle seeded() => PortfolioBundle(
-      projects: SeedProjects.all,
-      certificates: SeedCertificates.all,
-      workHistory: SeedWorkHistory.all,
-      pricingPackages: SeedPricing.packages,
-      pricingAddOns: SeedPricing.addOns,
-      siteContent: SeedSiteContent.value,
-      skillGroups: SeedSkills.groups,
-      techBadges: SeedSkills.techBadges,
-      sections: SeedSections.all,
-      customItems: const <String, List<CustomSectionItem>>{
-        'section-1': <CustomSectionItem>[
-          CustomSectionItem(id: 'i1', sectionId: 'section-1', titleEn: 'One'),
-        ],
-      },
-      contentVersion: 7,
-      updatedAt: '2026-09-09T18:37:40.000Z',
-    );
-
     test('survives encode/decode intact', () {
-      final original = seeded();
+      final original = sampleBundle(contentVersion: 7);
       final decoded = PortfolioBundle.fromJson(
         json.decode(json.encode(original.toJson())) as Map<String, dynamic>,
       );
@@ -196,19 +128,22 @@ void main() {
 
     test('carries the version markers the read path branches on', () {
       final decoded = PortfolioBundle.fromJson(
-        json.decode(json.encode(seeded().toJson())) as Map<String, dynamic>,
+        json.decode(
+              json.encode(sampleBundle(contentVersion: 7).toJson()),
+            )
+            as Map<String, dynamic>,
       );
       expect(decoded.contentVersion, 7);
       expect(decoded.schemaVersion, PortfolioBundle.currentSchemaVersion);
-      expect(decoded.updatedAt, '2026-09-09T18:37:40.000Z');
     });
 
     test('keeps the nested custom-items map keyed by section', () {
       final decoded = PortfolioBundle.fromJson(
-        json.decode(json.encode(seeded().toJson())) as Map<String, dynamic>,
+        json.decode(json.encode(sampleBundle().toJson()))
+            as Map<String, dynamic>,
       );
       expect(decoded.customItems.keys, <String>['section-1']);
-      expect(decoded.customItems['section-1']!.single.titleEn, 'One');
+      expect(decoded.customItems['section-1']!.single.titleEn, 'Title');
     });
 
     test('an empty bundle is still valid JSON in both directions', () {

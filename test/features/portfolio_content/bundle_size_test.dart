@@ -1,14 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_certificates.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_pricing.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_projects.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_sections.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_site_content.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_skills.dart';
-import 'package:marco_portfolio/features/portfolio_content/data/seed/seed_work_history.dart';
-import 'package:marco_portfolio/features/portfolio_content/domain/entities/portfolio_bundle.dart';
+
+import 'sample_bundle.dart';
 
 /// Firestore refuses any document over 1 MiB. The bundle is one document, so
 /// that ceiling is a hard correctness boundary, not a performance nicety: an
@@ -19,6 +13,13 @@ import 'package:marco_portfolio/features/portfolio_content/domain/entities/portf
 /// `ImageSourceKind.embedded` is meant to be a debug-time convenience that is
 /// pinned to an asset or uploaded before publishing, and nothing structurally
 /// prevents one from surviving into an export.
+///
+/// This measures the one-item-per-collection fixture from `sample_bundle.dart`,
+/// not real production content — real content now lives in Firestore, not in
+/// this repo, so there is nothing to measure it against here any more. What
+/// this guards is the *shape's* own overhead (field names, nesting, version
+/// markers) and the no-embedded-image invariant, both of which a schema change
+/// can break regardless of how much real content exists.
 void main() {
   /// Firestore's own limit, in bytes.
   const int firestoreDocumentLimit = 1048576;
@@ -27,24 +28,12 @@ void main() {
   /// overhead, which is not counted by a plain UTF-8 length.
   const int budget = 900 * 1024;
 
-  PortfolioBundle seeded() => PortfolioBundle(
-    projects: SeedProjects.all,
-    certificates: SeedCertificates.all,
-    workHistory: SeedWorkHistory.all,
-    pricingPackages: SeedPricing.packages,
-    pricingAddOns: SeedPricing.addOns,
-    siteContent: SeedSiteContent.value,
-    skillGroups: SeedSkills.groups,
-    techBadges: SeedSkills.techBadges,
-    sections: SeedSections.all,
-  );
-
   int bytesOf(Object? value) => utf8.encode(json.encode(value)).length;
 
   String kb(int bytes) => '${(bytes / 1024).toStringAsFixed(1)} KB';
 
   test('reports where the weight actually is', () {
-    final map = seeded().toJson();
+    final map = sampleBundle().toJson();
     final sizes = <String, int>{
       for (final entry in map.entries) entry.key: bytesOf(entry.value),
     };
@@ -52,27 +41,27 @@ void main() {
       ..sort((a, b) => b.value.compareTo(a.value));
 
     // ignore: avoid_print
-    print('--- seeded bundle: ${kb(bytesOf(map))} total ---');
-    for (final entry in ordered.where((e) => e.value > 64)) {
+    print('--- sample bundle (one item per collection): ${kb(bytesOf(map))} total ---');
+    for (final entry in ordered.where((e) => e.value > 16)) {
       // ignore: avoid_print
       print('${entry.key.padRight(18)} ${kb(entry.value)}');
     }
   });
 
-  test('the seeded bundle fits in a Firestore document', () {
-    final bytes = bytesOf(seeded().toJson());
+  test('the sample bundle fits well inside a Firestore document', () {
+    final bytes = bytesOf(sampleBundle().toJson());
     expect(
       bytes,
       lessThan(budget),
       reason:
           'Serialized bundle is ${kb(bytes)}, over the ${kb(budget)} budget '
-          '(Firestore hard limit ${kb(firestoreDocumentLimit)}). Run the '
-          'breakdown test above to see which collection carries the weight.',
+          '(Firestore hard limit ${kb(firestoreDocumentLimit)}). If real '
+          'production content approaches this, check for base64 images.',
     );
   });
 
   test('no base64 image bytes reach the bundle', () {
-    final encoded = json.encode(seeded().toJson());
+    final encoded = json.encode(sampleBundle().toJson());
     expect(
       encoded.contains('"embedded"'),
       isFalse,

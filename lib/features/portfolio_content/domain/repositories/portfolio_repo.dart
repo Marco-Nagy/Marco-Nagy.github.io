@@ -87,8 +87,6 @@ abstract class PortfolioRepo {
     String itemId,
   );
 
-  Future<DataResult<void>> resetToSeed();
-
   // Whole-store access.
 
   /// Every collection as one [PortfolioBundle] — the shape Firestore stores
@@ -104,6 +102,24 @@ abstract class PortfolioRepo {
   ///
   /// Never fails in a way a visitor sees: an unreachable Firestore, a missing
   /// document and a stale cache all resolve to "render what we have", falling
-  /// back through cache, then the committed JSON asset, then the seeds.
+  /// back through cache, then the committed JSON asset (D3), then whatever the
+  /// local store holds — empty, on a device that has never synced at all.
   Future<DataResult<PortfolioBundle>> syncFromRemote();
+
+  /// Discards local edits and reloads the last published content — what the
+  /// admin's "Reset" action means now that content lives in Firestore rather
+  /// than in hardcoded seed constants.
+  ///
+  /// Unlike [syncFromRemote], this always re-fetches: an admin's unpublished
+  /// local edit never changes the cached [PortfolioBundle.contentVersion] (only
+  /// a publish does), so a version-matches-cache check would treat "identical
+  /// version, different content" as nothing to do and silently keep the edit —
+  /// exactly the case this exists to undo.
+  ///
+  /// Falls back to the committed JSON asset if Firestore is unreachable, and
+  /// fails outright — leaving the current local content untouched — only when
+  /// neither is available. Untouched is the right failure mode: there is
+  /// nothing trustworthy to replace it with, and wiping it would be worse than
+  /// refusing.
+  Future<DataResult<PortfolioBundle>> resetToPublished();
 }

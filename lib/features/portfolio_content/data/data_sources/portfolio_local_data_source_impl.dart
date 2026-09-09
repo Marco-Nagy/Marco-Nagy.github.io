@@ -16,13 +16,6 @@ import '../../domain/entities/site_content.dart';
 import '../../domain/entities/skill_group_entity.dart';
 import '../../domain/entities/tech_badge_entity.dart';
 import '../../domain/entities/work_history_entry.dart';
-import '../seed/seed_certificates.dart';
-import '../seed/seed_pricing.dart';
-import '../seed/seed_projects.dart';
-import '../seed/seed_sections.dart';
-import '../seed/seed_site_content.dart';
-import '../seed/seed_skills.dart';
-import '../seed/seed_work_history.dart';
 import 'portfolio_local_data_source.dart';
 
 @LazySingleton(as: PortfolioLocalDataSource)
@@ -62,35 +55,6 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   List<SectionDefinition>? _sectionsCache;
   final Map<String, List<CustomSectionItem>> _customItemsCache =
       <String, List<CustomSectionItem>>{};
-
-  @override
-  Future<void> seedIfEmpty() async {
-    if (_prefs.getBool(key: SharedPrefKeys.seeded)) return;
-    await resetToSeed();
-  }
-
-  @override
-  Future<void> resetToSeed() async {
-    // Custom sections are a debug-time creation, so a reset clears them
-    // entirely rather than trying to merge them with the seed.
-    for (final key in _prefs.keysWithPrefix(
-      SharedPrefKeys.customSectionItemsPrefix,
-    )) {
-      await _prefs.removePreference(key: key);
-    }
-    _customItemsCache.clear();
-
-    await saveProjects(SeedProjects.all);
-    await saveCertificates(SeedCertificates.all);
-    await saveWorkHistory(SeedWorkHistory.all);
-    await savePricingPackages(SeedPricing.packages);
-    await savePricingAddOns(SeedPricing.addOns);
-    await saveSiteContent(SeedSiteContent.value);
-    await saveSkillGroups(SeedSkills.groups);
-    await saveTechBadges(SeedSkills.techBadges);
-    await saveSections(SeedSections.all);
-    await _prefs.setBool(key: SharedPrefKeys.seeded, value: true);
-  }
 
   // Whole-store access --------------------------------------------------------
 
@@ -326,10 +290,15 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   SiteContent getSiteContent() {
     final cached = _siteContentCache;
     if (cached != null) return cached;
+    // No seed fallback any more: an absent key means the startup sync in
+    // main() has not populated it yet (or Firestore has never been reached),
+    // not that this device is new. `const SiteContent()` — every field
+    // blank — is what chrome renders in that gap; see SiteContentCubit
+    // (Phase 3) for how call sites are meant to tolerate that.
     final content = _decodeObject(
       SharedPrefKeys.siteContent,
       SiteContent.fromJson,
-      SeedSiteContent.value,
+      const SiteContent(),
     );
     _siteContentCache = content;
     return content;

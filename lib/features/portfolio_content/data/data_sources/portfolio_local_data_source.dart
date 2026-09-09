@@ -13,13 +13,6 @@ import '../../domain/entities/work_history_entry.dart';
 /// The app's only persistence contract. Reads are synchronous because
 /// shared_preferences keeps everything in memory once loaded; writes are async.
 abstract class PortfolioLocalDataSource {
-  /// Writes seed content on first launch only. Once the seed marker is set,
-  /// deleting every item in debug is respected rather than undone.
-  Future<void> seedIfEmpty();
-
-  /// Discards local edits and restores the seeded content.
-  Future<void> resetToSeed();
-
   // Whole-store access --------------------------------------------------------
   //
   // The per-entity getters above stay the app's day-to-day interface. These

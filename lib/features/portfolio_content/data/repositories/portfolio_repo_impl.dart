@@ -332,10 +332,6 @@ class PortfolioRepoImpl implements PortfolioRepo {
     return _sorted(next, (i) => i.order);
   }, 'Could not delete the item');
 
-  @override
-  Future<DataResult<void>> resetToSeed() =>
-      _guard(_local.resetToSeed, 'Could not restore the seeded content');
-
   // Whole-store access --------------------------------------------------------
 
   @override
@@ -349,7 +345,8 @@ class PortfolioRepoImpl implements PortfolioRepo {
   /// 1. Remote says the cache is stale -> fetch, cache, use it.
   /// 2. Remote agrees with the cache, or cannot be reached -> use the cache.
   /// 3. No cache either -> the committed JSON asset (D3).
-  /// 4. Not even that -> whatever the store holds, empty or seeded.
+  /// 4. Not even that -> whatever the store holds, which is empty on a device
+  ///    that has never synced.
   ///
   /// Steps 2-4 are why this returns [Success] on a failed fetch: a visitor
   /// offline is a state the site renders, not an error to report. Only a
@@ -361,24 +358,15 @@ class PortfolioRepoImpl implements PortfolioRepo {
     final meta = await _remote.fetchMeta();
     if (meta != null && !meta.isFromNewerSchema) {
       if (meta.isNewerThan(cached.contentVersion)) {
-        final fetched = await _remote.fetchBundle();
-        // A bundle whose schema this build cannot represent is worse than a
-        // stale one: writing it to the cache would corrupt what already works.
-        if (fetched != null && !fetched.isFromNewerSchema) {
-          await _local.writeAll(fetched);
-          return fetched;
-        }
+        final applied = await _fetchAndApply();
+        if (applied != null) return applied;
       } else {
         // The common case, and the whole point of the meta document: one read,
         // no payload, cache already correct.
         return cached;
       }
     } else if (meta != null) {
-      debugPrint(
-        'Firestore content is schema v${meta.schemaVersion}, newer than this '
-        'build (v${PortfolioBundle.currentSchemaVersion}) — staying on cache. '
-        'Deploy the newer build to pick it up.',
-      );
+      _warnNewerSchema(meta.schemaVersion);
     }
 
     if (!cached.isEmpty) return cached;
@@ -393,4 +381,42 @@ class PortfolioRepoImpl implements PortfolioRepo {
 
     return _local.readAll();
   }, 'Could not synchronise content');
+
+  @override
+  Future<DataResult<PortfolioBundle>> resetToPublished() => _guard(() async {
+    // Always re-fetches — see the interface doc for why a version-match
+    // short-circuit (as syncFromRemote uses) would be wrong here.
+    final applied = await _fetchAndApply();
+    if (applied != null) return applied;
+
+    final bundled = await _bundled.load();
+    if (bundled != null && !bundled.isEmpty) {
+      await _local.writeAll(bundled);
+      return bundled;
+    }
+
+    throw StateError(
+      'Firestore is unreachable and no committed content/portfolio_content.json '
+      'fallback exists — nothing trustworthy to reset to.',
+    );
+  }, 'Could not reset to the published content');
+
+  /// Fetches the bundle, applies the same newer-schema refusal
+  /// [syncFromRemote] uses, and persists it. Null when the fetch failed or the
+  /// schema guard rejected it — the caller decides what "nothing usable came
+  /// back" means for it.
+  Future<PortfolioBundle?> _fetchAndApply() async {
+    final fetched = await _remote.fetchBundle();
+    if (fetched == null || fetched.isFromNewerSchema) return null;
+    await _local.writeAll(fetched);
+    return fetched;
+  }
+
+  void _warnNewerSchema(int remoteSchemaVersion) {
+    debugPrint(
+      'Firestore content is schema v$remoteSchemaVersion, newer than this '
+      'build (v${PortfolioBundle.currentSchemaVersion}) — staying on cache. '
+      'Deploy the newer build to pick it up.',
+    );
+  }
 }

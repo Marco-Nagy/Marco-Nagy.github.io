@@ -136,8 +136,9 @@ class LangKeys {
   static const String adminCancel = 'admin_cancel';
   static const String adminDeleteConfirmTitle = 'admin_delete_confirm_title';
   static const String adminDeleteConfirmBody = 'admin_delete_confirm_body';
-  static const String adminResetSeed = 'admin_reset_seed';
-  static const String adminResetSeedConfirm = 'admin_reset_seed_confirm';
+  static const String adminResetPublished = 'admin_reset_published';
+  static const String adminResetPublishedConfirm =
+      'admin_reset_published_confirm';
   static const String adminSaved = 'admin_saved';
   static const String adminDeleted = 'admin_deleted';
 

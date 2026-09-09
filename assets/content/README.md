@@ -1,14 +1,18 @@
 # Bundled content
 
-`portfolio_content.json` is produced by the **Export** button in the debug-mode
-admin screen. It is optional: if it is absent the app seeds from the Dart
-constants under `lib/features/portfolio_content/data/seed/`.
+`portfolio_content.json` is the cold-start floor from decision D3 in
+`docs/firebase-migration-plan.md`. It is produced by the **Export content
+JSON** action in the debug-mode admin menu and committed here by hand.
 
-Seeding priority on launch:
+Content's source of truth is Firestore (`content/bundle` + `content/meta`),
+not this file. The read path (`PortfolioRepo.syncFromRemote`, run once at
+startup) only reaches this file when Firestore cannot be reached *and* the
+local cache is empty — a first visit during an outage, a quota exhaustion, or
+a misconfigured security rule. Everyone else reads the cache or Firestore.
 
-1. Local storage already has content -> use it
-2. else `portfolio_content.json` exists -> seed from it
-3. else -> seed from the Dart seed constants
+Doubling as a backup: every export committed here is a restorable snapshot in
+git history, which is why scheduled Firestore backups (a Blaze-only feature)
+were skipped — see the Phase 2 status note in the migration plan.
 
-To publish edits made in debug: edit -> Export -> save the JSON here ->
-`flutter build web --release` -> deploy.
+To refresh it after a content change: open the admin menu -> **Export content
+JSON** -> paste the clipboard contents over this file -> commit.

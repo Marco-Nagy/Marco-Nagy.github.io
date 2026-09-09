@@ -26,14 +26,6 @@ class SharedPrefKeys {
   /// Prefix used to sweep every custom-items key when resetting.
   static const String customSectionItemsPrefix = 'portfolio_custom_items_';
 
-  /// Set once seeding has run, so deleting every item in debug is respected
-  /// rather than silently undone on the next launch.
-  ///
-  /// Superseded by [contentVersion] — an unversioned boolean can never tell a
-  /// returning visitor that new content exists. Phase 1 of the Firebase
-  /// migration deletes this along with the seed files.
-  static const String seeded = 'portfolio_seeded';
-
   /// The [contentVersion] of the cached bundle. Compared against the value in
   /// Firestore's `content/meta` to decide whether the cache is still current,
   /// which is what keeps a returning visitor at a single Firestore read.
