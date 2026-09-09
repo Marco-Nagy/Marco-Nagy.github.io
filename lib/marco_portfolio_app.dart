@@ -7,6 +7,7 @@ import 'core/app_cubit/app_cubit.dart';
 import 'core/app_cubit/app_state.dart';
 import 'core/localization/app_localizations_setup.dart';
 import 'core/localization/lang_keys.dart';
+import 'core/routes/app_route_observer.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/route_names.dart';
 import 'core/styles/theme/app_theme.dart';
@@ -51,6 +52,7 @@ class MarcoPortfolioApp extends StatelessWidget {
                         AppLocalizationsSetup.localeResolutionCallback,
                     initialRoute: RouteNames.splash,
                     onGenerateRoute: AppRoutes.onGenerateRoute,
+                    navigatorObservers: <NavigatorObserver>[appRouteObserver],
                   );
                 },
               );

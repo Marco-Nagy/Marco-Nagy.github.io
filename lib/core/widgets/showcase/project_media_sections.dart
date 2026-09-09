@@ -30,6 +30,7 @@ class ProjectMediaSections extends StatelessWidget {
     required this.videos,
     required this.background,
     required this.stripWidth,
+    this.playing = true,
     super.key,
   });
 
@@ -41,6 +42,13 @@ class ProjectMediaSections extends StatelessWidget {
 
   /// The page's own content width — only [FeatureGraphicSection] reads it.
   final double stripWidth;
+
+  /// False while the page these sections sit on is covered by another route
+  /// — stops a looping GIF screenshot from decoding frames nobody can see
+  /// underneath whatever was just pushed on top. Video/feature-graphic cards
+  /// already own their play state locally (tap to play), so only the GIF
+  /// layers need this passed through.
+  final bool playing;
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +78,15 @@ class ProjectMediaSections extends StatelessWidget {
           pageWidth: stripWidth,
         ),
       if (screenshots.isNotEmpty)
-        ScreenshotsSection(panels: screenshots, background: background),
+        ScreenshotsSection(
+          panels: screenshots,
+          background: background,
+          playing: playing,
+        ),
       if (videos.isNotEmpty)
         VideoSection(videos: videos, background: background),
-      if (gifs.isNotEmpty) GifSection(panels: gifs, background: background),
+      if (gifs.isNotEmpty)
+        GifSection(panels: gifs, background: background, playing: playing),
     ];
     if (sections.isEmpty) return const SizedBox.shrink();
 

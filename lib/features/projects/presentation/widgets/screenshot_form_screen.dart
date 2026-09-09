@@ -10,8 +10,9 @@ import '../../../../core/widgets/admin/admin_form_screen.dart';
 import '../../../../core/widgets/admin/admin_slider_field.dart';
 import '../../../../core/widgets/admin/media_ref_field.dart';
 import '../../../../core/widgets/common/underline_text_field.dart';
-import '../../../../core/widgets/showcase/shot_preview.dart';
+import '../../../../core/widgets/showcase/screenshots_strip.dart';
 import '../../../portfolio_content/domain/entities/media_shot.dart';
+import '../../../portfolio_content/domain/entities/shot_background.dart';
 import '../../../portfolio_content/domain/entities/showcase_panel.dart';
 
 /// Add/edit screen for one Screenshot panel — a device-framed shot with its
@@ -19,23 +20,48 @@ import '../../../portfolio_content/domain/entities/showcase_panel.dart';
 ///
 /// Its own screen rather than a case inside a shared media-item form — this
 /// is the one media kind with real geometry to tune, and tuning it blind was
-/// exactly the complaint that led here: [ShotPreview] sits fixed on the
-/// right, so a scale or rotation change is seen the moment it is made instead
-/// of after saving and reopening the panel to look.
+/// exactly the complaint that led here: the preview sits fixed on the right,
+/// so a scale or rotation change is seen the moment it is made instead of
+/// after saving and reopening the panel to look.
+///
+/// The preview is a live [ScreenshotsStrip], not a single framed shot: it
+/// starts showing just this panel's frame, and as soon as a second
+/// screenshot exists on the project it renders beside this one exactly as it
+/// will on the real page — the point being tuned is not just this shot's
+/// geometry but how it sits next to its neighbours.
 class ScreenshotFormScreen extends StatefulWidget {
-  const ScreenshotFormScreen({this.panel, super.key});
+  const ScreenshotFormScreen({
+    this.panel,
+    this.siblingPanels = const <ShowcasePanel>[],
+    this.background = const ShotBackground(),
+    super.key,
+  });
 
   /// Null when adding.
   final ShowcasePanel? panel;
+
+  /// Every other screenshot panel already on the project, in display order —
+  /// used only to render them alongside this one in the preview strip; saving
+  /// never touches them.
+  final List<ShowcasePanel> siblingPanels;
+
+  /// The project's default showcase background, for panels with no override.
+  final ShotBackground background;
 
   /// Resolves to the built panel, or null if dismissed.
   static Future<ShowcasePanel?> open(
     BuildContext context, {
     ShowcasePanel? panel,
+    List<ShowcasePanel> siblingPanels = const <ShowcasePanel>[],
+    ShotBackground background = const ShotBackground(),
   }) {
     return AdminFormScreen.open<ShowcasePanel>(
       context,
-      ScreenshotFormScreen(panel: panel),
+      ScreenshotFormScreen(
+        panel: panel,
+        siblingPanels: siblingPanels,
+        background: background,
+      ),
     );
   }
 
@@ -142,9 +168,40 @@ class _ScreenshotFormScreenState extends State<ScreenshotFormScreen> {
     ];
   }
 
+  /// Every sibling panel with this one substituted in at its place (by id),
+  /// or appended when it is not among them yet — so the strip always shows
+  /// exactly what the real page will, including this panel's own live edits.
+  List<ShowcasePanel> get _previewPanels {
+    final panels = List<ShowcasePanel>.of(widget.siblingPanels);
+    final index = panels.indexWhere((p) => p.id == _id);
+    if (index == -1) {
+      panels.add(_panel);
+    } else {
+      panels[index] = _panel;
+    }
+    return panels;
+  }
+
+  /// `maxWidth` shrinks every panel to fit the preview column instead of
+  /// leaving a fixed size only the first one or two would fit at — width
+  /// comes from a [LayoutBuilder] rather than a constant so the strip always
+  /// fills whatever the column actually measures.
+  ///
+  /// `activePanelId: _id` freezes every sibling screenshot in the strip,
+  /// leaving only the one actually being tuned animating — a GIF sibling
+  /// left looping while its neighbour's rotation/scale sliders are dragged
+  /// is exactly the kind of compounding cost that made this screen laggy.
   Widget _preview(BuildContext context) {
-    return Center(
-      child: ShotPreview(shot: _shot, width: 300.w, height: 380.h),
+    return LayoutBuilder(
+      builder: (context, constraints) => Center(
+        child: ScreenshotsStrip(
+          panels: _previewPanels,
+          background: widget.background,
+          height: 380.h,
+          maxWidth: constraints.maxWidth,
+          activePanelId: _id,
+        ),
+      ),
     );
   }
 

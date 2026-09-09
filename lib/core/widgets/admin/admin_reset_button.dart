@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../di/di.dart';
 import '../../../features/portfolio_content/domain/repositories/portfolio_repo.dart';
@@ -11,6 +10,8 @@ import '../../utils/extension/navigation_extensions.dart';
 import '../common/app_snack_bar.dart';
 import 'admin_confirm_dialog.dart';
 import 'admin_gate.dart';
+import 'admin_hover_icon_button.dart';
+import 'admin_svg_icons.dart';
 
 /// Restores the seeded content, undoing local edits.
 ///
@@ -22,16 +23,12 @@ class AdminResetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AdminGate(
-      child: Tooltip(
-        message: context.translate(LangKeys.adminResetSeed),
-        child: IconButton(
-          icon: Icon(
-            Icons.restore_rounded,
-            size: 22.r,
-            color: context.colors.accent,
-          ),
-          onPressed: () => _confirmAndReset(context),
-        ),
+      child: AdminHoverIconButton(
+        svg: AdminSvgIcons.reset,
+        tooltip: context.translate(LangKeys.adminResetSeed),
+        color: context.colors.accent,
+        iconSize: 19,
+        onPressed: () => _confirmAndReset(context),
       ),
     );
   }

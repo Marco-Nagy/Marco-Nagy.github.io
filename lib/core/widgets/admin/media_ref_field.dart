@@ -15,6 +15,7 @@ import '../../utils/youtube_thumbnail.dart';
 import '../common/app_media.dart';
 import '../common/underline_text_field.dart';
 import 'admin_choice_field.dart';
+import 'admin_confirm_dialog.dart';
 
 /// Edits one [MediaRef]: pick what kind of thing it is, paste a path or a URL,
 /// and watch the thumbnail resolve underneath.
@@ -37,7 +38,7 @@ class MediaRefField extends StatefulWidget {
   final MediaRef value;
   final ValueChanged<MediaRef> onChanged;
 
-  /// Folder under `assets/images/` a picked file is suggested for.
+  /// Folder under `assets/` a picked file is suggested for.
   final String assetFolder;
 
   /// Shape of the preview box, so a feature graphic previews wide and a phone
@@ -69,8 +70,14 @@ class _MediaRefFieldState extends State<MediaRefField> {
   bool _picking = false;
 
   /// Size of an image picked this session, so the storage warning applies to
-  /// exactly the payload it was measured from.
+  /// exactly the payload it was measured from. Only meaningful for [_embedFile]
+  /// — [_pickAsset] never embeds, so it never sets this.
   int? _pickedBytes;
+
+  /// True right after [_pickAsset] fills the box with a path — the file it
+  /// names may not exist in the project yet, so the reminder to copy it in
+  /// stays up until something else changes the source (typing, re-picking).
+  bool _pendingAssetCopy = false;
 
   static const Duration _previewDelay = Duration(milliseconds: 600);
 
@@ -137,6 +144,7 @@ class _MediaRefFieldState extends State<MediaRefField> {
 
   void _onTyped(String text) {
     final value = text.trim();
+    _pendingAssetCopy = false;
     _emit(
       _value.isVideo
           ? _value.copyWith(videoUrl: value)
@@ -144,11 +152,49 @@ class _MediaRefFieldState extends State<MediaRefField> {
     );
   }
 
-  /// Reads a file off the device and embeds it, so the result is on screen
-  /// immediately — the only option on web, which has no writable `assets/`.
-  /// The box below is filled with where that file *should* live once copied
-  /// into the bundle, ready for [_pinAsAsset].
-  Future<void> _pickFile() async {
+  /// Reads a file off the device for its name only, then points the field
+  /// straight at the `assets/...` path that file belongs at — no embedding,
+  /// no separate pin step. This assumes the workflow it's built for: the
+  /// exact file was already copied into the project's assets folder by hand
+  /// before picking it here, so the path this resolves to is immediately
+  /// real. If it wasn't, the preview shows broken rather than a false
+  /// "it worked" from an embedded copy — see [_pendingAssetCopy].
+  Future<void> _pickAsset() async {
+    if (_picking) return;
+    setState(() => _picking = true);
+    try {
+      final picked = await getIt<ImagePickerService>().pick();
+      if (picked == null || !mounted) return;
+
+      final path = ImagePickerService.suggestedAssetPath(
+        widget.assetFolder,
+        picked.fileName,
+      );
+      _source.text = path;
+      _pickedBytes = null;
+
+      final next = _value.copyWith(
+        kind: MediaKind.image,
+        image: ImageRef.asset(path),
+        videoUrl: '',
+      );
+      setState(() {
+        _value = next;
+        _preview = next;
+        _normalized = false;
+        _pendingAssetCopy = true;
+      });
+      widget.onChanged(next);
+    } finally {
+      if (mounted) setState(() => _picking = false);
+    }
+  }
+
+  /// Fallback for a file that hasn't been copied into the project yet: embeds
+  /// the bytes so the preview is correct immediately, at the cost of storing
+  /// the payload in `shared_preferences` until [_pinAsAsset] swaps it for the
+  /// real path.
+  Future<void> _embedFile() async {
     if (_picking) return;
     setState(() => _picking = true);
     try {
@@ -170,6 +216,7 @@ class _MediaRefFieldState extends State<MediaRefField> {
         _value = next;
         _preview = next;
         _normalized = false;
+        _pendingAssetCopy = false;
       });
       widget.onChanged(next);
     } finally {
@@ -179,11 +226,23 @@ class _MediaRefFieldState extends State<MediaRefField> {
 
   /// Swaps the embedded bytes for the `assets/...` path a release build ships.
   /// The path only resolves after the file is copied in and the app rebuilt,
-  /// which is why this is a separate, deliberate press.
-  void _pinAsAsset() {
+  /// which is why this is a separate, deliberate press — confirmed rather
+  /// than instant, since the file disappears everywhere it's used the moment
+  /// this runs and stays gone until that copy actually happens.
+  Future<void> _pinAsAsset() async {
     final path = _source.text.trim();
     if (path.isEmpty) return;
+
+    final confirmed = await AdminConfirmDialog.show(
+      context,
+      title: context.translate(LangKeys.fieldMediaPin),
+      body: context.translate(LangKeys.fieldMediaPinWarning),
+      confirmLabel: context.translate(LangKeys.fieldMediaPin),
+    );
+    if (!confirmed || !mounted) return;
+
     _pickedBytes = null;
+    _pendingAssetCopy = true;
     _emit(_value.copyWith(image: _imageFrom(path)));
   }
 
@@ -240,7 +299,7 @@ class _MediaRefFieldState extends State<MediaRefField> {
       _malformedSource == null;
 
   String get _sourceHint => switch (_value.kind) {
-    MediaKind.image => 'assets/images/projects/cover.png',
+    MediaKind.image => 'assets/projects/cover.png',
     MediaKind.videoFile => 'https://cloud.example.com/s/AbC123/download',
     MediaKind.videoEmbed => 'https://youtu.be/dQw4w9WgXcQ',
   };
@@ -268,7 +327,7 @@ class _MediaRefFieldState extends State<MediaRefField> {
               busy: _picking,
               // Tapping the picture to replace the picture is the gesture
               // everyone tries first.
-              onTap: _pickFile,
+              onTap: _pickAsset,
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -323,6 +382,24 @@ class _MediaRefFieldState extends State<MediaRefField> {
                       text: context.translate(LangKeys.fieldMediaHeavyEmbed),
                       color: colors.danger,
                     ),
+                  // A fresh asset-path pick assumes the file is already in
+                  // the project; this is the one chance to catch "actually
+                  // it isn't yet" before the preview quietly shows broken.
+                  if (_pendingAssetCopy)
+                    _Note(
+                      text: context.translate(
+                        LangKeys.fieldMediaPickPendingCopy,
+                      ),
+                      color: colors.onNavyFaint,
+                    ),
+                  // Shown as long as the Pin button is: pinning is silent
+                  // and immediate, so the warning has to land before the
+                  // press, not after the file has already vanished.
+                  if (_value.image.isEmbedded)
+                    _Note(
+                      text: context.translate(LangKeys.fieldMediaPinWarning),
+                      color: colors.onNavyFaint,
+                    ),
                   Wrap(
                     spacing: 4.w,
                     children: <Widget>[
@@ -330,8 +407,17 @@ class _MediaRefFieldState extends State<MediaRefField> {
                         icon: Icons.image_outlined,
                         label: context.translate(LangKeys.fieldMediaPick),
                         color: colors.accent,
-                        onPressed: _picking ? null : _pickFile,
+                        onPressed: _picking ? null : _pickAsset,
                       ),
+                      if (!_value.image.isEmbedded)
+                        _MiniButton(
+                          icon: Icons.cloud_upload_outlined,
+                          label: context.translate(
+                            LangKeys.fieldMediaEmbedInstead,
+                          ),
+                          color: colors.onNavyMuted,
+                          onPressed: _picking ? null : _embedFile,
+                        ),
                       if (_value.image.isEmbedded)
                         _MiniButton(
                           icon: Icons.push_pin_outlined,

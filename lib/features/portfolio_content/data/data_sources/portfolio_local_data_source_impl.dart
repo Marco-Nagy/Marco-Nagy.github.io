@@ -29,6 +29,38 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
 
   final SharedPrefHelper _prefs;
 
+  // In-memory cache, one entry per storage key -------------------------------
+  //
+  // `shared_preferences` already keeps its own strings in memory, but every
+  // read here used to still re-run `json.decode` (and the `fromJson` mapping)
+  // on that whole string from scratch — for most sections that is small
+  // change, but a project can carry an embedded (not-yet-pinned) screenshot
+  // or GIF as base64, and that string rides inside the *same* JSON blob as
+  // every other project. Re-parsing megabytes of it on every single page
+  // visit or save is real, synchronous, UI-thread work — which is what was
+  // actually behind "the edit button hangs after adding a GIF": the hang was
+  // never about rendering the GIF, it was about re-decoding the whole
+  // projects list around it, repeatedly, for no reason.
+  //
+  // `compute()` is the usual fix for CPU-bound work like this, but it runs
+  // the callback on the *same* thread on Flutter Web (there is no worker
+  // isolate to hand it off to there), so it would not have helped the actual
+  // platform this was slow on. Caching the decoded list instead removes
+  // almost all of the repeated work outright, on every platform: decode runs
+  // at most once per key per app session, and a write updates the cache
+  // directly from the value just saved instead of reading its own write back.
+  List<PersonalProject>? _projectsCache;
+  List<Certificate>? _certificatesCache;
+  List<WorkHistoryEntry>? _workHistoryCache;
+  List<PricingPackage>? _pricingPackagesCache;
+  List<PricingAddOn>? _pricingAddOnsCache;
+  SiteContent? _siteContentCache;
+  List<SkillGroupEntity>? _skillGroupsCache;
+  List<TechBadgeEntity>? _techBadgesCache;
+  List<SectionDefinition>? _sectionsCache;
+  final Map<String, List<CustomSectionItem>> _customItemsCache =
+      <String, List<CustomSectionItem>>{};
+
   @override
   Future<void> seedIfEmpty() async {
     if (_prefs.getBool(key: SharedPrefKeys.seeded)) return;
@@ -44,6 +76,7 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     )) {
       await _prefs.removePreference(key: key);
     }
+    _customItemsCache.clear();
 
     await saveProjects(SeedProjects.all);
     await saveCertificates(SeedCertificates.all);
@@ -60,8 +93,9 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   // Shared JSON helpers -------------------------------------------------------
 
   /// A corrupt or schema-drifted payload falls back rather than leaving the
-  /// visitor on an empty page.
-  List<T> _readList<T>(
+  /// visitor on an empty page. Only reached on a cache miss — see the class
+  /// doc comment on the cache fields above.
+  List<T> _decodeList<T>(
     String key,
     T Function(Map<String, dynamic>) fromJson,
     List<T> fallback,
@@ -91,7 +125,7 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     );
   }
 
-  T _readObject<T>(
+  T _decodeObject<T>(
     String key,
     T Function(Map<String, dynamic>) fromJson,
     T fallback,
@@ -113,130 +147,171 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   // Built-in section content --------------------------------------------------
 
   @override
-  List<PersonalProject> getProjects() => _readList(
+  List<PersonalProject> getProjects() => _projectsCache ??= _decodeList(
     SharedPrefKeys.projects,
     PersonalProject.fromJson,
     const <PersonalProject>[],
   );
 
   @override
-  Future<void> saveProjects(List<PersonalProject> projects) =>
-      _writeList(SharedPrefKeys.projects, projects, (p) => p.toJson());
+  Future<void> saveProjects(List<PersonalProject> projects) async {
+    await _writeList(SharedPrefKeys.projects, projects, (p) => p.toJson());
+    _projectsCache = projects;
+  }
 
   @override
-  List<Certificate> getCertificates() => _readList(
+  List<Certificate> getCertificates() => _certificatesCache ??= _decodeList(
     SharedPrefKeys.certificates,
     Certificate.fromJson,
     const <Certificate>[],
   );
 
   @override
-  Future<void> saveCertificates(List<Certificate> certificates) =>
-      _writeList(SharedPrefKeys.certificates, certificates, (c) => c.toJson());
+  Future<void> saveCertificates(List<Certificate> certificates) async {
+    await _writeList(
+      SharedPrefKeys.certificates,
+      certificates,
+      (c) => c.toJson(),
+    );
+    _certificatesCache = certificates;
+  }
 
   @override
-  List<WorkHistoryEntry> getWorkHistory() => _readList(
+  List<WorkHistoryEntry> getWorkHistory() => _workHistoryCache ??= _decodeList(
     SharedPrefKeys.workHistory,
     WorkHistoryEntry.fromJson,
     const <WorkHistoryEntry>[],
   );
 
   @override
-  Future<void> saveWorkHistory(List<WorkHistoryEntry> entries) =>
-      _writeList(SharedPrefKeys.workHistory, entries, (e) => e.toJson());
+  Future<void> saveWorkHistory(List<WorkHistoryEntry> entries) async {
+    await _writeList(SharedPrefKeys.workHistory, entries, (e) => e.toJson());
+    _workHistoryCache = entries;
+  }
 
   @override
-  List<PricingPackage> getPricingPackages() => _readList(
-    SharedPrefKeys.pricingPackages,
-    PricingPackage.fromJson,
-    const <PricingPackage>[],
-  );
+  List<PricingPackage> getPricingPackages() =>
+      _pricingPackagesCache ??= _decodeList(
+        SharedPrefKeys.pricingPackages,
+        PricingPackage.fromJson,
+        const <PricingPackage>[],
+      );
 
   @override
-  Future<void> savePricingPackages(List<PricingPackage> packages) =>
-      _writeList(SharedPrefKeys.pricingPackages, packages, (p) => p.toJson());
+  Future<void> savePricingPackages(List<PricingPackage> packages) async {
+    await _writeList(
+      SharedPrefKeys.pricingPackages,
+      packages,
+      (p) => p.toJson(),
+    );
+    _pricingPackagesCache = packages;
+  }
 
   @override
-  List<PricingAddOn> getPricingAddOns() => _readList(
+  List<PricingAddOn> getPricingAddOns() => _pricingAddOnsCache ??= _decodeList(
     SharedPrefKeys.pricingAddOns,
     PricingAddOn.fromJson,
     const <PricingAddOn>[],
   );
 
   @override
-  Future<void> savePricingAddOns(List<PricingAddOn> addOns) =>
-      _writeList(SharedPrefKeys.pricingAddOns, addOns, (a) => a.toJson());
+  Future<void> savePricingAddOns(List<PricingAddOn> addOns) async {
+    await _writeList(SharedPrefKeys.pricingAddOns, addOns, (a) => a.toJson());
+    _pricingAddOnsCache = addOns;
+  }
 
   // Site-wide content ---------------------------------------------------------
 
   @override
-  SiteContent getSiteContent() => _readObject(
-    SharedPrefKeys.siteContent,
-    SiteContent.fromJson,
-    SeedSiteContent.value,
-  );
+  SiteContent getSiteContent() {
+    final cached = _siteContentCache;
+    if (cached != null) return cached;
+    final content = _decodeObject(
+      SharedPrefKeys.siteContent,
+      SiteContent.fromJson,
+      SeedSiteContent.value,
+    );
+    _siteContentCache = content;
+    return content;
+  }
 
   @override
-  Future<void> saveSiteContent(SiteContent content) =>
-      _writeObject(SharedPrefKeys.siteContent, content.toJson());
+  Future<void> saveSiteContent(SiteContent content) async {
+    await _writeObject(SharedPrefKeys.siteContent, content.toJson());
+    _siteContentCache = content;
+  }
 
   @override
-  List<SkillGroupEntity> getSkillGroups() => _readList(
+  List<SkillGroupEntity> getSkillGroups() => _skillGroupsCache ??= _decodeList(
     SharedPrefKeys.skillGroups,
     SkillGroupEntity.fromJson,
     const <SkillGroupEntity>[],
   );
 
   @override
-  Future<void> saveSkillGroups(List<SkillGroupEntity> groups) =>
-      _writeList(SharedPrefKeys.skillGroups, groups, (g) => g.toJson());
+  Future<void> saveSkillGroups(List<SkillGroupEntity> groups) async {
+    await _writeList(SharedPrefKeys.skillGroups, groups, (g) => g.toJson());
+    _skillGroupsCache = groups;
+  }
 
   @override
-  List<TechBadgeEntity> getTechBadges() => _readList(
+  List<TechBadgeEntity> getTechBadges() => _techBadgesCache ??= _decodeList(
     SharedPrefKeys.techBadges,
     TechBadgeEntity.fromJson,
     const <TechBadgeEntity>[],
   );
 
   @override
-  Future<void> saveTechBadges(List<TechBadgeEntity> badges) =>
-      _writeList(SharedPrefKeys.techBadges, badges, (b) => b.toJson());
+  Future<void> saveTechBadges(List<TechBadgeEntity> badges) async {
+    await _writeList(SharedPrefKeys.techBadges, badges, (b) => b.toJson());
+    _techBadgesCache = badges;
+  }
 
   // Section registry ----------------------------------------------------------
 
   @override
-  List<SectionDefinition> getSections() => _readList(
+  List<SectionDefinition> getSections() => _sectionsCache ??= _decodeList(
     SharedPrefKeys.sectionDefinitions,
     SectionDefinition.fromJson,
     const <SectionDefinition>[],
   );
 
   @override
-  Future<void> saveSections(List<SectionDefinition> sections) => _writeList(
-    SharedPrefKeys.sectionDefinitions,
-    sections,
-    (s) => s.toJson(),
-  );
+  Future<void> saveSections(List<SectionDefinition> sections) async {
+    await _writeList(
+      SharedPrefKeys.sectionDefinitions,
+      sections,
+      (s) => s.toJson(),
+    );
+    _sectionsCache = sections;
+  }
 
   @override
-  List<CustomSectionItem> getCustomItems(String sectionId) => _readList(
-    SharedPrefKeys.customSectionItems(sectionId),
-    CustomSectionItem.fromJson,
-    const <CustomSectionItem>[],
-  );
+  List<CustomSectionItem> getCustomItems(String sectionId) =>
+      _customItemsCache[sectionId] ??= _decodeList(
+        SharedPrefKeys.customSectionItems(sectionId),
+        CustomSectionItem.fromJson,
+        const <CustomSectionItem>[],
+      );
 
   @override
   Future<void> saveCustomItems(
     String sectionId,
     List<CustomSectionItem> items,
-  ) => _writeList(
-    SharedPrefKeys.customSectionItems(sectionId),
-    items,
-    (i) => i.toJson(),
-  );
+  ) async {
+    await _writeList(
+      SharedPrefKeys.customSectionItems(sectionId),
+      items,
+      (i) => i.toJson(),
+    );
+    _customItemsCache[sectionId] = items;
+  }
 
   @override
-  Future<void> deleteCustomItems(String sectionId) => _prefs.removePreference(
-    key: SharedPrefKeys.customSectionItems(sectionId),
-  );
+  Future<void> deleteCustomItems(String sectionId) async {
+    await _prefs.removePreference(
+      key: SharedPrefKeys.customSectionItems(sectionId),
+    );
+    _customItemsCache.remove(sectionId);
+  }
 }

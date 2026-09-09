@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../common/pill_button.dart';
 import 'admin_gate.dart';
+import 'admin_svg_icons.dart';
 
 /// The debug-only "add" affordance that sits inline at the end of a list.
 ///
@@ -26,7 +27,7 @@ class AdminAddButton extends StatelessWidget {
         child: PillButton(
           label: label,
           variant: PillButtonVariant.outlined,
-          icon: Icons.add_rounded,
+          svgIcon: AdminSvgIcons.add,
           showArrow: false,
           dense: true,
           onPressed: onPressed,

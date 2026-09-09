@@ -50,6 +50,16 @@ class DeviceFrame extends StatelessWidget {
       media: image,
       playing: playing,
       allowPlatformView: false,
+      // The screen inside the bezel is always this exact box — passing its
+      // size lets the decoder target that resolution instead of the source
+      // file's native one. A phone screenshot or, worse, an animated GIF
+      // decoded (and, for a GIF, re-decoded every loop) at its full camera
+      // resolution while only ever painted at a few hundred logical pixels
+      // is pure wasted CPU, and for a multi-frame GIF that waste repeats
+      // every frame of the loop — this is what made one feel so much
+      // heavier than a still screenshot at the same spot.
+      width: width,
+      height: width / aspectRatioOf(frame),
       fallback: AssetPlaceholder(
         icon: frame == DeviceFrameType.laptop
             ? Icons.laptop_mac_outlined

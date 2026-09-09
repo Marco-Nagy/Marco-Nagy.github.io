@@ -302,12 +302,23 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
             title: '${i + 1}. ${inLayer[i].id}',
             subtitle: _panelSubtitle(inLayer[i]),
             onEdit: () => _savePanel(
-              ScreenshotFormScreen.open(context, panel: inLayer[i]),
+              ScreenshotFormScreen.open(
+                context,
+                panel: inLayer[i],
+                siblingPanels: inLayer,
+                background: _background,
+              ),
             ),
             onDelete: () => _deletePanel(inLayer[i].id),
           ),
       ],
-      onAdd: () => _savePanel(ScreenshotFormScreen.open(context)),
+      onAdd: () => _savePanel(
+        ScreenshotFormScreen.open(
+          context,
+          siblingPanels: inLayer,
+          background: _background,
+        ),
+      ),
     );
   }
 

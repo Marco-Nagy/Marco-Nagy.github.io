@@ -15,10 +15,20 @@ import 'gif_card.dart';
 /// [FeatureGraphicSection]'s doc comment for why these four sections stay
 /// independent rather than sharing one "showcase panel" strip underneath.
 class GifSection extends StatelessWidget {
-  const GifSection({required this.panels, required this.background, super.key});
+  const GifSection({
+    required this.panels,
+    required this.background,
+    this.playing = true,
+    super.key,
+  });
 
   final List<ShowcasePanel> panels;
   final ShotBackground background;
+
+  /// False stops every GIF here from animating — see
+  /// [ScreenshotsStrip.playing] for why that matters while covered by
+  /// another route.
+  final bool playing;
 
   /// A fixed card height regardless of page width — these are individual
   /// cards meant to be browsed by scrolling sideways, not one element that
@@ -58,6 +68,7 @@ class GifSection extends StatelessWidget {
                     panel.subtitleAr,
                   ),
                   width: cardWidth,
+                  playing: playing,
                 );
               },
             ),

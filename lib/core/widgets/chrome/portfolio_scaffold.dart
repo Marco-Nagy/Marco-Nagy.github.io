@@ -13,6 +13,7 @@ class PortfolioScaffold extends StatefulWidget {
   const PortfolioScaffold({
     required this.children,
     required this.activeSectionId,
+    this.pinnedHeader,
     super.key,
   });
 
@@ -20,6 +21,12 @@ class PortfolioScaffold extends StatefulWidget {
 
   /// Which nav link reads as current while this page is open.
   final String activeSectionId;
+
+  /// Sits directly under [TopNavBar], outside the scrolling body — for a
+  /// page-level action row (e.g. a detail page's back/edit buttons) that
+  /// should stay in view rather than scroll away with the content. Null on
+  /// every page that has nothing to pin.
+  final Widget? pinnedHeader;
 
   @override
   State<PortfolioScaffold> createState() => _PortfolioScaffoldState();
@@ -52,6 +59,7 @@ class _PortfolioScaffoldState extends State<PortfolioScaffold> {
                 activeSectionId: widget.activeSectionId,
                 onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
               ),
+              if (widget.pinnedHeader != null) widget.pinnedHeader!,
               Expanded(
                 child: RevealScope(
                   ticker: _revealTicker,

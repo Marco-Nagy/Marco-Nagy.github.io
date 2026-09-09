@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/widgets/admin/admin_item_actions.dart';
+import '../../../../core/widgets/admin/admin_svg_icons.dart';
 
 /// One row of an [AdminSubList].
 class AdminSubListItem {
@@ -77,7 +79,12 @@ class AdminSubList extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.symmetric(horizontal: 8.w),
               ),
-              icon: Icon(Icons.add_rounded, size: 18.r, color: colors.accent),
+              icon: SvgPicture.string(
+                AdminSvgIcons.add,
+                width: 16.r,
+                height: 16.r,
+                colorFilter: ColorFilter.mode(colors.accent, BlendMode.srcIn),
+              ),
               label: Text(
                 addLabel,
                 style: MyFonts.regular14.copyWith(color: colors.accent),

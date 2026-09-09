@@ -15,10 +15,10 @@ import 'tappable_video.dart';
 /// edge, caption on top.
 ///
 /// Complete on its own — no device frame, no rotate/scale/offset, no shared
-/// "positioned shot" logic with [ScreenshotCard]. A feature graphic is one
-/// flat image at the Play Store's own 1024×500 proportions; wiring it through
-/// the same widget that frames a phone screenshot is what previously let a
-/// feature graphic pick up a stray device bezel.
+/// "positioned shot" logic with [ScreenshotsSection]. A feature graphic is
+/// one flat image at the Play Store's own 1024×500 proportions; wiring it
+/// through the same widget that frames a phone screenshot is what previously
+/// let a feature graphic pick up a stray device bezel.
 class FeatureGraphicCard extends StatefulWidget {
   const FeatureGraphicCard({
     required this.panel,

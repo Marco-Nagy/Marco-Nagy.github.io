@@ -23,6 +23,7 @@ class GifCard extends StatelessWidget {
     required this.caption,
     required this.subtitle,
     required this.width,
+    this.playing = true,
     super.key,
   });
 
@@ -36,6 +37,11 @@ class GifCard extends StatelessWidget {
   final String subtitle;
 
   final double width;
+
+  /// False stops the loop from decoding frames — see
+  /// [ScreenshotsStrip.playing] for why that matters while this card sits,
+  /// out of sight, under whatever route got pushed on top of its page.
+  final bool playing;
 
   static const double aspectRatio = 9 / 16;
 
@@ -61,6 +67,12 @@ class GifCard extends StatelessWidget {
                 media: _media,
                 fit: BoxFit.cover,
                 allowPlatformView: false,
+                playing: playing,
+                // Caps the decode to what's actually painted — see
+                // `DeviceFrame`'s own comment on why this matters so much
+                // more for a GIF than a still.
+                width: panelWidth,
+                height: panelWidth / aspectRatio,
                 fallback: const AssetPlaceholder(icon: Icons.gif_box_outlined),
               ),
               PanelCaption(

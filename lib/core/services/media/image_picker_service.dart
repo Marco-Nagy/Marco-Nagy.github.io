@@ -56,13 +56,17 @@ class ImagePickerService {
   /// Where a picked file should live once copied into the bundle.
   ///
   /// Sanitised because a picked name can carry spaces, capitals or non-latin
-  /// characters, none of which survive as an asset key.
+  /// characters, none of which survive as an asset key. `assets/$folder/` —
+  /// not `assets/images/$folder/` — matches the folder pubspec.yaml actually
+  /// declares (`assets/projects/`, the only [MediaRefField.assetFolder] every
+  /// call site uses); the `images/` segment pointed at a directory that was
+  /// never declared, so a pinned file 404'd no matter where it was copied.
   static String suggestedAssetPath(String folder, String fileName) {
     final safe = fileName
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9._-]+'), '_')
         .replaceAll(RegExp(r'_+'), '_');
-    return 'assets/images/$folder/$safe';
+    return 'assets/$folder/$safe';
   }
 
   /// Embedded images live in `shared_preferences`, which on web is

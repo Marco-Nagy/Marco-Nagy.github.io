@@ -17,8 +17,8 @@ import 'shot_background_view.dart';
 /// Shape comes from [ProjectVideo.aspectRatio] rather than a fixed ratio, so a
 /// portrait screen recording and a landscape walkthrough each render at their
 /// own shape. The recording fills the card edge to edge; there is no device
-/// bezel here — that is [ScreenshotCard]'s job, and a bezel around a video
-/// only crops it to a shape it was never recorded at.
+/// bezel here — that is [ScreenshotsSection]'s job, and a bezel around a
+/// video only crops it to a shape it was never recorded at.
 ///
 /// The card clips itself to [radius]. The strip above must not do that
 /// rounding on its behalf: one clip around a whole scrolling row rounds the

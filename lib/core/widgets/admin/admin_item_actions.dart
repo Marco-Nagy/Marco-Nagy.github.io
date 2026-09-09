@@ -5,6 +5,8 @@ import '../../localization/lang_keys.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
 import 'admin_gate.dart';
+import 'admin_hover_icon_button.dart';
+import 'admin_svg_icons.dart';
 
 /// Per-item edit/delete icons shown beside content in debug builds only.
 class AdminItemActions extends StatelessWidget {
@@ -22,58 +24,28 @@ class AdminItemActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final size = compact ? 16.r : 18.r;
+    final size = compact ? 15.0 : 17.0;
 
     return AdminGate(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _ActionIcon(
-            icon: Icons.edit_outlined,
+          AdminHoverIconButton(
+            svg: AdminSvgIcons.edit,
             tooltip: context.translate(LangKeys.adminEdit),
             color: colors.accent,
-            size: size,
+            iconSize: size,
             onPressed: onEdit,
           ),
-          SizedBox(width: 4.w),
-          _ActionIcon(
-            icon: Icons.delete_outline_rounded,
+          SizedBox(width: 6.w),
+          AdminHoverIconButton(
+            svg: AdminSvgIcons.delete,
             tooltip: context.translate(LangKeys.adminDelete),
             color: colors.danger,
-            size: size,
+            iconSize: size,
             onPressed: onDelete,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ActionIcon extends StatelessWidget {
-  const _ActionIcon({
-    required this.icon,
-    required this.tooltip,
-    required this.color,
-    required this.size,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final Color color;
-  final double size;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: IconButton(
-        onPressed: onPressed,
-        visualDensity: VisualDensity.compact,
-        constraints: BoxConstraints(minWidth: 34.w, minHeight: 34.h),
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, size: size, color: color),
       ),
     );
   }

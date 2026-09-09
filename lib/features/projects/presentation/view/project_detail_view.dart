@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/localization/lang_keys.dart';
+import '../../../../core/routes/app_route_observer.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/utils/extension/navigation_extensions.dart';
@@ -38,11 +39,37 @@ class ProjectDetailView extends StatefulWidget {
   State<ProjectDetailView> createState() => _ProjectDetailViewState();
 }
 
-class _ProjectDetailViewState extends State<ProjectDetailView> {
+class _ProjectDetailViewState extends State<ProjectDetailView>
+    with RouteAware {
   /// Starts as the row data the route carried, then follows the project after
   /// an edit — the argument that opened this page is a snapshot, and saving
   /// would otherwise leave the page showing what it used to say.
   late ListRowData _data = widget.data;
+
+  /// False while this page is covered by another route (the edit form, a
+  /// screenshot's editor) — handed down to every looping GIF screenshot so it
+  /// actually stops instead of decoding frames nobody can see underneath
+  /// whatever was just pushed on top of it.
+  bool _playing = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) appRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPushNext() => setState(() => _playing = false);
+
+  @override
+  void didPopNext() => setState(() => _playing = true);
 
   Future<void> _edit(
     BuildContext context,
@@ -88,57 +115,79 @@ class _ProjectDetailViewState extends State<ProjectDetailView> {
 
     return PortfolioScaffold(
       activeSectionId: BuiltInSectionIds.projects,
+      pinnedHeader: _actionsRow(context),
       children: <Widget>[
         SizedBox(height: 32.h),
         ContentContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  PillButton(
-                    label: context.translate(LangKeys.projectsBack),
-                    variant: PillButtonVariant.outlined,
-                    showArrow: false,
-                    dense: true,
-                    icon: Icons.arrow_back_rounded,
-                    onPressed: () => context.pop<void>(),
-                  ),
-                  const Spacer(),
-                  AdminGate(
-                    child: BlocBuilder<ProjectsViewModelCubit, ProjectsState>(
-                      builder: (context, state) {
-                        // Disabled until the load lands: without the project
-                        // list there is nothing to hand the form.
-                        final projects = state is ProjectsSuccess
-                            ? state.projects
-                            : const <PersonalProject>[];
-                        return PillButton(
-                          label: context.translate(LangKeys.adminEdit),
-                          variant: PillButtonVariant.outlined,
-                          showArrow: false,
-                          dense: true,
-                          icon: Icons.edit_outlined,
-                          onPressed: projects.isEmpty
-                              ? null
-                              : () => _edit(
-                                  context,
-                                  context.read<ProjectsViewModelCubit>(),
-                                  projects,
-                                ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 32.h),
-              _DetailBody(data: data, accent: accent),
+              _DetailBody(data: data, accent: accent, playing: _playing),
               SizedBox(height: 64.h),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  /// The back/edit row, pinned under the nav bar rather than scrolling away
+  /// with the write-up — the two actions a visitor (or Marco, editing) needs
+  /// reachable no matter how far down the page they've scrolled.
+  Widget _actionsRow(BuildContext context) {
+    final colors = context.colors;
+
+    return DecoratedBox(
+      // Sits above the scrolling content, so it needs its own ground rather
+      // than letting sections show through as they pass under it — same
+      // treatment as `TopNavBar` immediately above it.
+      decoration: BoxDecoration(
+        color: colors.pageTop.withValues(alpha: 0.92),
+        border: Border(
+          bottom: BorderSide(color: colors.divider.withValues(alpha: 0.5)),
+        ),
+      ),
+      child: ContentContainer(
+        verticalPadding: 14.h,
+        child: Row(
+          children: <Widget>[
+            PillButton(
+              label: context.translate(LangKeys.projectsBack),
+              variant: PillButtonVariant.outlined,
+              showArrow: false,
+              dense: true,
+              icon: Icons.arrow_back_rounded,
+              onPressed: () => context.pop<void>(),
+            ),
+            const Spacer(),
+            AdminGate(
+              child: BlocBuilder<ProjectsViewModelCubit, ProjectsState>(
+                builder: (context, state) {
+                  // Disabled until the load lands: without the project list
+                  // there is nothing to hand the form.
+                  final projects = state is ProjectsSuccess
+                      ? state.projects
+                      : const <PersonalProject>[];
+                  return PillButton(
+                    label: context.translate(LangKeys.adminEdit),
+                    variant: PillButtonVariant.outlined,
+                    showArrow: false,
+                    dense: true,
+                    icon: Icons.edit_outlined,
+                    onPressed: projects.isEmpty
+                        ? null
+                        : () => _edit(
+                            context,
+                            context.read<ProjectsViewModelCubit>(),
+                            projects,
+                          ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -151,10 +200,18 @@ class _ProjectDetailViewState extends State<ProjectDetailView> {
 /// (title, links) first, media second — visitors judge the screenshots before
 /// they read a word — then the write-up.
 class _DetailBody extends StatelessWidget {
-  const _DetailBody({required this.data, required this.accent});
+  const _DetailBody({
+    required this.data,
+    required this.accent,
+    required this.playing,
+  });
 
   final ListRowData data;
   final Color accent;
+
+  /// False while this page is covered by another route — see
+  /// [_ProjectDetailViewState._playing].
+  final bool playing;
 
   @override
   Widget build(BuildContext context) {
@@ -250,6 +307,7 @@ class _DetailBody extends StatelessWidget {
               videos: data.videos,
               background: data.background,
               stripWidth: constraints.maxWidth,
+              playing: playing,
             ),
           ),
         ],
