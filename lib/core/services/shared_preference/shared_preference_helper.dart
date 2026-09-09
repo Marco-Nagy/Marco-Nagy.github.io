@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Thin singleton wrapper over [SharedPreferences]. Call
@@ -13,6 +14,19 @@ class SharedPrefHelper {
   Future<void> instantiatePreferences() async {
     _prefs ??= await SharedPreferences.getInstance();
   }
+
+  /// Drops the cached [SharedPreferences] instance so the next
+  /// [instantiatePreferences] re-reads it.
+  ///
+  /// `??=` above means a real app only ever calls [instantiatePreferences]
+  /// once, which is correct there — but it also means a test file with
+  /// several `setUp`s sharing one process would otherwise have every test
+  /// after the first silently keep reading the first test's data, because
+  /// `SharedPreferences.setMockInitialValues` replaces the *mock's* store,
+  /// not this already-cached instance. Call this from `tearDown` in any test
+  /// that touches [SharedPrefHelper].
+  @visibleForTesting
+  static void resetForTesting() => _prefs = null;
 
   SharedPreferences get _requirePrefs {
     final prefs = _prefs;

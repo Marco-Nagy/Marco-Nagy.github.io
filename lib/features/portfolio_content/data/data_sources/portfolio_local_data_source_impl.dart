@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/services/shared_preference/shared_pref_keys.dart';
@@ -168,9 +169,18 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
 
   // Shared JSON helpers -------------------------------------------------------
 
-  /// A corrupt or schema-drifted payload falls back rather than leaving the
-  /// visitor on an empty page. Only reached on a cache miss — see the class
-  /// doc comment on the cache fields above.
+  /// Distinguishes the two ways a key can yield nothing, because they mean
+  /// opposite things.
+  ///
+  /// **Absent or blank** is normal: nothing has been stored under that key
+  /// yet. Falling back quietly is correct — a collection added in a later
+  /// schema reads as empty until content for it arrives, and the startup sync
+  /// fills it the moment the published version moves ahead of the cache.
+  ///
+  /// **Present but undecodable** is schema drift or corruption, and returning
+  /// the fallback silently is how a whole section disappears from the site
+  /// with nothing in any log to say why. That case is loud in debug and, in
+  /// release, at least leaves a breadcrumb.
   List<T> _decodeList<T>(
     String key,
     T Function(Map<String, dynamic>) fromJson,
@@ -185,9 +195,22 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
       return decoded
           .map((e) => fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(growable: false);
-    } on Object {
+    } on Object catch (error, stack) {
+      _reportDrift(key, error, stack);
       return fallback;
     }
+  }
+
+  /// Stored content that exists but cannot be read back. In debug this stops
+  /// the app at the point of the mistake; in release it prints and carries on,
+  /// because losing one section is better than losing the page.
+  void _reportDrift(String key, Object error, StackTrace stack) {
+    debugPrint(
+      'Stored content under "$key" could not be decoded and was dropped. '
+      'This is schema drift or corruption, not an empty collection: $error',
+    );
+    debugPrintStack(stackTrace: stack);
+    assert(false, 'Undecodable stored content under "$key": $error');
   }
 
   Future<void> _writeList<T>(
@@ -212,7 +235,8 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     if (raw == null || raw.trim().isEmpty) return fallback;
     try {
       return fromJson(Map<String, dynamic>.from(json.decode(raw) as Map));
-    } on Object {
+    } on Object catch (error, stack) {
+      _reportDrift(key, error, stack);
       return fallback;
     }
   }

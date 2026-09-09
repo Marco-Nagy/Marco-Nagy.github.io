@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/common/data_result.dart';
@@ -13,13 +14,20 @@ import '../../domain/entities/skill_group_entity.dart';
 import '../../domain/entities/tech_badge_entity.dart';
 import '../../domain/entities/work_history_entry.dart';
 import '../../domain/repositories/portfolio_repo.dart';
+import '../data_sources/bundled_content_loader.dart';
 import '../data_sources/portfolio_local_data_source.dart';
+import '../data_sources/portfolio_remote_data_source.dart';
 
 @LazySingleton(as: PortfolioRepo)
 class PortfolioRepoImpl implements PortfolioRepo {
-  PortfolioRepoImpl(this._local);
+  PortfolioRepoImpl(this._local, this._remote, this._bundled);
 
+  /// The cache and, for everything except [syncFromRemote], the only source
+  /// these methods read. Kept synchronous on purpose: the view models were
+  /// built around reads that cannot fail or wait.
   final PortfolioLocalDataSource _local;
+  final PortfolioRemoteDataSource _remote;
+  final BundledContentLoader _bundled;
 
   /// Every read/write goes through here so a storage failure surfaces as a
   /// [Fail] instead of an unhandled exception inside a cubit.
@@ -335,4 +343,54 @@ class PortfolioRepoImpl implements PortfolioRepo {
     () async => _local.readAll(),
     'Could not read the content bundle from local storage',
   );
+
+  /// Decision D2, in order of preference:
+  ///
+  /// 1. Remote says the cache is stale -> fetch, cache, use it.
+  /// 2. Remote agrees with the cache, or cannot be reached -> use the cache.
+  /// 3. No cache either -> the committed JSON asset (D3).
+  /// 4. Not even that -> whatever the store holds, empty or seeded.
+  ///
+  /// Steps 2-4 are why this returns [Success] on a failed fetch: a visitor
+  /// offline is a state the site renders, not an error to report. Only a
+  /// genuine storage fault reaches [Fail].
+  @override
+  Future<DataResult<PortfolioBundle>> syncFromRemote() => _guard(() async {
+    final cached = _local.readAll();
+
+    final meta = await _remote.fetchMeta();
+    if (meta != null && !meta.isFromNewerSchema) {
+      if (meta.isNewerThan(cached.contentVersion)) {
+        final fetched = await _remote.fetchBundle();
+        // A bundle whose schema this build cannot represent is worse than a
+        // stale one: writing it to the cache would corrupt what already works.
+        if (fetched != null && !fetched.isFromNewerSchema) {
+          await _local.writeAll(fetched);
+          return fetched;
+        }
+      } else {
+        // The common case, and the whole point of the meta document: one read,
+        // no payload, cache already correct.
+        return cached;
+      }
+    } else if (meta != null) {
+      debugPrint(
+        'Firestore content is schema v${meta.schemaVersion}, newer than this '
+        'build (v${PortfolioBundle.currentSchemaVersion}) — staying on cache. '
+        'Deploy the newer build to pick it up.',
+      );
+    }
+
+    if (!cached.isEmpty) return cached;
+
+    // Cold start with nothing to show: a first visit during an outage, or a
+    // cleared browser profile with Firestore unreachable.
+    final bundled = await _bundled.load();
+    if (bundled != null && !bundled.isEmpty) {
+      await _local.writeAll(bundled);
+      return bundled;
+    }
+
+    return _local.readAll();
+  }, 'Could not synchronise content');
 }

@@ -35,6 +35,14 @@ void main() {
     await source.resetToSeed();
   });
 
+  // SharedPrefHelper caches its SharedPreferences instance on first use, so
+  // without this every test after the first would keep reading whatever the
+  // previous one wrote — resetToSeed above happens to overwrite every key
+  // regardless, which is why this file passed before this was added, but the
+  // "an empty bundle empties the store" case does not go through resetToSeed
+  // and would leak without it.
+  tearDown(SharedPrefHelper.resetForTesting);
+
   group('readAll', () {
     test('carries every seeded collection with nothing dropped', () {
       final bundle = source.readAll();

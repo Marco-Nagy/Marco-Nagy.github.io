@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'core/services/shared_preference/shared_preference_helper.dart';
 import 'di/di.dart';
 import 'features/portfolio_content/data/data_sources/portfolio_local_data_source.dart';
+import 'features/portfolio_content/domain/repositories/portfolio_repo.dart';
 import 'firebase_options.dart';
 import 'marco_portfolio_app.dart';
 
@@ -30,9 +31,18 @@ Future<void> main() async {
 
   configureDependencies();
 
-  // Seeds on first launch only; later launches respect whatever is stored,
-  // including content deleted in debug.
+  // TRANSITIONAL — deleted at the end of Phase 1, once Firestore holds the
+  // first published bundle. Until then the Dart seeds are still the only
+  // content a brand-new profile can find, because the committed JSON asset
+  // that replaces them is itself produced by exporting these seeds.
   await getIt<PortfolioLocalDataSource>().seedIfEmpty();
+
+  // One Firestore read, before the first frame: compares the published
+  // content version against the cached one and pulls the bundle only when it
+  // differs. Awaited rather than fired off, so the app never paints stale
+  // content and then jumps. It cannot throw a visitor-facing failure —
+  // unreachable, unpublished and stale all resolve to "render what we have".
+  await getIt<PortfolioRepo>().syncFromRemote();
 
   runApp(const MarcoPortfolioApp());
 }

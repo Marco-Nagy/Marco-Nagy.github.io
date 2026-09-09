@@ -22,6 +22,8 @@ import '../features/certificates/presentation/view_model/certificates_view_model
     as _i337;
 import '../features/experience/presentation/view_model/experience_view_model.dart'
     as _i866;
+import '../features/portfolio_content/data/data_sources/bundled_content_loader.dart'
+    as _i972;
 import '../features/portfolio_content/data/data_sources/portfolio_local_data_source.dart'
     as _i275;
 import '../features/portfolio_content/data/data_sources/portfolio_local_data_source_impl.dart'
@@ -70,6 +72,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.sharedPrefHelper,
     );
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
+    gh.lazySingleton<_i972.BundledContentLoader>(
+      () => const _i972.BundledContentLoader(),
+    );
     gh.lazySingleton<_i109.PortfolioRemoteDataSource>(
       () => _i811.PortfolioRemoteDataSourceImpl(),
     );
@@ -83,7 +88,11 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i809.ImagePickerService(gh<_i183.ImagePicker>()),
     );
     gh.lazySingleton<_i1023.PortfolioRepo>(
-      () => _i432.PortfolioRepoImpl(gh<_i275.PortfolioLocalDataSource>()),
+      () => _i432.PortfolioRepoImpl(
+        gh<_i275.PortfolioLocalDataSource>(),
+        gh<_i109.PortfolioRemoteDataSource>(),
+        gh<_i972.BundledContentLoader>(),
+      ),
     );
     gh.factory<_i120.BundleUseCase>(
       () => _i120.BundleUseCase(gh<_i1023.PortfolioRepo>()),

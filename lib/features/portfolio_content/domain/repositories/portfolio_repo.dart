@@ -95,4 +95,15 @@ abstract class PortfolioRepo {
   /// and the admin exports. Reads the same in-memory caches the per-entity
   /// getters use, so this is not a fresh decode of the whole store.
   Future<DataResult<PortfolioBundle>> readBundle();
+
+  /// Brings the local cache up to date with Firestore, once, at startup.
+  ///
+  /// Every other read on this interface stays a plain cache read. Putting the
+  /// version check inside each of them instead would turn one page into
+  /// dozens of round trips, and none of them could then be synchronous.
+  ///
+  /// Never fails in a way a visitor sees: an unreachable Firestore, a missing
+  /// document and a stale cache all resolve to "render what we have", falling
+  /// back through cache, then the committed JSON asset, then the seeds.
+  Future<DataResult<PortfolioBundle>> syncFromRemote();
 }
