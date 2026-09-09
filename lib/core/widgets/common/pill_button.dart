@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
@@ -22,15 +23,23 @@ class PillButton extends StatefulWidget {
     this.variant = PillButtonVariant.filled,
     this.showArrow = true,
     this.icon,
+    this.svgIcon,
     this.dense = false,
     super.key,
-  });
+  }) : assert(
+         icon == null || svgIcon == null,
+         'Pass either icon or svgIcon, not both.',
+       );
 
   final String label;
   final VoidCallback? onPressed;
   final PillButtonVariant variant;
   final bool showArrow;
   final IconData? icon;
+
+  /// A raw SVG string rendered instead of [icon] — for admin-only controls
+  /// whose glyphs are hand-drawn rather than Material icons.
+  final String? svgIcon;
   final bool dense;
 
   @override
@@ -94,6 +103,14 @@ class _PillButtonState extends State<PillButton> {
             children: <Widget>[
               if (widget.icon != null) ...<Widget>[
                 Icon(widget.icon, size: 18.r, color: foreground),
+                SizedBox(width: 8.w),
+              ] else if (widget.svgIcon != null) ...<Widget>[
+                SvgPicture.string(
+                  widget.svgIcon!,
+                  width: 16.r,
+                  height: 16.r,
+                  colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
+                ),
                 SizedBox(width: 8.w),
               ],
               Text(

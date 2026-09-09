@@ -5,6 +5,7 @@ import '../../../../core/constants/skill_groups.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/widgets/common/skill_chip.dart';
 
 /// Grouped skill chips, rendered below the About columns as a secondary block.
 class SkillsBlock extends StatelessWidget {
@@ -44,30 +45,6 @@ class SkillsBlock extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class SkillChip extends StatelessWidget {
-  const SkillChip({required this.label, super.key});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 9.h),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(100.r),
-        border: Border.all(color: colors.divider),
-      ),
-      child: Text(
-        label,
-        style: MyFonts.regular14.copyWith(color: colors.onNavyMuted),
-      ),
     );
   }
 }

@@ -1,8 +1,10 @@
 import '../../domain/entities/custom_section_item.dart';
-import '../../domain/entities/image_ref.dart';
+import '../../domain/entities/media_ref.dart';
+import '../../domain/entities/project_video.dart';
 import '../../domain/entities/shot_background.dart';
 import '../../domain/entities/showcase_panel.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/project_link.dart';
 import 'localized_pick.dart';
 
 /// What a numbered list row needs to render, resolved into one language.
@@ -18,11 +20,16 @@ class ListRowData {
     this.category = '',
     this.description = '',
     this.features = const <String>[],
-    this.cover = const ImageRef(),
+    this.cover = const MediaRef(),
     this.panels = const <ShowcasePanel>[],
+    this.videos = const <ProjectVideo>[],
     this.background = const ShotBackground(),
     this.accentHex = '4CC9F0',
     this.linkUrl = '',
+    this.links = const <ProjectLink>[],
+    this.skills = const <String>[],
+    this.technologies = const <String>[],
+    this.tools = const <String>[],
   });
 
   final String id;
@@ -33,13 +40,26 @@ class ListRowData {
   final String category;
   final String description;
   final List<String> features;
-  final ImageRef cover;
+  final MediaRef cover;
   final List<ShowcasePanel> panels;
 
-  /// Default background the panels render on.
+  /// Empty for a custom-section row — only [PersonalProject] carries videos.
+  final List<ProjectVideo> videos;
+
+  /// Default background the panels and videos render on.
   final ShotBackground background;
   final String accentHex;
   final String linkUrl;
+
+  /// Outbound links (repo, stores, demo) — populated for [PersonalProject]
+  /// rows only; custom-section items use the single [linkUrl] instead.
+  final List<ProjectLink> links;
+
+  /// Skills · technologies · tools chip groups. Empty for custom-section rows —
+  /// only [PersonalProject] carries them.
+  final List<String> skills;
+  final List<String> technologies;
+  final List<String> tools;
 
   factory ListRowData.fromProject(
     PersonalProject project,
@@ -59,8 +79,13 @@ class ListRowData {
       features: pickList(isArabic, project.features, project.featuresAr),
       cover: project.cover,
       panels: project.panels,
+      videos: project.videos,
       background: project.showcaseBackground,
       accentHex: project.accentHex,
+      links: project.links,
+      skills: pickList(isArabic, project.skills, project.skillsAr),
+      technologies: project.technologies,
+      tools: project.tools,
     );
   }
 
@@ -76,7 +101,9 @@ class ListRowData {
       category: pickText(isArabic, item.tagEn, item.tagAr),
       description: pickText(isArabic, item.descriptionEn, item.descriptionAr),
       features: pickList(isArabic, item.bulletsEn, item.bulletsAr),
-      cover: item.images.isEmpty ? const ImageRef() : item.images.first,
+      cover: item.images.isEmpty
+          ? const MediaRef()
+          : MediaRef.still(item.images.first),
       accentHex: item.accentHex,
       linkUrl: item.linkUrl,
     );

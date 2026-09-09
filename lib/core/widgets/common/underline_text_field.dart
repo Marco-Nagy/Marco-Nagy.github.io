@@ -15,6 +15,7 @@ class UnderlineTextField extends StatelessWidget {
     this.maxLines = 1,
     this.hint,
     this.textInputAction,
+    this.onChanged,
     super.key,
   });
 
@@ -25,6 +26,10 @@ class UnderlineTextField extends StatelessWidget {
   final int maxLines;
   final String? hint;
   final TextInputAction? textInputAction;
+
+  /// Lets a field that mirrors non-text state — a [MediaRef], a parsed number —
+  /// react as it is typed rather than only when the form is saved.
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,7 @@ class UnderlineTextField extends StatelessWidget {
         keyboardType: keyboardType,
         maxLines: maxLines,
         textInputAction: textInputAction,
+        onChanged: onChanged,
         style: MyFonts.regular16.copyWith(color: colors.onNavy),
         cursorColor: colors.accent,
         decoration: InputDecoration(
@@ -50,7 +56,9 @@ class UnderlineTextField extends StatelessWidget {
           isDense: true,
           contentPadding: EdgeInsets.symmetric(vertical: 12.h),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: colors.divider),
+            // Not `divider`: on the admin sheet's surfaceHigh ground those two
+            // are the same navy, and the field reads as absent.
+            borderSide: BorderSide(color: colors.onNavyFaint),
           ),
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: colors.accent, width: 1.6),

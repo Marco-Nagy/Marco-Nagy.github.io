@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'image_ref.dart';
+import 'media_ref.dart';
 
 part 'media_shot.freezed.dart';
 part 'media_shot.g.dart';
@@ -32,7 +32,7 @@ enum DeviceFrameType {
 @freezed
 abstract class MediaShot with _$MediaShot {
   const factory MediaShot({
-    @Default(ImageRef()) ImageRef image,
+    @Default(MediaRef()) MediaRef image,
     @Default(DeviceFrameType.none) DeviceFrameType frame,
     @Default(0) double rotationDegrees,
     @Default(1) double scale,

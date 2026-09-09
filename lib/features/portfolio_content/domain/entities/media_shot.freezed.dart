@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MediaShot {
 
- ImageRef get image; DeviceFrameType get frame; double get rotationDegrees; double get scale;/// Fractional offset inside the panel: 0 is centred, 1 is a full panel
+ MediaRef get image; DeviceFrameType get frame; double get rotationDegrees; double get scale;/// Fractional offset inside the panel: 0 is centred, 1 is a full panel
 /// width/height away.
  double get offsetX; double get offsetY;
 /// Create a copy of MediaShot
@@ -50,11 +50,11 @@ abstract mixin class $MediaShotCopyWith<$Res>  {
   factory $MediaShotCopyWith(MediaShot value, $Res Function(MediaShot) _then) = _$MediaShotCopyWithImpl;
 @useResult
 $Res call({
- ImageRef image, DeviceFrameType frame, double rotationDegrees, double scale, double offsetX, double offsetY
+ MediaRef image, DeviceFrameType frame, double rotationDegrees, double scale, double offsetX, double offsetY
 });
 
 
-$ImageRefCopyWith<$Res> get image;
+$MediaRefCopyWith<$Res> get image;
 
 }
 /// @nodoc
@@ -70,7 +70,7 @@ class _$MediaShotCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? image = null,Object? frame = null,Object? rotationDegrees = null,Object? scale = null,Object? offsetX = null,Object? offsetY = null,}) {
   return _then(_self.copyWith(
 image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
-as ImageRef,frame: null == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
+as MediaRef,frame: null == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
 as DeviceFrameType,rotationDegrees: null == rotationDegrees ? _self.rotationDegrees : rotationDegrees // ignore: cast_nullable_to_non_nullable
 as double,scale: null == scale ? _self.scale : scale // ignore: cast_nullable_to_non_nullable
 as double,offsetX: null == offsetX ? _self.offsetX : offsetX // ignore: cast_nullable_to_non_nullable
@@ -82,9 +82,9 @@ as double,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ImageRefCopyWith<$Res> get image {
+$MediaRefCopyWith<$Res> get image {
   
-  return $ImageRefCopyWith<$Res>(_self.image, (value) {
+  return $MediaRefCopyWith<$Res>(_self.image, (value) {
     return _then(_self.copyWith(image: value));
   });
 }
@@ -169,7 +169,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ImageRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MediaRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MediaShot() when $default != null:
 return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.offsetX,_that.offsetY);case _:
@@ -190,7 +190,7 @@ return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ImageRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MediaRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)  $default,) {final _that = this;
 switch (_that) {
 case _MediaShot():
 return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.offsetX,_that.offsetY);case _:
@@ -210,7 +210,7 @@ return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ImageRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MediaRef image,  DeviceFrameType frame,  double rotationDegrees,  double scale,  double offsetX,  double offsetY)?  $default,) {final _that = this;
 switch (_that) {
 case _MediaShot() when $default != null:
 return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.offsetX,_that.offsetY);case _:
@@ -225,10 +225,10 @@ return $default(_that.image,_that.frame,_that.rotationDegrees,_that.scale,_that.
 @JsonSerializable()
 
 class _MediaShot implements MediaShot {
-  const _MediaShot({this.image = const ImageRef(), this.frame = DeviceFrameType.none, this.rotationDegrees = 0, this.scale = 1, this.offsetX = 0, this.offsetY = 0});
+  const _MediaShot({this.image = const MediaRef(), this.frame = DeviceFrameType.none, this.rotationDegrees = 0, this.scale = 1, this.offsetX = 0, this.offsetY = 0});
   factory _MediaShot.fromJson(Map<String, dynamic> json) => _$MediaShotFromJson(json);
 
-@override@JsonKey() final  ImageRef image;
+@override@JsonKey() final  MediaRef image;
 @override@JsonKey() final  DeviceFrameType frame;
 @override@JsonKey() final  double rotationDegrees;
 @override@JsonKey() final  double scale;
@@ -270,11 +270,11 @@ abstract mixin class _$MediaShotCopyWith<$Res> implements $MediaShotCopyWith<$Re
   factory _$MediaShotCopyWith(_MediaShot value, $Res Function(_MediaShot) _then) = __$MediaShotCopyWithImpl;
 @override @useResult
 $Res call({
- ImageRef image, DeviceFrameType frame, double rotationDegrees, double scale, double offsetX, double offsetY
+ MediaRef image, DeviceFrameType frame, double rotationDegrees, double scale, double offsetX, double offsetY
 });
 
 
-@override $ImageRefCopyWith<$Res> get image;
+@override $MediaRefCopyWith<$Res> get image;
 
 }
 /// @nodoc
@@ -290,7 +290,7 @@ class __$MediaShotCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? image = null,Object? frame = null,Object? rotationDegrees = null,Object? scale = null,Object? offsetX = null,Object? offsetY = null,}) {
   return _then(_MediaShot(
 image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
-as ImageRef,frame: null == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
+as MediaRef,frame: null == frame ? _self.frame : frame // ignore: cast_nullable_to_non_nullable
 as DeviceFrameType,rotationDegrees: null == rotationDegrees ? _self.rotationDegrees : rotationDegrees // ignore: cast_nullable_to_non_nullable
 as double,scale: null == scale ? _self.scale : scale // ignore: cast_nullable_to_non_nullable
 as double,offsetX: null == offsetX ? _self.offsetX : offsetX // ignore: cast_nullable_to_non_nullable
@@ -303,9 +303,9 @@ as double,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ImageRefCopyWith<$Res> get image {
+$MediaRefCopyWith<$Res> get image {
   
-  return $ImageRefCopyWith<$Res>(_self.image, (value) {
+  return $MediaRefCopyWith<$Res>(_self.image, (value) {
     return _then(_self.copyWith(image: value));
   });
 }

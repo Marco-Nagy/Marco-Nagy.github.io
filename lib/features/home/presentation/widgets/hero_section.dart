@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/localization/lang_keys.dart';
-import '../../../../core/routes/route_names.dart';
-import '../../../../core/utils/extension/navigation_extensions.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/common/content_container.dart';
@@ -17,7 +15,10 @@ import 'scroll_down_label.dart';
 /// The landing view: headline and CTA on the leading side, the photo on the
 /// trailing side, social links bottom-leading and the scroll cue on the edge.
 class HeroSection extends StatelessWidget {
-  const HeroSection({super.key});
+  const HeroSection({required this.onSeeWorks, super.key});
+
+  /// Travels to the works block further down the same page.
+  final VoidCallback onSeeWorks;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,9 @@ class HeroSection extends StatelessWidget {
         children: <Widget>[
           ContentContainer(
             verticalPadding: 48.h,
-            child: context.isWide ? const _WideHero() : const _NarrowHero(),
+            child: context.isWide
+                ? _WideHero(onSeeWorks: onSeeWorks)
+                : _NarrowHero(onSeeWorks: onSeeWorks),
           ),
           if (context.isWide)
             Positioned.directional(
@@ -36,7 +39,7 @@ class HeroSection extends StatelessWidget {
               end: 24.w,
               top: 0,
               bottom: 0,
-              child: const Center(child: ScrollDownLabel()),
+              child: Center(child: ScrollDownLabel(onTap: onSeeWorks)),
             ),
         ],
       ),
@@ -45,7 +48,9 @@ class HeroSection extends StatelessWidget {
 }
 
 class _WideHero extends StatelessWidget {
-  const _WideHero();
+  const _WideHero({required this.onSeeWorks});
+
+  final VoidCallback onSeeWorks;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +67,7 @@ class _WideHero extends StatelessWidget {
               // it still fade.
               const HeroHeadline(),
               SizedBox(height: 44.h),
-              const RevealOnScroll(child: _SeeMyWorkCta()),
+              RevealOnScroll(child: _SeeMyWorkCta(onPressed: onSeeWorks)),
               SizedBox(height: 44.h),
               const RevealOnScroll(child: HeroSocialLinks()),
             ],
@@ -83,7 +88,9 @@ class _WideHero extends StatelessWidget {
 }
 
 class _NarrowHero extends StatelessWidget {
-  const _NarrowHero();
+  const _NarrowHero({required this.onSeeWorks});
+
+  final VoidCallback onSeeWorks;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +102,7 @@ class _NarrowHero extends StatelessWidget {
         SizedBox(height: 36.h),
         const HeroHeadline(),
         SizedBox(height: 36.h),
-        const RevealOnScroll(child: _SeeMyWorkCta()),
+        RevealOnScroll(child: _SeeMyWorkCta(onPressed: onSeeWorks)),
         SizedBox(height: 36.h),
         const RevealOnScroll(child: HeroSocialLinks()),
       ],
@@ -104,7 +111,9 @@ class _NarrowHero extends StatelessWidget {
 }
 
 class _SeeMyWorkCta extends StatelessWidget {
-  const _SeeMyWorkCta();
+  const _SeeMyWorkCta({required this.onPressed});
+
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +121,7 @@ class _SeeMyWorkCta extends StatelessWidget {
       alignment: AlignmentDirectional.centerStart,
       child: PillButton(
         label: context.translate(LangKeys.heroCta),
-        onPressed: () => context.replaceNamed<void>(RouteNames.projects),
+        onPressed: onPressed,
       ),
     );
   }

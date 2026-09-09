@@ -67,10 +67,13 @@ class _RevealTriggerState extends State<RevealTrigger>
     // bails it out. A one-shot recheck timed to when the curtain is
     // guaranteed to be done closes that gap without depending on catching an
     // exact animation tick.
-    Future<void>.delayed(Motion.curtain * 2 + const Duration(milliseconds: 50), () {
-      if (!mounted) return;
-      _check();
-    });
+    Future<void>.delayed(
+      Motion.curtain * 2 + const Duration(milliseconds: 50),
+      () {
+        if (!mounted) return;
+        _check();
+      },
+    );
   }
 
   @override

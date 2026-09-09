@@ -15,6 +15,8 @@ class SafeAssetImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.width,
     this.height,
+    this.cacheWidth,
+    this.cacheHeight,
     super.key,
   });
 
@@ -23,6 +25,10 @@ class SafeAssetImage extends StatelessWidget {
   final BoxFit fit;
   final double? width;
   final double? height;
+
+  /// Physical-pixel decode target — see `AppImage._cacheDim`.
+  final int? cacheWidth;
+  final int? cacheHeight;
 
   bool get _isVector => assetPath.toLowerCase().endsWith('.svg');
 
@@ -43,6 +49,8 @@ class SafeAssetImage extends StatelessWidget {
       fit: fit,
       width: width,
       height: height,
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
       errorBuilder: (context, error, stackTrace) => fallback,
       // Decoding is asynchronous, so a large asset lands after its entrance
       // animation has already played. Without this the image pops in abruptly

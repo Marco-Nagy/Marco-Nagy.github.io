@@ -34,30 +34,18 @@ class SiteFooter extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // The call to action wipes itself in line by line, so it is not
           // wrapped in a fade; only the ring beside it still needs one.
-          if (isWide)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const Expanded(child: _FooterCallToAction()),
-                SizedBox(width: 40.w),
-                RevealOnScroll(child: HatchedCircle(diameter: 180.w)),
-              ],
-            )
-          else ...<Widget>[
-            const _FooterCallToAction(),
+          const _FooterCallToAction(),
+          if (!isWide) ...<Widget>[
             SizedBox(height: 32.h),
-            Center(
-              child: RevealOnScroll(child: HatchedCircle(diameter: 140.w)),
-            ),
+            RevealOnScroll(child: HatchedCircle(diameter: 140.w)),
           ],
           SizedBox(height: 48.h),
           Divider(color: colors.divider.withValues(alpha: 0.6)),
           SizedBox(height: 24.h),
-          _FooterCredits(isWide: isWide),
+          const _FooterCredits(),
         ],
       ),
     );
@@ -70,20 +58,40 @@ class _FooterCallToAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+
+    final headline = BlockRevealText(
+      context.translate(LangKeys.footerHeadline),
+      textAlign: TextAlign.center,
+      style: (context.isMobile ? MyFonts.display36 : MyFonts.display48)
+          .copyWith(color: colors.onNavy),
+    );
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        BlockRevealText(
-          context.translate(LangKeys.footerHeadline),
-          style: (context.isMobile ? MyFonts.display36 : MyFonts.display48)
-              .copyWith(color: colors.onNavy),
-        ),
+        if (context.isWide)
+          // The ring hangs off the headline's tail and, being the first child,
+          // paints behind it — the reference overlaps the two rather than
+          // setting them side by side, and the words stay readable through it.
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: AlignmentDirectional.centerEnd,
+            children: <Widget>[
+              PositionedDirectional(
+                end: -56.w,
+                child: RevealOnScroll(child: HatchedCircle(diameter: 120.w)),
+              ),
+              headline,
+            ],
+          )
+        else
+          headline,
         SizedBox(height: 16.h),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 520.w),
           child: BlockRevealText(
             context.translate(LangKeys.footerAvailability),
+            textAlign: TextAlign.center,
             style: MyFonts.regular16.copyWith(color: colors.onNavyMuted),
           ),
         ),
@@ -98,44 +106,31 @@ class _FooterCallToAction extends StatelessWidget {
 }
 
 class _FooterCredits extends StatelessWidget {
-  const _FooterCredits({required this.isWide});
-
-  final bool isWide;
+  const _FooterCredits();
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final year = DateTime.now().year;
+    final style = MyFonts.regular12.copyWith(color: colors.onNavyFaint);
 
-    final credit = Text(
-      '© $year ${context.translate(LangKeys.footerBuiltBy)}',
-      style: MyFonts.regular12.copyWith(color: colors.onNavyFaint),
-    );
-    final builtWith = Text(
-      context.translate(LangKeys.footerBuiltWith),
-      style: MyFonts.regular12.copyWith(color: colors.onNavyFaint),
-    );
-
-    if (!isWide) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const FooterSocialIcons(),
-          SizedBox(height: 20.h),
-          credit,
-          SizedBox(height: 6.h),
-          builtWith,
-        ],
-      );
-    }
-
-    return Row(
+    // Stacked and centred at every width — the reference signs off down the
+    // middle rather than splitting the credits across the page.
+    return Column(
       children: <Widget>[
-        credit,
-        SizedBox(width: 20.w),
-        builtWith,
-        const Spacer(),
         const FooterSocialIcons(),
+        SizedBox(height: 20.h),
+        Text(
+          '© $year ${context.translate(LangKeys.footerBuiltBy)}',
+          textAlign: TextAlign.center,
+          style: style,
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          context.translate(LangKeys.footerBuiltWith),
+          textAlign: TextAlign.center,
+          style: style,
+        ),
       ],
     );
   }

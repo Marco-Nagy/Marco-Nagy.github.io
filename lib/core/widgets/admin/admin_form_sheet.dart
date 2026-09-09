@@ -29,6 +29,10 @@ class AdminFormSheet extends StatefulWidget {
   final VoidCallback onSave;
 
   /// Opens any form sheet as a modal, typed by what that form pops with.
+  ///
+  /// Cancel and the close button pop `null` rather than a "dismissed" flag:
+  /// the modal route casts its result to `T?`, so popping any value that is
+  /// not a [T] throws mid-pop and leaves the navigator locked.
   static Future<T?> show<T>(BuildContext context, Widget sheet) {
     return showModalBottomSheet<T>(
       context: context,
@@ -85,7 +89,8 @@ class _AdminFormSheetState extends State<AdminFormSheet> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.of(context).pop(false),
+                      // Pops null, not `false` — see [show].
+                      onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(
                         Icons.close_rounded,
                         color: colors.onNavyMuted,
@@ -113,7 +118,7 @@ class _AdminFormSheetState extends State<AdminFormSheet> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
+                      onPressed: () => Navigator.of(context).pop(),
                       child: Text(
                         context.translate(LangKeys.adminCancel),
                         style: MyFonts.semi16.copyWith(

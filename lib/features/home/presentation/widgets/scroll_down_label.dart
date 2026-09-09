@@ -14,7 +14,10 @@ import '../../../../core/widgets/motion/reveal_scope.dart';
 /// the whole session, so an unconditional `repeat()` would keep producing
 /// frames for an off-screen 1.4px line forever.
 class ScrollDownLabel extends StatefulWidget {
-  const ScrollDownLabel({super.key});
+  const ScrollDownLabel({this.onTap, super.key});
+
+  /// Makes the cue act on what it invites. Decorative when null.
+  final VoidCallback? onTap;
 
   @override
   State<ScrollDownLabel> createState() => _ScrollDownLabelState();
@@ -77,7 +80,7 @@ class _ScrollDownLabelState extends State<ScrollDownLabel>
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return Column(
+    final label = Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         RotatedBox(
@@ -119,6 +122,17 @@ class _ScrollDownLabelState extends State<ScrollDownLabel>
           ),
         ),
       ],
+    );
+
+    if (widget.onTap == null) return label;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: label,
+      ),
     );
   }
 }

@@ -11,9 +11,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'package:get_it/get_it.dart' as _i174;
+import 'package:image_picker/image_picker.dart' as _i183;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../core/app_cubit/app_cubit.dart' as _i693;
+import '../core/services/media/image_picker_service.dart' as _i809;
 import '../core/services/shared_preference/shared_preference_helper.dart'
     as _i668;
 import '../features/certificates/presentation/view_model/certificates_view_model.dart'
@@ -61,11 +63,15 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i668.SharedPrefHelper>(
       () => registerModule.sharedPrefHelper,
     );
+    gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
     gh.factory<_i693.AppCubit>(
       () => _i693.AppCubit(gh<_i668.SharedPrefHelper>()),
     );
     gh.lazySingleton<_i275.PortfolioLocalDataSource>(
       () => _i420.PortfolioLocalDataSourceImpl(gh<_i668.SharedPrefHelper>()),
+    );
+    gh.lazySingleton<_i809.ImagePickerService>(
+      () => _i809.ImagePickerService(gh<_i183.ImagePicker>()),
     );
     gh.lazySingleton<_i1023.PortfolioRepo>(
       () => _i432.PortfolioRepoImpl(gh<_i275.PortfolioLocalDataSource>()),

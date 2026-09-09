@@ -52,3 +52,39 @@ abstract class ShowcasePanel with _$ShowcasePanel {
   factory ShowcasePanel.fromJson(Map<String, dynamic> json) =>
       _$ShowcasePanelFromJson(json);
 }
+
+/// The three kinds of panel a project's showcase is built from — a feature
+/// graphic, device-framed screenshots, a looping GIF. Video is not one of
+/// these: it is never a [ShowcasePanel] at all, see [ProjectVideo]. Not a
+/// stored field: derived from what a panel actually holds, so the admin
+/// screen's sections and the detail page's media blocks classify every panel
+/// the same way without a chance to drift out of sync with each other.
+enum ProjectMediaLayer { featureGraphic, screenshots, gif }
+
+extension ShowcasePanelLayer on ShowcasePanel {
+  /// Classified by what the panel's first shot actually is where that
+  /// matters, and by the declared format otherwise. An empty panel (just
+  /// added, no shot yet) always falls back to its declared format so it
+  /// still lands in the section the admin meant to add it to.
+  ///
+  /// An animated image is only a GIF-layer banner when it has no device
+  /// frame around it — that is what [GifFormScreen] always produces, since
+  /// it has no frame control. Add the same animated file through
+  /// [ScreenshotFormScreen] instead, with a frame picked, and it stays a
+  /// screenshot: a looping screen recording inside a phone bezel, not the
+  /// edge-to-edge banner a bare GIF is. The frame, not the file type, is what
+  /// tells the two apart.
+  ProjectMediaLayer get mediaLayer {
+    if (format == ShowcaseFormat.featureGraphic) {
+      return ProjectMediaLayer.featureGraphic;
+    }
+    final shot = shots.isEmpty ? null : shots.first;
+    final isFramelessGif =
+        shot != null &&
+        shot.frame == DeviceFrameType.none &&
+        shot.image.isAnimatedImage;
+    return isFramelessGif
+        ? ProjectMediaLayer.gif
+        : ProjectMediaLayer.screenshots;
+  }
+}
