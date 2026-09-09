@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Project media (compressed clips and screenshots) is public to read and
+// writable only by the single owner account — same reasoning as
+// firestore.rules: an authenticated-but-arbitrary user is not good enough.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /media/{allPaths=**} {
+      allow read: if true;
+
+      // PHASE 2: replace with the line below once the owner account exists.
+      //   allow write: if request.auth != null
+      //                && request.auth.uid == '<owner-uid>';
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
