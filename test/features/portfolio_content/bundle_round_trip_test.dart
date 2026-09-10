@@ -163,4 +163,39 @@ void main() {
       expect(const PortfolioBundle().isFromNewerSchema, isFalse);
     });
   });
+
+  // Everything above rests on the fixtures being exhaustive, and nothing was
+  // enforcing that: adding a field to an entity and forgetting to add it to
+  // `sample_bundle.dart` leaves the round-trip test still passing while no
+  // longer covering that field. This turns the convention into a check.
+  //
+  // `SiteContent` is the one asserted here because it is the entity that keeps
+  // growing — 35 fields at Phase 3, 43 after Phase 4 added the featured-works
+  // copy — and the only one whose every field has a default, so a bare
+  // instance to diff against actually exists.
+  group('fixture coverage', () {
+    test('every SiteContent field is set away from its default', () {
+      final fixture = sampleSiteContent().toJson();
+      final blank = const SiteContent().toJson();
+
+      final untouched = <String>[
+        for (final key in blank.keys)
+          if (_sameJson(fixture[key], blank[key])) key,
+      ];
+
+      expect(
+        untouched,
+        isEmpty,
+        reason:
+            'sample_bundle.dart leaves these at their default, so '
+            'bundle_round_trip_test would pass even if they never '
+            'serialised: ${untouched.join(', ')}',
+      );
+    });
+  });
 }
+
+/// Structural equality over decoded JSON, so a `List`/`Map` field compares by
+/// content rather than by identity — `<String>[] == <String>[]` is false in
+/// Dart, and every list field would otherwise read as "changed".
+bool _sameJson(Object? a, Object? b) => json.encode(a) == json.encode(b);

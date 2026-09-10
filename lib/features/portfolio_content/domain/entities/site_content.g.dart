@@ -60,6 +60,14 @@ _SiteContent _$SiteContentFromJson(Map<String, dynamic> json) => _SiteContent(
   contactTitleAr: json['contactTitleAr'] as String? ?? '',
   contactSubtitleEn: json['contactSubtitleEn'] as String? ?? '',
   contactSubtitleAr: json['contactSubtitleAr'] as String? ?? '',
+  homeWorksHeadlineEn: json['homeWorksHeadlineEn'] as String? ?? '',
+  homeWorksHeadlineAr: json['homeWorksHeadlineAr'] as String? ?? '',
+  homeWorksSubtitleEn: json['homeWorksSubtitleEn'] as String? ?? '',
+  homeWorksSubtitleAr: json['homeWorksSubtitleAr'] as String? ?? '',
+  homeWorksMoreLabelEn: json['homeWorksMoreLabelEn'] as String? ?? '',
+  homeWorksMoreLabelAr: json['homeWorksMoreLabelAr'] as String? ?? '',
+  homeWorksViewAllEn: json['homeWorksViewAllEn'] as String? ?? '',
+  homeWorksViewAllAr: json['homeWorksViewAllAr'] as String? ?? '',
 );
 
 Map<String, dynamic> _$SiteContentToJson(_SiteContent instance) =>
@@ -99,4 +107,12 @@ Map<String, dynamic> _$SiteContentToJson(_SiteContent instance) =>
       'contactTitleAr': instance.contactTitleAr,
       'contactSubtitleEn': instance.contactSubtitleEn,
       'contactSubtitleAr': instance.contactSubtitleAr,
+      'homeWorksHeadlineEn': instance.homeWorksHeadlineEn,
+      'homeWorksHeadlineAr': instance.homeWorksHeadlineAr,
+      'homeWorksSubtitleEn': instance.homeWorksSubtitleEn,
+      'homeWorksSubtitleAr': instance.homeWorksSubtitleAr,
+      'homeWorksMoreLabelEn': instance.homeWorksMoreLabelEn,
+      'homeWorksMoreLabelAr': instance.homeWorksMoreLabelAr,
+      'homeWorksViewAllEn': instance.homeWorksViewAllEn,
+      'homeWorksViewAllAr': instance.homeWorksViewAllAr,
     };

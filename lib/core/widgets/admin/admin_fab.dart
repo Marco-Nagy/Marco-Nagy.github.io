@@ -3,10 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../di/di.dart';
 import '../../../features/portfolio_content/domain/entities/portfolio_bundle.dart';
 import '../../../features/portfolio_content/domain/use_cases/bundle_use_case.dart'
     show BundleExport, BundleUseCase;
+import '../../../features/portfolio_content/presentation/view_model/site_content_actions.dart';
+import '../../../features/portfolio_content/presentation/view_model/site_content_view_model.dart';
+import '../../../features/portfolio_content/presentation/widgets/site_content_form_screen.dart';
 import '../../common/data_result.dart';
 import '../../localization/lang_keys.dart';
 import '../../services/auth/admin_auth_service.dart';
@@ -54,6 +59,23 @@ class _AdminFabState extends State<AdminFab> {
     setState(() => _busy = true);
     await getIt<AdminAuthService>().signOut();
     if (mounted) setState(() => _busy = false);
+  }
+
+  /// The one form with no list to hang off: `SiteContent` is a singleton, so
+  /// there is no row anywhere to put an edit button beside.
+  Future<void> _editSiteContent() async {
+    final cubit = context.read<SiteContentCubit>();
+    setState(() => _open = false);
+
+    final built = await SiteContentFormScreen.open(
+      context,
+      content: cubit.content,
+    );
+    if (built == null) return;
+
+    // Saves to the local cache only. Publish is what sends it to Firestore —
+    // deliberately two steps, so editing and going live stay separate.
+    cubit.doAction(SaveSiteContent(built));
   }
 
   Future<void> _publish() async {
@@ -120,10 +142,7 @@ class _AdminFabState extends State<AdminFab> {
             backgroundColor: problems.isEmpty ? null : danger,
             duration: Duration(seconds: problems.isEmpty ? 4 : 8),
             content: Text(
-              <String>[
-                '$copied — ${export.sizeLabel}',
-                ...problems,
-              ].join('\n'),
+              <String>['$copied — ${export.sizeLabel}', ...problems].join('\n'),
             ),
           ),
         );
@@ -170,6 +189,12 @@ class _AdminFabState extends State<AdminFab> {
                   icon: Icons.download_rounded,
                   busy: _busy,
                   onPressed: _export,
+                ),
+                _AdminFabAction(
+                  label: context.translate(LangKeys.adminSiteContent),
+                  icon: Icons.article_outlined,
+                  busy: _busy,
+                  onPressed: _editSiteContent,
                 ),
               ],
               SizedBox(height: 12.h),

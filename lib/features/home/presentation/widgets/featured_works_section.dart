@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/extension/navigation_extensions.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/common/content_container.dart';
@@ -28,6 +28,7 @@ class FeaturedWorksSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     return BlocProvider<ProjectsViewModelCubit>(
       create: (_) => getIt<ProjectsViewModelCubit>()..doAction(LoadProjects()),
@@ -38,14 +39,20 @@ class FeaturedWorksSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               BlockRevealText(
-                context.translate(LangKeys.homeWorksHeadline),
+                context.localized(
+                  site.homeWorksHeadlineEn,
+                  site.homeWorksHeadlineAr,
+                ),
                 style:
                     (context.isMobile ? MyFonts.display36 : MyFonts.display48)
                         .copyWith(color: colors.onNavy),
               ),
               SizedBox(height: 16.h),
               BlockRevealText(
-                context.translate(LangKeys.homeWorksSubtitle),
+                context.localized(
+                  site.homeWorksSubtitleEn,
+                  site.homeWorksSubtitleAr,
+                ),
                 style: MyFonts.regular16.copyWith(color: colors.onNavyMuted),
               ),
               SizedBox(height: 56.h),
@@ -75,6 +82,7 @@ class _ViewAllLinkState extends State<_ViewAllLink> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     return Align(
       alignment: AlignmentDirectional.centerStart,
@@ -90,7 +98,12 @@ class _ViewAllLinkState extends State<_ViewAllLink> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                context.translate(LangKeys.homeWorksMoreLabel).toUpperCase(),
+                context
+                    .localized(
+                      site.homeWorksMoreLabelEn,
+                      site.homeWorksMoreLabelAr,
+                    )
+                    .toUpperCase(),
                 style: MyFonts.caps10.copyWith(color: colors.onNavyFaint),
               ),
               SizedBox(height: 12.h),
@@ -105,7 +118,12 @@ class _ViewAllLinkState extends State<_ViewAllLink> {
                             .copyWith(
                               color: _hovered ? colors.accent : colors.onNavy,
                             ),
-                    child: Text(context.translate(LangKeys.homeWorksViewAll)),
+                    child: Text(
+                      context.localized(
+                        site.homeWorksViewAllEn,
+                        site.homeWorksViewAllAr,
+                      ),
+                    ),
                   ),
                   AnimatedContainer(
                     duration: Motion.quick,

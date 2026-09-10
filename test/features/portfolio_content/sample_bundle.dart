@@ -220,7 +220,9 @@ SiteContent sampleSiteContent() => SiteContent(
   fullNameAr: 'ماركو نجى',
   roleEn: 'Flutter Developer',
   roleAr: 'مطور فلاتر',
-  monogram: 'MN',
+  // Not 'MN': that is the entity's own default, and a fixture that matches
+  // the default proves nothing about whether the field serialises.
+  monogram: 'MNL',
   locationEn: 'Cairo, Egypt',
   locationAr: 'القاهرة، مصر',
   profileImage: ImageRef.asset('assets/images/profile.png'),
@@ -251,6 +253,14 @@ SiteContent sampleSiteContent() => SiteContent(
   contactTitleAr: 'تواصل',
   contactSubtitleEn: "Let's talk",
   contactSubtitleAr: 'يلا نتكلم',
+  homeWorksHeadlineEn: 'Crafted with care.',
+  homeWorksHeadlineAr: 'مصنوع بعناية.',
+  homeWorksSubtitleEn: 'A selection of recent work.',
+  homeWorksSubtitleAr: 'مختارات من أعمالي الأخيرة.',
+  homeWorksMoreLabelEn: "There's more",
+  homeWorksMoreLabelAr: 'وهناك المزيد',
+  homeWorksViewAllEn: 'View all projects',
+  homeWorksViewAllAr: 'عرض كل المشاريع',
 );
 
 /// A full bundle composed from the fixtures above — one item per collection,

@@ -16,11 +16,6 @@ class LangKeys {
   static const String heroCta = 'hero_cta';
   static const String heroScrollDown = 'hero_scroll_down';
 
-  static const String homeWorksHeadline = 'home_works_headline';
-  static const String homeWorksSubtitle = 'home_works_subtitle';
-  static const String homeWorksMoreLabel = 'home_works_more_label';
-  static const String homeWorksViewAll = 'home_works_view_all';
-
   static const String aboutSkillsTitle = 'about_skills_title';
   static const String aboutLocationLabel = 'about_location_label';
 
@@ -261,4 +256,58 @@ class LangKeys {
   static const String commonLoading = 'common_loading';
   static const String commonError = 'common_error';
   static const String commonClose = 'common_close';
+
+  // Site content form — labels for the screen that edits every
+  // SiteContent field. The values themselves are content, not keys.
+  static const String formEditSiteContent = 'form_edit_site_content';
+  static const String adminSiteContent = 'admin_site_content';
+  static const String groupIdentity = 'group_identity';
+  static const String groupHero = 'group_hero';
+  static const String groupAbout = 'group_about';
+  static const String groupContact = 'group_contact';
+  static const String groupFooter = 'group_footer';
+  static const String groupFeaturedWorks = 'group_featured_works';
+  static const String fieldFullNameEn = 'field_full_name_en';
+  static const String fieldFullNameAr = 'field_full_name_ar';
+  static const String fieldMonogram = 'field_monogram';
+  static const String fieldProfileImage = 'field_profile_image';
+  static const String fieldEmail = 'field_email';
+  static const String fieldPhone = 'field_phone';
+  static const String fieldGithubUrl = 'field_github_url';
+  static const String fieldLinkedinUrl = 'field_linkedin_url';
+  static const String fieldHostedCvUrl = 'field_hosted_cv_url';
+  static const String fieldHeroGreetingEn = 'field_hero_greeting_en';
+  static const String fieldHeroGreetingAr = 'field_hero_greeting_ar';
+  static const String fieldHeroNameEn = 'field_hero_name_en';
+  static const String fieldHeroNameAr = 'field_hero_name_ar';
+  static const String fieldHeroRoleEn = 'field_hero_role_en';
+  static const String fieldHeroRoleAr = 'field_hero_role_ar';
+  static const String fieldRoleTagsEn = 'field_role_tags_en';
+  static const String fieldRoleTagsAr = 'field_role_tags_ar';
+  static const String fieldSummaryEn = 'field_summary_en';
+  static const String fieldSummaryAr = 'field_summary_ar';
+  static const String fieldAboutLeadEn = 'field_about_lead_en';
+  static const String fieldAboutLeadAr = 'field_about_lead_ar';
+  static const String fieldAboutStatementsEn = 'field_about_statements_en';
+  static const String fieldAboutStatementsAr = 'field_about_statements_ar';
+  static const String fieldFooterHeadlineEn = 'field_footer_headline_en';
+  static const String fieldFooterHeadlineAr = 'field_footer_headline_ar';
+  static const String fieldFooterAvailabilityEn =
+      'field_footer_availability_en';
+  static const String fieldFooterAvailabilityAr =
+      'field_footer_availability_ar';
+  static const String fieldContactTitleEn = 'field_contact_title_en';
+  static const String fieldContactTitleAr = 'field_contact_title_ar';
+  static const String fieldContactSubtitleEn = 'field_contact_subtitle_en';
+  static const String fieldContactSubtitleAr = 'field_contact_subtitle_ar';
+  static const String fieldHomeWorksHeadlineEn = 'field_home_works_headline_en';
+  static const String fieldHomeWorksHeadlineAr = 'field_home_works_headline_ar';
+  static const String fieldHomeWorksSubtitleEn = 'field_home_works_subtitle_en';
+  static const String fieldHomeWorksSubtitleAr = 'field_home_works_subtitle_ar';
+  static const String fieldHomeWorksMoreLabelEn =
+      'field_home_works_more_label_en';
+  static const String fieldHomeWorksMoreLabelAr =
+      'field_home_works_more_label_ar';
+  static const String fieldHomeWorksViewAllEn = 'field_home_works_view_all_en';
+  static const String fieldHomeWorksViewAllAr = 'field_home_works_view_all_ar';
 }
