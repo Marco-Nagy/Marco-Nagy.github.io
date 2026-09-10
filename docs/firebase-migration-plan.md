@@ -226,7 +226,34 @@ Reused verbatim from `project_form_screen.dart`: `IdGenerator.next()`, `TextList
 
 **Verify:** add/edit/delete one of each, reload, confirm it persisted to Firestore, and check the change appears in a second browser.
 
+**Status 2026-09-10 — done, in three commits. Two of this phase's open questions were settled by Marco, not by the plan.**
+
+**4a — the wiring was indeed the real work, and it was cheaper than it looked.** Every translation key the four forms needed (`form_add_certificate`, `field_provider_en`, `field_company`, `field_base_price`, `field_has_counter`, …) already existed, written when the data layer was and never referenced since. So `certificate_form_screen`, `work_history_form_screen`, `pricing_package_form_screen` and `pricing_add_on_form_sheet` are mostly assembly. Each of the four `onEdit: () {}` sites now opens its form and dispatches the `Save*` action that had existed, with a working cubit handler, without ever being dispatched; delete goes through `AdminConfirmDialog` to match Projects.
+
+One thing the plan did not call out: **all four sections rendered a bare "nothing here yet" message with no way out of it.** The empty state returned early, before any add affordance, so an empty Certificates list was a dead end. Every `AdminAddButton` here sits *outside* the empty check — an empty list is exactly when adding the first record has to be reachable.
+
+Shared widgets came to two, as planned, but not the two named: `bilingual_field_pair.dart` (side by side above ~520px, stacked below, English-only validation because `context.localized` already falls back to English) and `admin_switch_field.dart` for the two content booleans. `admin_text_field.dart` was not built — `UnderlineTextField` already takes label/controller/validator, and a wrapper over it would have added a layer that defaults one argument. `admin_sub_list.dart` moved to `core/widgets/admin/` as planned.
+
+**4b — the site content form, and the last of D4.** `site_content_form_screen` edits all 43 fields in six collapsible groups, reached from the `AdminFab` because a singleton has no list row to hang an edit button from. `maintainState` is on so a collapsed group's fields stay in the enclosing `Form`; without it Save would validate only whatever happened to be open. The eight `homeWorks*` fields landed here rather than in Phase 3, and `featured_works_section` now reads them — which closes D4: no content string remains in either translation JSON.
+
+**Those four headings render blank until they are typed into the form and published.** That is the predicted, expected state, not a bug: a publish only ever writes back what Firestore already held, so a field cannot carry a value before the form that authors it exists. The English and Arabic copy that left the JSONs is recoverable from this commit's parent.
+
+A new **fixture-coverage test** was added while doing this, because adding eight fields exposed that the round-trip suite's whole value rested on an unenforced convention — `sample_bundle.dart` sets every field away from its default, and forgetting one leaves the tests passing while silently no longer covering it. It compares the fixture's `toJson()` against `const SiteContent().toJson()` and fails on any key that matches, which is reflection-free because json_serializable already enumerates the fields. **It found a hole on its first run:** the fixture's `monogram` was `'MN'`, the entity's own default, so that field had never actually been covered by the round-trip test at all.
+
+**4c — and the two questions the plan left open.** Both were put to Marco rather than decided here:
+
+- **`tech_badge_form_sheet` was dropped.** The plan had already made it conditional after the Phase 3 badge decision; with the orbit reading `TechBrandMarks.all`, nothing renders `TechBadgeEntity`, so a form for it would edit something invisible. The entity stays in the bundle and `SkillsCubit` still loads it — dormant, not deleted.
+- **The sections editor moved *forward* into this phase**, out of Phase 5. `SectionsCubit` had gained `SaveSection`/`SaveAllSections`/`DeleteCustomSection` in Phase 3 with nothing dispatching them, and rename-plus-hide needs none of the drag-and-drop machinery. Phase 5 is therefore now only reordering.
+
+Both managers hang off the `AdminFab` and use a new `AdminListScreen` rather than `AdminFormScreen` — that one owns a `Form`, validates on the way out and docks a Save bar, and these save each change as it is made, so sharing it would have meant a Save button that saves nothing. The sections screen lists **all** sections rather than visible ones: hiding one there is the only way to get it back, so a hidden section that also vanished from the manager would be unreachable.
+
+Four upsert tests were added with them. These cubits got a UI that dispatches `Save*` for the first time, and the failure worth guarding is an upsert that appends instead of replacing — on screen that is an edited record appearing twice, or a hidden section coming back, and it survives a reload because the duplicate really is in the store.
+
+`flutter analyze` clean, **70 tests pass** (66 after 4b, 65 after 4a).
+
 ### Phase 5 — Reorder · 6% · *needs 4*
+
+**Narrowed 2026-09-10.** Renaming a section and toggling its nav visibility shipped in Phase 4c (`sections_manager_screen`), so what is left here is strictly the drag-and-drop ordering — for sections and for the other eight collections. `admin_reorderable_list.dart` can drop into `sections_manager_screen` rather than needing a screen of its own.
 
 **Build drag-and-drop.** The cost is unusually low: the data source **already** has `saveX(List<T>)` for all 9 collections, each repo method is a `_guard` one-liner, and each use case is a 3-line passthrough (`SectionsUseCase.saveAll` is the template). One new widget — `admin_reorderable_list.dart` wrapping `ReorderableListView` inside an `AdminGate`, so no drag handles ship to visitors. With numeric fields instead, swapping two rows means editing two records and getting the arithmetic right, across 9 entities. Remove the numeric `order` field from `project_form_screen.dart` once this lands — two sources of truth for ordering will drift.
 
@@ -287,7 +314,7 @@ Skip widget and golden tests.
 | 1 Read path + cache + seed migration | 10% | ~20% (local layer exists) | 0, 7.1 |
 | 2 Auth + rules + write path | 12% | 0% | 0, 1 |
 | 3 Static → dynamic | 22% | **100%** | — (parallel to 0–2) |
-| 4 Missing forms | 18% | ~35% (Projects + dead handlers) | 3 (for SiteContent/Skills) |
+| 4 Missing forms | 18% | **100%** | 3 (for SiteContent/Skills) |
 | 5 Reorder | 6% | ~15% (repo support) | 4 |
 | 6 Media | 12% | 0% | 0, 2 |
 | 7 Tests | 5% | 0% | interleaved |
