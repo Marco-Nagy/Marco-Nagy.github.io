@@ -15,3 +15,9 @@ class DeleteWorkHistory extends ExperienceActions {
   DeleteWorkHistory(this.id);
   final String id;
 }
+
+/// Debug-only: persist a whole reordered list in one write.
+class ReorderWorkHistory extends ExperienceActions {
+  ReorderWorkHistory(this.entries);
+  final List<WorkHistoryEntry> entries;
+}

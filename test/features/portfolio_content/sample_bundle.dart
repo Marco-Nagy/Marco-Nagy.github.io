@@ -226,6 +226,7 @@ SiteContent sampleSiteContent() => SiteContent(
   locationEn: 'Cairo, Egypt',
   locationAr: 'القاهرة، مصر',
   profileImage: ImageRef.asset('assets/images/profile.png'),
+  aboutPhotoImage: ImageRef.asset('assets/images/about.png'),
   email: 'marco@example.com',
   phone: '+201234567890',
   gitHubUrl: 'https://github.com/marco',

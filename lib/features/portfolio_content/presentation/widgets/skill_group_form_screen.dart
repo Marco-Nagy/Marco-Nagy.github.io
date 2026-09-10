@@ -48,16 +48,12 @@ class _SkillGroupFormScreenState extends State<SkillGroupFormScreen> {
   late final _skills = TextEditingController(
     text: TextListConverter.toText(widget.group?.skills ?? <String>[]),
   );
-  late final _order = TextEditingController(
-    text: '${widget.group?.order ?? 0}',
-  );
 
   @override
   void dispose() {
     _labelEn.dispose();
     _labelAr.dispose();
     _skills.dispose();
-    _order.dispose();
     super.dispose();
   }
 
@@ -69,7 +65,6 @@ class _SkillGroupFormScreenState extends State<SkillGroupFormScreen> {
         labelEn: _labelEn.text.trim(),
         labelAr: _labelAr.text.trim(),
         skills: TextListConverter.toList(_skills.text),
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -87,12 +82,6 @@ class _SkillGroupFormScreenState extends State<SkillGroupFormScreen> {
         label: context.translate(LangKeys.fieldSkillNames),
         controller: _skills,
         maxLines: 8,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

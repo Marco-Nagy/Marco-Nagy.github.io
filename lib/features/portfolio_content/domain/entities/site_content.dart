@@ -22,7 +22,18 @@ abstract class SiteContent with _$SiteContent {
     @Default('MN') String monogram,
     @Default('') String locationEn,
     @Default('') String locationAr,
+
+    /// The hero's circular headshot.
     @Default(ImageRef()) ImageRef profileImage,
+
+    /// The About section's rounded-square portrait — separate from
+    /// [profileImage] because the two crop to different shapes from
+    /// (typically) different source photos.
+    ///
+    /// Falls back to [profileImage] wherever it is read: an empty value here
+    /// means "not set yet," not "show nothing," so an existing site does not
+    /// go blank the moment this field ships ahead of a photo chosen for it.
+    @Default(ImageRef()) ImageRef aboutPhotoImage,
 
     // Contact + outward links.
     @Default('') String email,
@@ -79,6 +90,15 @@ abstract class SiteContent with _$SiteContent {
     @Default('') String homeWorksViewAllAr,
   }) = _SiteContent;
 
+  const SiteContent._();
+
   factory SiteContent.fromJson(Map<String, dynamic> json) =>
       _$SiteContentFromJson(json);
+
+  /// The photo the About section should actually render: [aboutPhotoImage]
+  /// when it has been set, [profileImage] otherwise. Centralised here rather
+  /// than left to each call site, so "not set yet" only ever falls back one
+  /// way in the whole app.
+  ImageRef get aboutPhoto =>
+      aboutPhotoImage.isEmpty ? profileImage : aboutPhotoImage;
 }

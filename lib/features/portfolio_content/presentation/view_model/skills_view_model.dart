@@ -43,6 +43,8 @@ class SkillsCubit extends Cubit<SkillsState> {
         _runGroups(_useCase.upsertGroup(action.group));
       case DeleteSkillGroup():
         _runGroups(_useCase.deleteGroup(action.id));
+      case ReorderSkillGroups():
+        _runGroups(_useCase.saveAllGroups(action.groups));
       case SaveTechBadge():
         _runBadges(_useCase.upsertBadge(action.badge));
       case DeleteTechBadge():

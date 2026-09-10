@@ -15,6 +15,11 @@ class WorkHistoryUseCase {
   Future<DataResult<List<WorkHistoryEntry>>> upsert(WorkHistoryEntry entry) =>
       _repo.upsertWorkHistory(entry);
 
+  /// Persists a whole reordered list in one write.
+  Future<DataResult<List<WorkHistoryEntry>>> saveAll(
+    List<WorkHistoryEntry> entries,
+  ) => _repo.saveWorkHistory(entries);
+
   Future<DataResult<List<WorkHistoryEntry>>> delete(String id) =>
       _repo.deleteWorkHistory(id);
 }

@@ -18,6 +18,11 @@ class SkillsUseCase {
     SkillGroupEntity group,
   ) => _repo.upsertSkillGroup(group);
 
+  /// Persists a whole reordered list in one write.
+  Future<DataResult<List<SkillGroupEntity>>> saveAllGroups(
+    List<SkillGroupEntity> groups,
+  ) => _repo.saveSkillGroups(groups);
+
   Future<DataResult<List<SkillGroupEntity>>> deleteGroup(String id) =>
       _repo.deleteSkillGroup(id);
 

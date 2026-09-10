@@ -23,6 +23,8 @@ class ExperienceViewModelCubit extends Cubit<ExperienceState> {
         _save(action.entry);
       case DeleteWorkHistory():
         _delete(action.id);
+      case ReorderWorkHistory():
+        _reorder(action.entries);
     }
   }
 
@@ -37,6 +39,10 @@ class ExperienceViewModelCubit extends Cubit<ExperienceState> {
 
   Future<void> _delete(String id) async {
     _emitResult(await _useCase.delete(id));
+  }
+
+  Future<void> _reorder(List<WorkHistoryEntry> entries) async {
+    _emitResult(await _useCase.saveAll(entries));
   }
 
   void _emitResult(DataResult<List<WorkHistoryEntry>> result) {

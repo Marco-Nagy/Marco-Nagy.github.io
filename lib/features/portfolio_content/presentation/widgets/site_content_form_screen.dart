@@ -8,6 +8,8 @@ import '../../../../core/utils/extension/navigation_extensions.dart';
 import '../../../../core/utils/text_list_converter.dart';
 import '../../../../core/widgets/admin/admin_form_screen.dart';
 import '../../../../core/widgets/admin/bilingual_field_pair.dart';
+import '../../../../core/widgets/admin/crop_photo_dialog.dart';
+import '../../../../core/widgets/admin/profile_photo_field.dart';
 import '../../../../core/widgets/common/underline_text_field.dart';
 import '../../domain/entities/image_ref.dart';
 import '../../domain/entities/site_content.dart';
@@ -58,7 +60,11 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
   late final _monogram = TextEditingController(text: _c.monogram);
   late final _locationEn = TextEditingController(text: _c.locationEn);
   late final _locationAr = TextEditingController(text: _c.locationAr);
-  late final _profileImage = TextEditingController(text: _c.profileImage.value);
+
+  /// Not a [TextEditingController]: [ProfilePhotoField] hands back a whole
+  /// [ImageRef] from its pick-and-crop flow rather than text to parse.
+  late ImageRef _profileImage = _c.profileImage;
+  late ImageRef _aboutPhotoImage = _c.aboutPhotoImage;
 
   late final _email = TextEditingController(text: _c.email);
   late final _phone = TextEditingController(text: _c.phone);
@@ -145,7 +151,6 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
     _monogram,
     _locationEn,
     _locationAr,
-    _profileImage,
     _email,
     _phone,
     _gitHubUrl,
@@ -191,16 +196,6 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
     super.dispose();
   }
 
-  /// The same rule `MediaRefField` reads a typed source by, so a pasted
-  /// Cloudinary URL and an `assets/…` path both land as the right kind.
-  ImageRef _imageRef(String value) {
-    final trimmed = value.trim();
-    if (trimmed.isEmpty) return const ImageRef();
-    return trimmed.startsWith('http')
-        ? ImageRef.network(trimmed)
-        : ImageRef.asset(trimmed);
-  }
-
   void _submit() {
     // copyWith on the incoming content, not a fresh SiteContent: a field added
     // to the entity that this form has not grown a control for yet rides
@@ -214,7 +209,8 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
         monogram: _monogram.text.trim(),
         locationEn: _locationEn.text.trim(),
         locationAr: _locationAr.text.trim(),
-        profileImage: _imageRef(_profileImage.text),
+        profileImage: _profileImage,
+        aboutPhotoImage: _aboutPhotoImage,
         email: _email.text.trim(),
         phone: _phone.text.trim(),
         gitHubUrl: _gitHubUrl.text.trim(),
@@ -286,14 +282,15 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
             controllerEn: _locationEn,
             controllerAr: _locationAr,
           ),
-          // A plain path/URL box rather than MediaRefField: that widget edits a
-          // MediaRef and offers video kinds a headshot has no use for. Phase 6
-          // replaces this with the Cloudinary upload.
-          UnderlineTextField(
+          // Pick-and-crop rather than MediaRefField's path/URL box: a headshot
+          // only ever comes from a file on hand, and cropping it to the
+          // circle it actually renders in (ClipOval on the hero) here means
+          // what is previewed is what ships, not a guess from a raw path.
+          ProfilePhotoField(
             label: t(LangKeys.fieldProfileImage),
-            controller: _profileImage,
-            hint: t(LangKeys.fieldMediaImagePath),
-            textInputAction: TextInputAction.next,
+            value: _profileImage,
+            shape: PhotoCropShape.circle,
+            onChanged: (image) => setState(() => _profileImage = image),
           ),
         ],
       ),
@@ -330,6 +327,16 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
       _Group(
         title: t(LangKeys.groupAbout),
         children: <Widget>[
+          // Falls back to the hero's photo at render time when unset
+          // (`SiteContent.aboutPhoto`), but the form still edits the two
+          // fields separately: About wants a square crop, Hero a circular
+          // one, and they are not always the same source photo.
+          ProfilePhotoField(
+            label: t(LangKeys.fieldAboutPhoto),
+            value: _aboutPhotoImage,
+            shape: PhotoCropShape.square,
+            onChanged: (image) => setState(() => _aboutPhotoImage = image),
+          ),
           BilingualFieldPair(
             labelEn: t(LangKeys.fieldAboutLeadEn),
             labelAr: t(LangKeys.fieldAboutLeadAr),

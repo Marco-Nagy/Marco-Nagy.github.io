@@ -10,6 +10,8 @@ import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/admin/admin_add_button.dart';
 import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
@@ -150,14 +152,53 @@ class _PricingBody extends StatelessWidget {
   }
 }
 
-class _PackageGrid extends StatelessWidget {
+class _PackageGrid extends StatefulWidget {
   const _PackageGrid({required this.state, required this.cubit});
 
   final PricingReady state;
   final PricingViewModelCubit cubit;
 
   @override
+  State<_PackageGrid> createState() => _PackageGridState();
+}
+
+class _PackageGridState extends State<_PackageGrid> {
+  bool _reordering = false;
+
+  @override
   Widget build(BuildContext context) {
+    final state = widget.state;
+    final cubit = widget.cubit;
+
+    final toggle = Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: AdminReorderButton(
+        reordering: _reordering,
+        onToggle: () => setState(() => _reordering = !_reordering),
+      ),
+    );
+
+    if (_reordering) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          toggle,
+          AdminReorderableList<PricingPackage>(
+            items: <AdminReorderableItem<PricingPackage>>[
+              for (final package in state.packages)
+                AdminReorderableItem<PricingPackage>(
+                  id: package.id,
+                  value: package,
+                  title: context.localized(package.name, package.nameAr),
+                ),
+            ],
+            onReorder: (reordered) =>
+                cubit.doAction(ReorderPackages(reordered)),
+          ),
+        ],
+      );
+    }
+
     final cards = <Widget>[
       for (final package in state.packages)
         PricingPackageCard(
@@ -172,7 +213,9 @@ class _PackageGrid extends StatelessWidget {
 
     if (!context.isDesktop) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          toggle,
           for (final card in cards)
             Padding(
               padding: EdgeInsets.only(bottom: 16.h),
@@ -185,28 +228,80 @@ class _PackageGrid extends StatelessWidget {
     // IntrinsicHeight gives the row a real height to stretch into. Without it,
     // `stretch` inside the page's unbounded-height scroll view asks for
     // infinite height and the whole pricing section fails to lay out.
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (var i = 0; i < cards.length; i++) ...<Widget>[
-            Expanded(child: cards[i]),
-            if (i != cards.length - 1) SizedBox(width: 16.w),
-          ],
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        toggle,
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (var i = 0; i < cards.length; i++) ...<Widget>[
+                Expanded(child: cards[i]),
+                if (i != cards.length - 1) SizedBox(width: 16.w),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _AddOnList extends StatelessWidget {
+class _AddOnList extends StatefulWidget {
   const _AddOnList({required this.state, required this.cubit});
 
   final PricingReady state;
   final PricingViewModelCubit cubit;
 
   @override
+  State<_AddOnList> createState() => _AddOnListState();
+}
+
+class _AddOnListState extends State<_AddOnList> {
+  bool _reordering = false;
+
+  @override
   Widget build(BuildContext context) {
+    final state = widget.state;
+    final cubit = widget.cubit;
+
+    final toggle = Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: AdminReorderButton(
+        reordering: _reordering,
+        onToggle: () => setState(() => _reordering = !_reordering),
+      ),
+    );
+
+    if (_reordering) {
+      // Flat, not grouped by category: dragging across categories would fight
+      // with the grouping the normal display applies, so reorder mode shows
+      // one plain list and the category headers return once it is done.
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          toggle,
+          AdminReorderableList<PricingAddOn>(
+            items: <AdminReorderableItem<PricingAddOn>>[
+              for (final addOn in state.addOns)
+                AdminReorderableItem<PricingAddOn>(
+                  id: addOn.id,
+                  value: addOn,
+                  title: context.localized(addOn.name, addOn.nameAr),
+                  subtitle: context.localized(
+                    addOn.category,
+                    addOn.categoryAr,
+                  ),
+                ),
+            ],
+            onReorder: (reordered) =>
+                cubit.doAction(ReorderAddOns(reordered)),
+          ),
+        ],
+      );
+    }
+
     // Group by category so a long flat list stays scannable.
     final grouped = <String, List<int>>{};
     for (var i = 0; i < state.addOns.length; i++) {
@@ -218,6 +313,7 @@ class _AddOnList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        toggle,
         for (final entry in grouped.entries) ...<Widget>[
           if (entry.key.trim().isNotEmpty) ...<Widget>[
             SizedBox(height: 8.h),

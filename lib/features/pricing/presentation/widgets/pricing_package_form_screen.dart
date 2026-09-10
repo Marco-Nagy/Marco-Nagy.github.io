@@ -42,7 +42,6 @@ class _PricingPackageFormScreenState extends State<PricingPackageFormScreen> {
   late final TextEditingController _timelineAr;
   late final TextEditingController _descriptionEn;
   late final TextEditingController _descriptionAr;
-  late final TextEditingController _order;
 
   @override
   void initState() {
@@ -56,7 +55,6 @@ class _PricingPackageFormScreenState extends State<PricingPackageFormScreen> {
     _timelineAr = TextEditingController(text: package?.timelineLabelAr ?? '');
     _descriptionEn = TextEditingController(text: package?.description ?? '');
     _descriptionAr = TextEditingController(text: package?.descriptionAr ?? '');
-    _order = TextEditingController(text: '${package?.order ?? 0}');
   }
 
   @override
@@ -68,7 +66,6 @@ class _PricingPackageFormScreenState extends State<PricingPackageFormScreen> {
     _timelineAr.dispose();
     _descriptionEn.dispose();
     _descriptionAr.dispose();
-    _order.dispose();
     super.dispose();
   }
 
@@ -87,7 +84,6 @@ class _PricingPackageFormScreenState extends State<PricingPackageFormScreen> {
         timelineLabelAr: _timelineAr.text.trim(),
         description: _descriptionEn.text.trim(),
         descriptionAr: _descriptionAr.text.trim(),
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -119,12 +115,6 @@ class _PricingPackageFormScreenState extends State<PricingPackageFormScreen> {
         controllerEn: _descriptionEn,
         controllerAr: _descriptionAr,
         maxLines: 3,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

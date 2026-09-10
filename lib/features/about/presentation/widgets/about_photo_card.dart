@@ -55,7 +55,7 @@ class AboutPhotoCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(27.r),
                 child: AppImage(
-                  image: context.site.profileImage,
+                  image: context.site.aboutPhoto,
                   width: size,
                   height: size,
                   fallback: Center(

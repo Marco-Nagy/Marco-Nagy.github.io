@@ -93,6 +93,17 @@ class PortfolioRepoImpl implements PortfolioRepo {
         return _sorted(next, (p) => p.order);
       }, 'Could not delete the project');
 
+  @override
+  Future<DataResult<List<PersonalProject>>> saveProjects(
+    List<PersonalProject> projects,
+  ) => _guard(() async {
+    final renumbered = <PersonalProject>[
+      for (var i = 0; i < projects.length; i++) projects[i].copyWith(order: i),
+    ];
+    await _local.saveProjects(renumbered);
+    return renumbered;
+  }, 'Could not save the project order');
+
   // Certificates --------------------------------------------------------------
 
   @override
@@ -118,6 +129,18 @@ class PortfolioRepoImpl implements PortfolioRepo {
         return _sorted(next, (c) => c.order);
       }, 'Could not delete the certificate');
 
+  @override
+  Future<DataResult<List<Certificate>>> saveCertificates(
+    List<Certificate> certificates,
+  ) => _guard(() async {
+    final renumbered = <Certificate>[
+      for (var i = 0; i < certificates.length; i++)
+        certificates[i].copyWith(order: i),
+    ];
+    await _local.saveCertificates(renumbered);
+    return renumbered;
+  }, 'Could not save the certificate order');
+
   // Work history --------------------------------------------------------------
 
   @override
@@ -142,6 +165,17 @@ class PortfolioRepoImpl implements PortfolioRepo {
         await _local.saveWorkHistory(next);
         return _sorted(next, (e) => e.order);
       }, 'Could not delete the experience entry');
+
+  @override
+  Future<DataResult<List<WorkHistoryEntry>>> saveWorkHistory(
+    List<WorkHistoryEntry> entries,
+  ) => _guard(() async {
+    final renumbered = <WorkHistoryEntry>[
+      for (var i = 0; i < entries.length; i++) entries[i].copyWith(order: i),
+    ];
+    await _local.saveWorkHistory(renumbered);
+    return renumbered;
+  }, 'Could not save the experience order');
 
   // Pricing -------------------------------------------------------------------
 
@@ -172,6 +206,17 @@ class PortfolioRepoImpl implements PortfolioRepo {
       }, 'Could not delete the package');
 
   @override
+  Future<DataResult<List<PricingPackage>>> savePricingPackages(
+    List<PricingPackage> packages,
+  ) => _guard(() async {
+    final renumbered = <PricingPackage>[
+      for (var i = 0; i < packages.length; i++) packages[i].copyWith(order: i),
+    ];
+    await _local.savePricingPackages(renumbered);
+    return renumbered;
+  }, 'Could not save the package order');
+
+  @override
   Future<DataResult<List<PricingAddOn>>> getPricingAddOns() => _guard(
     () async => _sorted(_local.getPricingAddOns(), (a) => a.order),
     'Could not read add-ons from local storage',
@@ -196,6 +241,17 @@ class PortfolioRepoImpl implements PortfolioRepo {
         await _local.savePricingAddOns(next);
         return _sorted(next, (a) => a.order);
       }, 'Could not delete the add-on');
+
+  @override
+  Future<DataResult<List<PricingAddOn>>> savePricingAddOns(
+    List<PricingAddOn> addOns,
+  ) => _guard(() async {
+    final renumbered = <PricingAddOn>[
+      for (var i = 0; i < addOns.length; i++) addOns[i].copyWith(order: i),
+    ];
+    await _local.savePricingAddOns(renumbered);
+    return renumbered;
+  }, 'Could not save the add-on order');
 
   // Site-wide content ---------------------------------------------------------
 
@@ -234,6 +290,17 @@ class PortfolioRepoImpl implements PortfolioRepo {
         await _local.saveSkillGroups(next);
         return _sorted(next, (g) => g.order);
       }, 'Could not delete the skill group');
+
+  @override
+  Future<DataResult<List<SkillGroupEntity>>> saveSkillGroups(
+    List<SkillGroupEntity> groups,
+  ) => _guard(() async {
+    final renumbered = <SkillGroupEntity>[
+      for (var i = 0; i < groups.length; i++) groups[i].copyWith(order: i),
+    ];
+    await _local.saveSkillGroups(renumbered);
+    return renumbered;
+  }, 'Could not save the skill group order');
 
   @override
   Future<DataResult<List<TechBadgeEntity>>> getTechBadges() => _guard(

@@ -24,6 +24,8 @@ class CertificatesViewModelCubit extends Cubit<CertificatesState> {
         _save(action.certificate);
       case DeleteCertificate():
         _delete(action.id);
+      case ReorderCertificates():
+        _reorder(action.certificates);
     }
   }
 
@@ -38,6 +40,10 @@ class CertificatesViewModelCubit extends Cubit<CertificatesState> {
 
   Future<void> _delete(String id) async {
     _emitResult(await _useCase.delete(id));
+  }
+
+  Future<void> _reorder(List<Certificate> certificates) async {
+    _emitResult(await _useCase.saveAll(certificates));
   }
 
   void _emitResult(DataResult<List<Certificate>> result) {

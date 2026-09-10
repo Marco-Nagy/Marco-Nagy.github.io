@@ -14,6 +14,8 @@ import 'core/styles/theme/app_theme.dart';
 import 'core/utils/extension/context_extensions.dart';
 import 'core/utils/responsive/app_breakpoints.dart';
 import 'di/di.dart';
+import 'features/experience/presentation/view_model/experience_actions.dart';
+import 'features/experience/presentation/view_model/experience_view_model.dart';
 import 'features/portfolio_content/presentation/view_model/sections_actions.dart';
 import 'features/portfolio_content/presentation/view_model/sections_view_model.dart';
 import 'features/portfolio_content/presentation/view_model/site_content_actions.dart';
@@ -27,10 +29,12 @@ class MarcoPortfolioApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      // All four live above MaterialApp. Language, because the nav toggle on
-      // every page reads it; the three content cubits, because the nav bar,
-      // drawer and footer live in PortfolioScaffold — below every screen's own
-      // provider, and therefore out of reach of a per-screen one.
+      // All five live above MaterialApp. Language, because the nav toggle on
+      // every page reads it; the content cubits, because the nav bar, drawer
+      // and footer live in PortfolioScaffold — below every screen's own
+      // provider, and therefore out of reach of a per-screen one. Experience
+      // joined this set so About's computed years-of-experience stat can
+      // read work history without the Experience section having loaded yet.
       //
       // Each load is dispatched at creation rather than from a screen's
       // initState, so the read is already in flight before the first frame.
@@ -49,6 +53,10 @@ class MarcoPortfolioApp extends StatelessWidget {
         ),
         BlocProvider<SkillsCubit>(
           create: (_) => getIt<SkillsCubit>()..doAction(LoadSkills()),
+        ),
+        BlocProvider<ExperienceViewModelCubit>(
+          create: (_) =>
+              getIt<ExperienceViewModelCubit>()..doAction(LoadWorkHistory()),
         ),
       ],
       child: BlocBuilder<AppCubit, AppState>(

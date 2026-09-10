@@ -17,6 +17,12 @@ class DeleteSkillGroup extends SkillsActions {
   final String id;
 }
 
+/// Debug-only: persist a whole reordered list of groups in one write.
+class ReorderSkillGroups extends SkillsActions {
+  ReorderSkillGroups(this.groups);
+  final List<SkillGroupEntity> groups;
+}
+
 class SaveTechBadge extends SkillsActions {
   SaveTechBadge(this.badge);
   final TechBadgeEntity badge;

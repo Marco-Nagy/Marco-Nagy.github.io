@@ -3,4 +3,5 @@
     <!-- Mirrors AppColorTheme.navy pageTop, so the native window, the Flutter
          splash and the app all share one ground with no flash between them. -->
     <color name="splash_navy">#050B1B</color>
+	<color name="ic_launcher_background">#0D1319</color>
 </resources>

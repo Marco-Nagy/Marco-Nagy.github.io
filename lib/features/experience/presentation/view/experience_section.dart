@@ -9,12 +9,13 @@ import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/widgets/admin/admin_add_button.dart';
 import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 import '../../../../core/widgets/motion/reveal_on_scroll.dart';
 import '../../../../core/widgets/section/section_divider_header.dart';
-import '../../../../di/di.dart';
 import '../../../portfolio_content/domain/entities/work_history_entry.dart';
 import '../../../portfolio_content/presentation/view_data/timeline_row_data.dart';
 import '../view_model/experience_actions.dart';
@@ -23,21 +24,12 @@ import '../view_model/experience_view_model.dart';
 import '../widgets/experience_timeline_row.dart';
 import '../widgets/work_history_form_screen.dart';
 
+// Consumes the ExperienceViewModelCubit provided above MaterialApp (in
+// MarcoPortfolioApp) rather than owning one — About's years-of-experience
+// stat reads the same cubit and needs it loaded regardless of whether this
+// section has been scrolled into view yet.
 class ExperienceSection extends StatelessWidget {
   const ExperienceSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider<ExperienceViewModelCubit>(
-      create: (_) =>
-          getIt<ExperienceViewModelCubit>()..doAction(LoadWorkHistory()),
-      child: const _ExperienceBody(),
-    );
-  }
-}
-
-class _ExperienceBody extends StatelessWidget {
-  const _ExperienceBody();
 
   @override
   Widget build(BuildContext context) {
@@ -71,16 +63,23 @@ class _ExperienceBody extends StatelessWidget {
   }
 }
 
-class _ExperienceTimeline extends StatelessWidget {
+class _ExperienceTimeline extends StatefulWidget {
   const _ExperienceTimeline({required this.entries});
 
   final List<WorkHistoryEntry> entries;
 
   @override
+  State<_ExperienceTimeline> createState() => _ExperienceTimelineState();
+}
+
+class _ExperienceTimelineState extends State<_ExperienceTimeline> {
+  bool _reordering = false;
+
+  @override
   Widget build(BuildContext context) {
     final cubit = context.read<ExperienceViewModelCubit>();
 
-    if (entries.isEmpty) {
+    if (widget.entries.isEmpty) {
       return Column(
         children: <Widget>[
           _ExperienceMessage(text: context.translate(LangKeys.experienceEmpty)),
@@ -89,24 +88,61 @@ class _ExperienceTimeline extends StatelessWidget {
       );
     }
 
+    if (_reordering) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: AdminReorderButton(
+              reordering: true,
+              onToggle: () => setState(() => _reordering = false),
+            ),
+          ),
+          AdminReorderableList<WorkHistoryEntry>(
+            items: <AdminReorderableItem<WorkHistoryEntry>>[
+              for (final entry in widget.entries)
+                AdminReorderableItem<WorkHistoryEntry>(
+                  id: entry.id,
+                  value: entry,
+                  title: entry.company,
+                  subtitle: context.localized(entry.role, entry.roleAr),
+                ),
+            ],
+            onReorder: (reordered) =>
+                cubit.doAction(ReorderWorkHistory(reordered)),
+          ),
+        ],
+      );
+    }
+
     // Translated once here so the view-data layer stays free of BuildContext.
     final presentLabel = context.translate(LangKeys.experiencePresent);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        for (var i = 0; i < entries.length; i++)
+        Padding(
+          padding: EdgeInsets.only(bottom: 16.h),
+          child: AdminReorderButton(
+            reordering: false,
+            onToggle: () => setState(() => _reordering = true),
+          ),
+        ),
+        for (var i = 0; i < widget.entries.length; i++)
           RevealOnScroll(
             delay: Motion.stagger * i,
             child: ExperienceTimelineRow(
-              key: ValueKey<String>(entries[i].id),
+              key: ValueKey<String>(widget.entries[i].id),
               data: TimelineRowData.fromWorkHistory(
-                entries[i],
+                widget.entries[i],
                 i,
                 context.isArabic,
                 presentLabel,
               ),
-              onEdit: () => _editWorkHistory(context, cubit, entries[i]),
-              onDelete: () => _deleteWorkHistory(context, cubit, entries[i].id),
+              onEdit: () => _editWorkHistory(context, cubit, widget.entries[i]),
+              onDelete: () =>
+                  _deleteWorkHistory(context, cubit, widget.entries[i].id),
             ),
           ),
         SizedBox(height: 24.h),

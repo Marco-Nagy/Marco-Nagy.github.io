@@ -45,7 +45,6 @@ class _PricingAddOnFormSheetState extends State<PricingAddOnFormSheet> {
   late final TextEditingController _unitTimeDays;
   late final TextEditingController _categoryEn;
   late final TextEditingController _categoryAr;
-  late final TextEditingController _order;
   late bool _hasCounter;
 
   @override
@@ -59,7 +58,6 @@ class _PricingAddOnFormSheetState extends State<PricingAddOnFormSheet> {
     _unitTimeDays = TextEditingController(text: '${addOn?.unitTimeDays ?? 0}');
     _categoryEn = TextEditingController(text: addOn?.category ?? '');
     _categoryAr = TextEditingController(text: addOn?.categoryAr ?? '');
-    _order = TextEditingController(text: '${addOn?.order ?? 0}');
     _hasCounter = addOn?.hasCounter ?? false;
   }
 
@@ -71,7 +69,6 @@ class _PricingAddOnFormSheetState extends State<PricingAddOnFormSheet> {
     _unitTimeDays.dispose();
     _categoryEn.dispose();
     _categoryAr.dispose();
-    _order.dispose();
     super.dispose();
   }
 
@@ -91,7 +88,6 @@ class _PricingAddOnFormSheetState extends State<PricingAddOnFormSheet> {
         // blank ones sit ungrouped above the first heading.
         category: _categoryEn.text.trim(),
         categoryAr: _categoryAr.text.trim(),
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -137,12 +133,6 @@ class _PricingAddOnFormSheetState extends State<PricingAddOnFormSheet> {
         labelAr: context.translate(LangKeys.fieldCategoryAr),
         controllerEn: _categoryEn,
         controllerAr: _categoryAr,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

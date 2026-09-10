@@ -39,6 +39,10 @@ class PricingViewModelCubit extends Cubit<PricingState> {
         _saveAddOn(action.addOn);
       case DeleteAddOn():
         _deleteAddOn(action.id);
+      case ReorderPackages():
+        _reorderPackages(action.packages);
+      case ReorderAddOns():
+        _reorderAddOns(action.addOns);
     }
   }
 
@@ -133,6 +137,26 @@ class PricingViewModelCubit extends Cubit<PricingState> {
         // Clear any quantity held against the removed add-on.
         final next = Map<String, int>.of(selection.quantities)..remove(id);
         selection = selection.copyWith(quantities: next);
+        _emitReady();
+      case Fail<List<PricingAddOn>>(:final message):
+        emit(PricingError(message));
+    }
+  }
+
+  Future<void> _reorderPackages(List<PricingPackage> packages) async {
+    switch (await _useCase.saveAllPackages(packages)) {
+      case Success<List<PricingPackage>>(:final data):
+        this.packages = data;
+        _emitReady();
+      case Fail<List<PricingPackage>>(:final message):
+        emit(PricingError(message));
+    }
+  }
+
+  Future<void> _reorderAddOns(List<PricingAddOn> addOns) async {
+    switch (await _useCase.saveAllAddOns(addOns)) {
+      case Success<List<PricingAddOn>>(:final data):
+        this.addOns = data;
         _emitReady();
       case Fail<List<PricingAddOn>>(:final message):
         emit(PricingError(message));

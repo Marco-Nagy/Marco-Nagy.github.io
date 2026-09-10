@@ -72,6 +72,9 @@ dev_dependencies:
   injectable_generator:
   bloc_test:
 
+  # Generates platform app icons from assets/icon/app_icon.png
+  flutter_launcher_icons: ^0.14.3
+
 flutter:
   uses-material-design: true
 
@@ -82,3 +85,26 @@ flutter:
     - assets/images/
     - assets/projects/
     - assets/tech/
+    - assets/icon/
+
+# {MN} monogram — Flutter blue braces on deep navy, matching the intro
+# animation lockup. Run `dart run flutter_launcher_icons` after editing.
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: "ic_launcher"
+  min_sdk_android: 21
+  adaptive_icon_background: "#0D1319"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
+  ios: true
+  web:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    background_color: "#0D1319"
+    theme_color: "#0D1319"
+  windows:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/icon/app_icon.png"

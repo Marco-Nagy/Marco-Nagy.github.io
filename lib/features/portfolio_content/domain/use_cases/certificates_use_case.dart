@@ -15,6 +15,11 @@ class CertificatesUseCase {
   Future<DataResult<List<Certificate>>> upsert(Certificate certificate) =>
       _repo.upsertCertificate(certificate);
 
+  /// Persists a whole reordered list in one write.
+  Future<DataResult<List<Certificate>>> saveAll(
+    List<Certificate> certificates,
+  ) => _repo.saveCertificates(certificates);
+
   Future<DataResult<List<Certificate>>> delete(String id) =>
       _repo.deleteCertificate(id);
 }
