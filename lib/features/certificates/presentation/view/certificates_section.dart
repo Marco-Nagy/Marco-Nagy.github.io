@@ -10,6 +10,8 @@ import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/admin/admin_add_button.dart';
 import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
@@ -74,10 +76,17 @@ class _CertificatesBody extends StatelessWidget {
   }
 }
 
-class _CertificatesGrid extends StatelessWidget {
+class _CertificatesGrid extends StatefulWidget {
   const _CertificatesGrid({required this.certificates});
 
   final List<Certificate> certificates;
+
+  @override
+  State<_CertificatesGrid> createState() => _CertificatesGridState();
+}
+
+class _CertificatesGridState extends State<_CertificatesGrid> {
+  bool _reordering = false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +94,7 @@ class _CertificatesGrid extends StatelessWidget {
 
     // The add button sits outside the empty check: an empty grid is exactly
     // when adding the first certificate has to be reachable.
-    if (certificates.isEmpty) {
+    if (widget.certificates.isEmpty) {
       return Column(
         children: <Widget>[
           _CertificatesMessage(
@@ -96,13 +105,55 @@ class _CertificatesGrid extends StatelessWidget {
       );
     }
 
+    if (_reordering) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: AdminReorderButton(
+              reordering: true,
+              onToggle: () => setState(() => _reordering = false),
+            ),
+          ),
+          AdminReorderableList<Certificate>(
+            items: <AdminReorderableItem<Certificate>>[
+              for (final certificate in widget.certificates)
+                AdminReorderableItem<Certificate>(
+                  id: certificate.id,
+                  value: certificate,
+                  title: context.localized(
+                    certificate.title,
+                    certificate.titleAr,
+                  ),
+                  subtitle: context.localized(
+                    certificate.provider,
+                    certificate.providerAr,
+                  ),
+                ),
+            ],
+            onReorder: (reordered) =>
+                cubit.doAction(ReorderCertificates(reordered)),
+          ),
+        ],
+      );
+    }
+
     // Two columns on tablet and desktop, one on mobile.
     final columns = context.isWide ? 2 : 1;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(bottom: 16.h),
+          child: AdminReorderButton(
+            reordering: false,
+            onToggle: () => setState(() => _reordering = true),
+          ),
+        ),
         _CertificatesGridView(
-          certificates: certificates,
+          certificates: widget.certificates,
           columns: columns,
           cubit: cubit,
         ),

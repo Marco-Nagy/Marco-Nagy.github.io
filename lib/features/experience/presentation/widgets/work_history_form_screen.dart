@@ -44,7 +44,6 @@ class _WorkHistoryFormScreenState extends State<WorkHistoryFormScreen> {
   late final TextEditingController _locationAr;
   late final TextEditingController _bulletsEn;
   late final TextEditingController _bulletsAr;
-  late final TextEditingController _order;
 
   @override
   void initState() {
@@ -64,7 +63,6 @@ class _WorkHistoryFormScreenState extends State<WorkHistoryFormScreen> {
     _bulletsAr = TextEditingController(
       text: TextListConverter.toText(entry?.bulletsAr ?? <String>[]),
     );
-    _order = TextEditingController(text: '${entry?.order ?? 0}');
   }
 
   @override
@@ -78,7 +76,6 @@ class _WorkHistoryFormScreenState extends State<WorkHistoryFormScreen> {
     _locationAr.dispose();
     _bulletsEn.dispose();
     _bulletsAr.dispose();
-    _order.dispose();
     super.dispose();
   }
 
@@ -98,7 +95,6 @@ class _WorkHistoryFormScreenState extends State<WorkHistoryFormScreen> {
         locationAr: _locationAr.text.trim(),
         bullets: TextListConverter.toList(_bulletsEn.text),
         bulletsAr: TextListConverter.toList(_bulletsAr.text),
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -152,12 +148,6 @@ class _WorkHistoryFormScreenState extends State<WorkHistoryFormScreen> {
         controllerEn: _bulletsEn,
         controllerAr: _bulletsAr,
         maxLines: 6,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

@@ -23,6 +23,8 @@ class ProjectsViewModelCubit extends Cubit<ProjectsState> {
         _save(action.project);
       case DeleteProject():
         _delete(action.id);
+      case ReorderProjects():
+        _reorder(action.projects);
     }
   }
 
@@ -37,6 +39,10 @@ class ProjectsViewModelCubit extends Cubit<ProjectsState> {
 
   Future<void> _delete(String id) async {
     _emitResult(await _useCase.delete(id));
+  }
+
+  Future<void> _reorder(List<PersonalProject> projects) async {
+    _emitResult(await _useCase.saveAll(projects));
   }
 
   void _emitResult(DataResult<List<PersonalProject>> result) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
@@ -21,6 +22,21 @@ class PickedImage {
   final int byteCount;
 }
 
+/// A picked file's raw bytes, before anything has been done with them —
+/// [ImagePickerService.pickBytes] uses this for a caller that needs to crop
+/// or otherwise transform the image before it becomes an [ImageRef].
+class PickedImageBytes {
+  const PickedImageBytes({
+    required this.bytes,
+    required this.mime,
+    required this.fileName,
+  });
+
+  final Uint8List bytes;
+  final String mime;
+  final String fileName;
+}
+
 /// The single place the app reads an image off the device. Debug-only in
 /// practice: every caller sits behind [AdminGate].
 ///
@@ -37,19 +53,55 @@ class ImagePickerService {
 
   /// Null when the picker is dismissed without choosing a file.
   Future<PickedImage?> pick() async {
-    final file = await _picker.pickImage(source: ImageSource.gallery);
-    if (file == null) return null;
-
-    final bytes = await file.readAsBytes();
-    final mime = file.mimeType ?? _mimeFor(file.name);
+    final picked = await pickBytes();
+    if (picked == null) return null;
 
     return PickedImage(
       // A full data URI rather than bare base64: it keeps the payload
       // self-describing, which is how `MediaRef.isAnimatedImage` can tell a GIF
       // from a still. `AppImage` strips the prefix before decoding.
-      ref: ImageRef.embedded('data:$mime;base64,${base64Encode(bytes)}'),
+      ref: ImageRef.embedded(
+        'data:${picked.mime};base64,${base64Encode(picked.bytes)}',
+      ),
+      fileName: picked.fileName,
+      byteCount: picked.bytes.length,
+    );
+  }
+
+  /// The raw bytes of a picked file, before anything decides what to do with
+  /// them. [pick] is [pickBytes] plus the embed step every other caller
+  /// wants; a caller that needs to crop first — [ProfilePhotoField] — uses
+  /// this directly and embeds only the cropped result.
+  ///
+  /// [maxDimension] and [imageQuality] are passed straight to the platform
+  /// picker, which resizes/recompresses *before* handing bytes back — on web
+  /// this is a canvas resize (`image_picker_for_web` implements both), not a
+  /// no-op, so a caller that never needs full resolution should always set
+  /// these rather than shrinking the result afterwards. [pick] leaves them
+  /// unset, since `MediaRefField` callers (screenshots, feature graphics)
+  /// legitimately want the original; [ProfilePhotoField] does not — a
+  /// multi-megapixel source photo is exactly what made its crop editor feel
+  /// laggy, being decoded and repainted at full resolution on every drag
+  /// frame.
+  ///
+  /// Null when the picker is dismissed without choosing a file.
+  Future<PickedImageBytes?> pickBytes({
+    double? maxDimension,
+    int? imageQuality,
+  }) async {
+    final file = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: maxDimension,
+      maxHeight: maxDimension,
+      imageQuality: imageQuality,
+    );
+    if (file == null) return null;
+
+    final bytes = await file.readAsBytes();
+    return PickedImageBytes(
+      bytes: bytes,
+      mime: file.mimeType ?? _mimeFor(file.name),
       fileName: file.name,
-      byteCount: bytes.length,
     );
   }
 

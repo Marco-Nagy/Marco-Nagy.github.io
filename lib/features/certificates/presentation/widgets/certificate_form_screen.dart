@@ -48,7 +48,6 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
   late final TextEditingController _locationEn;
   late final TextEditingController _locationAr;
   late final TextEditingController _imageAsset;
-  late final TextEditingController _order;
 
   @override
   void initState() {
@@ -63,7 +62,6 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
     _locationEn = TextEditingController(text: certificate?.location ?? '');
     _locationAr = TextEditingController(text: certificate?.locationAr ?? '');
     _imageAsset = TextEditingController(text: certificate?.imageAsset ?? '');
-    _order = TextEditingController(text: '${certificate?.order ?? 0}');
   }
 
   @override
@@ -76,7 +74,6 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
     _locationEn.dispose();
     _locationAr.dispose();
     _imageAsset.dispose();
-    _order.dispose();
     super.dispose();
   }
 
@@ -93,7 +90,6 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
         location: _locationEn.text.trim(),
         locationAr: _locationAr.text.trim(),
         imageAsset: _imageAsset.text.trim(),
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -133,12 +129,6 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
         label: context.translate(LangKeys.fieldImageAsset),
         controller: _imageAsset,
         textInputAction: TextInputAction.next,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

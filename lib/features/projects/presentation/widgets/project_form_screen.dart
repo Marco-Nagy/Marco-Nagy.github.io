@@ -82,7 +82,6 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
   late ShotBackground _background;
   late List<ProjectLink> _links;
   late String _accentHex;
-  late final TextEditingController _order;
 
   @override
   void initState() {
@@ -128,7 +127,6 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
         );
     _links = List<ProjectLink>.of(project?.links ?? <ProjectLink>[]);
     _accentHex = project?.accentHex ?? '4CC9F0';
-    _order = TextEditingController(text: '${project?.order ?? 0}');
   }
 
   @override
@@ -145,8 +143,6 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     _skillsAr.dispose();
     _technologies.dispose();
     _tools.dispose();
-
-    _order.dispose();
     super.dispose();
   }
 
@@ -174,7 +170,6 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
         showcaseBackground: _background,
         links: _links,
         accentHex: hex.length == 6 ? hex : base.accentHex,
-        order: int.tryParse(_order.text.trim()) ?? base.order,
       ),
     );
   }
@@ -501,12 +496,6 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
         value: _accentHex,
         hint: '4CC9F0',
         onChanged: (hex) => _accentHex = hex,
-      ),
-      UnderlineTextField(
-        label: context.translate(LangKeys.fieldOrder),
-        controller: _order,
-        keyboardType: TextInputType.number,
-        validator: (value) => Validators.number(context, value),
       ),
     ];
   }

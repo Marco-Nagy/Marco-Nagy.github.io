@@ -15,3 +15,9 @@ class DeleteCertificate extends CertificatesActions {
   DeleteCertificate(this.id);
   final String id;
 }
+
+/// Debug-only: persist a whole reordered list in one write.
+class ReorderCertificates extends CertificatesActions {
+  ReorderCertificates(this.certificates);
+  final List<Certificate> certificates;
+}

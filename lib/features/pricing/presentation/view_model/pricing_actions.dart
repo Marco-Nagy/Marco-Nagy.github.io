@@ -45,3 +45,15 @@ class DeleteAddOn extends PricingActions {
   DeleteAddOn(this.id);
   final String id;
 }
+
+/// Debug-only: persist a whole reordered package list in one write.
+class ReorderPackages extends PricingActions {
+  ReorderPackages(this.packages);
+  final List<PricingPackage> packages;
+}
+
+/// Debug-only: persist a whole reordered add-on list in one write.
+class ReorderAddOns extends PricingActions {
+  ReorderAddOns(this.addOns);
+  final List<PricingAddOn> addOns;
+}

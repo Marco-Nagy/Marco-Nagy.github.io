@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../features/experience/presentation/view_model/experience_view_model.dart';
 import '../../../features/portfolio_content/domain/entities/section_definition.dart';
 import '../../../features/portfolio_content/domain/entities/site_content.dart';
+import '../../../features/portfolio_content/domain/entities/work_history_entry.dart';
 import '../../../features/portfolio_content/presentation/view_data/chips_group_data.dart';
 import '../../../features/portfolio_content/presentation/view_data/site_links.dart';
 import '../../../features/portfolio_content/presentation/view_model/sections_view_model.dart';
@@ -51,4 +53,10 @@ extension SiteContentContext on BuildContext {
         .map((group) => ChipsGroupData.fromSkillGroup(group, isArabic))
         .toList(growable: false);
   }
+
+  /// Work history entries, for widgets outside the Experience section (About's
+  /// computed years-of-experience stat) that need them without triggering
+  /// their own load.
+  List<WorkHistoryEntry> get workHistory =>
+      watch<ExperienceViewModelCubit>().entries;
 }

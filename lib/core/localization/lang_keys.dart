@@ -18,6 +18,7 @@ class LangKeys {
 
   static const String aboutSkillsTitle = 'about_skills_title';
   static const String aboutLocationLabel = 'about_location_label';
+  static const String aboutExperienceLabel = 'about_experience_label';
 
   static const String experiencePresent = 'experience_present';
   static const String experienceEmpty = 'experience_empty';
@@ -107,6 +108,8 @@ class LangKeys {
       'admin_reset_published_confirm';
   static const String adminSaved = 'admin_saved';
   static const String adminDeleted = 'admin_deleted';
+  static const String adminReorder = 'admin_reorder';
+  static const String adminReorderDone = 'admin_reorder_done';
 
   // Admin speed-dial. These label a widget rather than describe content, so
   // they belong here and not in SiteContent — see decision D4 in
@@ -151,10 +154,8 @@ class LangKeys {
   static const String fieldMediaPick = 'field_media_pick';
   static const String fieldMediaPickPendingCopy =
       'field_media_pick_pending_copy';
-  static const String fieldMediaEmbedInstead = 'field_media_embed_instead';
   static const String fieldMediaPin = 'field_media_pin';
   static const String fieldMediaPinWarning = 'field_media_pin_warning';
-  static const String fieldMediaHeavyEmbed = 'field_media_heavy_embed';
   static const String fieldMediaVideoUrl = 'field_media_video_url';
   static const String fieldMediaYoutubeUnresolved =
       'field_media_youtube_unresolved';
@@ -168,7 +169,6 @@ class LangKeys {
   static const String mediaKindVideoEmbed = 'media_kind_video_embed';
   static const String fieldScreenshots = 'field_screenshots';
   static const String fieldAccentColor = 'field_accent_color';
-  static const String fieldOrder = 'field_order';
   static const String fieldProviderEn = 'field_provider_en';
   static const String fieldProviderAr = 'field_provider_ar';
   static const String fieldYear = 'field_year';
@@ -271,6 +271,12 @@ class LangKeys {
   static const String fieldFullNameAr = 'field_full_name_ar';
   static const String fieldMonogram = 'field_monogram';
   static const String fieldProfileImage = 'field_profile_image';
+  static const String fieldAboutPhoto = 'field_about_photo';
+  static const String adminChoosePhoto = 'admin_choose_photo';
+  static const String adminChangePhoto = 'admin_change_photo';
+  static const String adminRemovePhoto = 'admin_remove_photo';
+  static const String adminCropPhoto = 'admin_crop_photo';
+  static const String adminPhotoHeavyEmbed = 'admin_photo_heavy_embed';
   static const String fieldEmail = 'field_email';
   static const String fieldPhone = 'field_phone';
   static const String fieldGithubUrl = 'field_github_url';

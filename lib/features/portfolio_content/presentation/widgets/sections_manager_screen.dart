@@ -7,6 +7,8 @@ import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/widgets/admin/admin_hover_icon_button.dart';
 import '../../../../core/widgets/admin/admin_list_screen.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/admin/admin_svg_icons.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../domain/entities/section_definition.dart';
@@ -15,7 +17,7 @@ import '../view_model/sections_states.dart';
 import '../view_model/sections_view_model.dart';
 import 'section_form_sheet.dart';
 
-/// Renames sections and toggles which appear in the nav.
+/// Renames sections, toggles which appear in the nav, and reorders them.
 ///
 /// Lists *all* sections, not `visible` ones: hiding a section here is the only
 /// way to get it back, so a hidden one that disappeared from this screen too
@@ -23,12 +25,19 @@ import 'section_form_sheet.dart';
 ///
 /// No add and no delete. Built-in sections each map to a dedicated screen and
 /// cannot be created or removed from content; custom sections are their own
-/// feature, and reordering is Phase 5.
-class SectionsManagerScreen extends StatelessWidget {
+/// feature.
+class SectionsManagerScreen extends StatefulWidget {
   const SectionsManagerScreen({super.key});
 
   static Future<void> open(BuildContext context) =>
       AdminListScreen.open(context, const SectionsManagerScreen());
+
+  @override
+  State<SectionsManagerScreen> createState() => _SectionsManagerScreenState();
+}
+
+class _SectionsManagerScreenState extends State<SectionsManagerScreen> {
+  bool _reordering = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,12 +61,34 @@ class SectionsManagerScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              for (final section in sections)
-                _SectionRow(
-                  key: ValueKey<String>(section.id),
-                  section: section,
-                  cubit: cubit,
+              Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: AdminReorderButton(
+                  reordering: _reordering,
+                  onToggle: () => setState(() => _reordering = !_reordering),
                 ),
+              ),
+              if (_reordering)
+                AdminReorderableList<SectionDefinition>(
+                  items: <AdminReorderableItem<SectionDefinition>>[
+                    for (final section in sections)
+                      AdminReorderableItem<SectionDefinition>(
+                        id: section.id,
+                        value: section,
+                        title: _titleOf(context, section),
+                        subtitle: '${section.id} · ${section.type.name}',
+                      ),
+                  ],
+                  onReorder: (reordered) =>
+                      cubit.doAction(SaveAllSections(reordered)),
+                )
+              else
+                for (final section in sections)
+                  _SectionRow(
+                    key: ValueKey<String>(section.id),
+                    section: section,
+                    cubit: cubit,
+                  ),
             ],
           );
         },
@@ -75,7 +106,7 @@ class _SectionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final title = context.localized(section.titleEn, section.titleAr);
+    final title = _titleOf(context, section);
 
     return Container(
       margin: EdgeInsets.only(bottom: 8.h),
@@ -93,9 +124,7 @@ class _SectionRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  // A section with no title still needs a row to click, so it
-                  // falls back to its id rather than rendering as a blank bar.
-                  title.trim().isEmpty ? section.id : title,
+                  title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: MyFonts.semi16.copyWith(
@@ -133,6 +162,13 @@ class _SectionRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A section with no title still needs a label to click, so it falls back to
+/// its id rather than rendering as a blank bar.
+String _titleOf(BuildContext context, SectionDefinition section) {
+  final title = context.localized(section.titleEn, section.titleAr);
+  return title.trim().isEmpty ? section.id : title;
 }
 
 Future<void> _rename(

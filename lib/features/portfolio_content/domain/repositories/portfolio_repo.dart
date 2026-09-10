@@ -20,11 +20,27 @@ abstract class PortfolioRepo {
   );
   Future<DataResult<List<PersonalProject>>> deleteProject(String id);
 
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<PersonalProject>>> saveProjects(
+    List<PersonalProject> projects,
+  );
+
   Future<DataResult<List<Certificate>>> getCertificates();
   Future<DataResult<List<Certificate>>> upsertCertificate(
     Certificate certificate,
   );
   Future<DataResult<List<Certificate>>> deleteCertificate(String id);
+
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<Certificate>>> saveCertificates(
+    List<Certificate> certificates,
+  );
 
   Future<DataResult<List<WorkHistoryEntry>>> getWorkHistory();
   Future<DataResult<List<WorkHistoryEntry>>> upsertWorkHistory(
@@ -32,15 +48,39 @@ abstract class PortfolioRepo {
   );
   Future<DataResult<List<WorkHistoryEntry>>> deleteWorkHistory(String id);
 
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<WorkHistoryEntry>>> saveWorkHistory(
+    List<WorkHistoryEntry> entries,
+  );
+
   Future<DataResult<List<PricingPackage>>> getPricingPackages();
   Future<DataResult<List<PricingPackage>>> upsertPricingPackage(
     PricingPackage package,
   );
   Future<DataResult<List<PricingPackage>>> deletePricingPackage(String id);
 
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<PricingPackage>>> savePricingPackages(
+    List<PricingPackage> packages,
+  );
+
   Future<DataResult<List<PricingAddOn>>> getPricingAddOns();
   Future<DataResult<List<PricingAddOn>>> upsertPricingAddOn(PricingAddOn addOn);
   Future<DataResult<List<PricingAddOn>>> deletePricingAddOn(String id);
+
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<PricingAddOn>>> savePricingAddOns(
+    List<PricingAddOn> addOns,
+  );
 
   // Site-wide content.
 
@@ -52,6 +92,14 @@ abstract class PortfolioRepo {
     SkillGroupEntity group,
   );
   Future<DataResult<List<SkillGroupEntity>>> deleteSkillGroup(String id);
+
+  /// Replaces the whole collection in the given order.
+  ///
+  /// `order` is renumbered from the list position, so a reorder never has
+  /// to compute indices and two records can never claim the same slot.
+  Future<DataResult<List<SkillGroupEntity>>> saveSkillGroups(
+    List<SkillGroupEntity> groups,
+  );
 
   Future<DataResult<List<TechBadgeEntity>>> getTechBadges();
   Future<DataResult<List<TechBadgeEntity>>> upsertTechBadge(

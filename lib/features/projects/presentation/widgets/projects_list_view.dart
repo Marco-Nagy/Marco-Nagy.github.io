@@ -9,6 +9,8 @@ import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/utils/extension/navigation_extensions.dart';
 import '../../../../core/widgets/admin/admin_add_button.dart';
 import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 import '../../../../core/widgets/motion/reveal_on_scroll.dart';
@@ -47,17 +49,24 @@ class ProjectsListView extends StatelessWidget {
   }
 }
 
-class _ProjectsRows extends StatelessWidget {
+class _ProjectsRows extends StatefulWidget {
   const _ProjectsRows({required this.projects, required this.limit});
 
   final List<PersonalProject> projects;
   final int? limit;
 
   @override
+  State<_ProjectsRows> createState() => _ProjectsRowsState();
+}
+
+class _ProjectsRowsState extends State<_ProjectsRows> {
+  bool _reordering = false;
+
+  @override
   Widget build(BuildContext context) {
     final cubit = context.read<ProjectsViewModelCubit>();
 
-    if (projects.isEmpty) {
+    if (widget.projects.isEmpty) {
       return Column(
         children: <Widget>[
           _ProjectsMessage(text: context.translate(LangKeys.projectsEmpty)),
@@ -66,12 +75,55 @@ class _ProjectsRows extends StatelessWidget {
       );
     }
 
-    final shown = limit == null
-        ? projects
-        : projects.take(limit!).toList(growable: false);
+    final shown = widget.limit == null
+        ? widget.projects
+        : widget.projects.take(widget.limit!).toList(growable: false);
+
+    // Reorder is only offered on the full Projects page: the Home page's
+    // featured block passes a `limit`, and dragging a partial view would
+    // reorder the whole collection from a slice of it.
+    final canReorder = widget.limit == null;
+
+    if (_reordering) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: AdminReorderButton(
+              reordering: true,
+              onToggle: () => setState(() => _reordering = false),
+            ),
+          ),
+          AdminReorderableList<PersonalProject>(
+            items: <AdminReorderableItem<PersonalProject>>[
+              for (final project in shown)
+                AdminReorderableItem<PersonalProject>(
+                  id: project.id,
+                  value: project,
+                  title: context.localized(project.title, project.titleAr),
+                ),
+            ],
+            onReorder: (reordered) =>
+                cubit.doAction(ReorderProjects(reordered)),
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: <Widget>[
+        if (canReorder)
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: AdminReorderButton(
+                reordering: false,
+                onToggle: () => setState(() => _reordering = true),
+              ),
+            ),
+          ),
         for (var i = 0; i < shown.length; i++)
           Builder(
             builder: (context) {

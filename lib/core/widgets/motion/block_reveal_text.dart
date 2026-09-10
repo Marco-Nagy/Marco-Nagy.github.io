@@ -78,7 +78,7 @@ class _BlockRevealTextState extends State<BlockRevealText>
           textDirection: Directionality.of(context),
           textAlign: widget.textAlign,
           maxLines: widget.maxLines,
-          blockColor: widget.blockColor ?? context.colors.pageTop,
+          blockColor: widget.blockColor ?? context.colors.onNavy,
           progress: _controller.value,
         ),
       ),
@@ -151,7 +151,7 @@ class _RenderBlockRevealText extends RenderBox {
 
   /// Both are set by the widget immediately after construction, so the
   /// placeholders here are never painted.
-  Color _blockColor = const Color(0xFF000000);
+  Color _blockColor = const Color.fromARGB(255, 104, 196, 253);
   double _progress = 0;
 
   set text(InlineSpan value) {

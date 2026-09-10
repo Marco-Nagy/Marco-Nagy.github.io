@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
 import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
 import '../../../../core/widgets/admin/admin_list_screen.dart';
+import '../../../../core/widgets/admin/admin_reorder_button.dart';
+import '../../../../core/widgets/admin/admin_reorderable_list.dart';
 import '../../../../core/widgets/admin/admin_sub_list.dart';
 import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../domain/entities/skill_group_entity.dart';
@@ -18,11 +21,18 @@ import 'skill_group_form_screen.dart';
 /// Reached from the [AdminFab] rather than inline under the About block, so
 /// the whole set is editable from anywhere on the site instead of only from
 /// the one page that happens to render it.
-class SkillsManagerScreen extends StatelessWidget {
+class SkillsManagerScreen extends StatefulWidget {
   const SkillsManagerScreen({super.key});
 
   static Future<void> open(BuildContext context) =>
       AdminListScreen.open(context, const SkillsManagerScreen());
+
+  @override
+  State<SkillsManagerScreen> createState() => _SkillsManagerScreenState();
+}
+
+class _SkillsManagerScreenState extends State<SkillsManagerScreen> {
+  bool _reordering = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,22 +45,58 @@ class SkillsManagerScreen extends StatelessWidget {
           final cubit = context.read<SkillsCubit>();
           final groups = cubit.orderedGroups;
 
-          return AdminSubList(
-            label: context.translate(LangKeys.adminSkills),
-            addLabel: context.translate(LangKeys.formAddSkillGroup),
-            emptyLabel: context.translate(LangKeys.skillsEmpty),
-            items: <AdminSubListItem>[
-              for (final group in groups)
-                AdminSubListItem(
-                  title: context.localized(group.labelEn, group.labelAr),
-                  subtitle: group.skills.isEmpty
-                      ? context.translate(LangKeys.adminEmptyItem)
-                      : group.skills.join(' · '),
-                  onEdit: () => _editGroup(context, cubit, group),
-                  onDelete: () => _deleteGroup(context, cubit, group.id),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (groups.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: AdminReorderButton(
+                    reordering: _reordering,
+                    onToggle: () =>
+                        setState(() => _reordering = !_reordering),
+                  ),
+                ),
+              if (_reordering)
+                AdminReorderableList<SkillGroupEntity>(
+                  items: <AdminReorderableItem<SkillGroupEntity>>[
+                    for (final group in groups)
+                      AdminReorderableItem<SkillGroupEntity>(
+                        id: group.id,
+                        value: group,
+                        title: context.localized(
+                          group.labelEn,
+                          group.labelAr,
+                        ),
+                        subtitle: group.skills.join(' · '),
+                      ),
+                  ],
+                  onReorder: (reordered) =>
+                      cubit.doAction(ReorderSkillGroups(reordered)),
+                )
+              else
+                AdminSubList(
+                  label: context.translate(LangKeys.adminSkills),
+                  addLabel: context.translate(LangKeys.formAddSkillGroup),
+                  emptyLabel: context.translate(LangKeys.skillsEmpty),
+                  items: <AdminSubListItem>[
+                    for (final group in groups)
+                      AdminSubListItem(
+                        title: context.localized(
+                          group.labelEn,
+                          group.labelAr,
+                        ),
+                        subtitle: group.skills.isEmpty
+                            ? context.translate(LangKeys.adminEmptyItem)
+                            : group.skills.join(' · '),
+                        onEdit: () => _editGroup(context, cubit, group),
+                        onDelete: () =>
+                            _deleteGroup(context, cubit, group.id),
+                      ),
+                  ],
+                  onAdd: () => _editGroup(context, cubit, null),
                 ),
             ],
-            onAdd: () => _editGroup(context, cubit, null),
           );
         },
       ),

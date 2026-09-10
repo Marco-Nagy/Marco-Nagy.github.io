@@ -17,6 +17,9 @@ _SiteContent _$SiteContentFromJson(Map<String, dynamic> json) => _SiteContent(
   profileImage: json['profileImage'] == null
       ? const ImageRef()
       : ImageRef.fromJson(json['profileImage'] as Map<String, dynamic>),
+  aboutPhotoImage: json['aboutPhotoImage'] == null
+      ? const ImageRef()
+      : ImageRef.fromJson(json['aboutPhotoImage'] as Map<String, dynamic>),
   email: json['email'] as String? ?? '',
   phone: json['phone'] as String? ?? '',
   gitHubUrl: json['gitHubUrl'] as String? ?? '',
@@ -80,6 +83,7 @@ Map<String, dynamic> _$SiteContentToJson(_SiteContent instance) =>
       'locationEn': instance.locationEn,
       'locationAr': instance.locationAr,
       'profileImage': instance.profileImage,
+      'aboutPhotoImage': instance.aboutPhotoImage,
       'email': instance.email,
       'phone': instance.phone,
       'gitHubUrl': instance.gitHubUrl,
