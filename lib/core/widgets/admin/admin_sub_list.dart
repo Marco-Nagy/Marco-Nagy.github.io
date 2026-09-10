@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../../core/styles/fonts/my_fonts.dart';
-import '../../../../core/utils/extension/context_extensions.dart';
-import '../../../../core/widgets/admin/admin_item_actions.dart';
-import '../../../../core/widgets/admin/admin_svg_icons.dart';
+import '../../styles/fonts/my_fonts.dart';
+import '../../utils/extension/context_extensions.dart';
+import 'admin_item_actions.dart';
+import 'admin_svg_icons.dart';
 
 /// One row of an [AdminSubList].
 class AdminSubListItem {
@@ -23,7 +23,7 @@ class AdminSubListItem {
 }
 
 /// A list of child records edited inside its parent's form — the panels of a
-/// project, the shots of a panel.
+/// project, the shots of a panel, the tiers of a pricing package.
 ///
 /// Inline rather than a sheet of its own: project → panel → shot is already
 /// three modals deep, and a fourth whose entire content is a list would be a
