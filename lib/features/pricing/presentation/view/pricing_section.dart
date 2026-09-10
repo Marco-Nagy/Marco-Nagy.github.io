@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
@@ -36,7 +38,7 @@ class _PricingBodyRoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = context.translate(LangKeys.pricingTitle);
+    final title = context.sectionTitle(BuiltInSectionIds.pricing);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

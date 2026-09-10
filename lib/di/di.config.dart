@@ -55,6 +55,12 @@ import '../features/portfolio_content/domain/use_cases/skills_use_case.dart'
     as _i1046;
 import '../features/portfolio_content/domain/use_cases/work_history_use_case.dart'
     as _i1028;
+import '../features/portfolio_content/presentation/view_model/sections_view_model.dart'
+    as _i537;
+import '../features/portfolio_content/presentation/view_model/site_content_view_model.dart'
+    as _i783;
+import '../features/portfolio_content/presentation/view_model/skills_view_model.dart'
+    as _i418;
 import '../features/pricing/presentation/view_model/pricing_view_model.dart'
     as _i53;
 import '../features/projects/presentation/view_model/projects_view_model.dart'
@@ -131,11 +137,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i53.PricingViewModelCubit>(
       () => _i53.PricingViewModelCubit(gh<_i249.PricingUseCase>()),
     );
+    gh.factory<_i783.SiteContentCubit>(
+      () => _i783.SiteContentCubit(gh<_i520.SiteContentUseCase>()),
+    );
     gh.factory<_i866.ExperienceViewModelCubit>(
       () => _i866.ExperienceViewModelCubit(gh<_i1028.WorkHistoryUseCase>()),
     );
     gh.factory<_i337.CertificatesViewModelCubit>(
       () => _i337.CertificatesViewModelCubit(gh<_i478.CertificatesUseCase>()),
+    );
+    gh.factory<_i537.SectionsCubit>(
+      () => _i537.SectionsCubit(gh<_i635.SectionsUseCase>()),
+    );
+    gh.factory<_i418.SkillsCubit>(
+      () => _i418.SkillsCubit(gh<_i1046.SkillsUseCase>()),
     );
     return this;
   }

@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/utils/url_opener.dart';
 import '../../../../core/utils/validators.dart';
@@ -46,11 +48,13 @@ class _ContactSectionState extends State<ContactSection> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final opened = await UrlOpener.openMailTo(
-      subject: _subject.text.trim(),
-      body:
-          '${_message.text.trim()}\n\n'
-          '${_name.text.trim()}\n${_email.text.trim()}',
+    final opened = await UrlOpener.open(
+      context.siteLinks.mailto(
+        subject: _subject.text.trim(),
+        body:
+            '${_message.text.trim()}\n\n'
+            '${_name.text.trim()}\n${_email.text.trim()}',
+      ),
     );
     if (!mounted) return;
 
@@ -66,7 +70,9 @@ class _ContactSectionState extends State<ContactSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SectionDividerHeader(title: context.translate(LangKeys.navContact)),
+        SectionDividerHeader(
+          title: context.sectionTitle(BuiltInSectionIds.contact),
+        ),
         ContentContainer(
           child: context.isWide
               ? Row(
@@ -105,18 +111,19 @@ class _ContactSectionState extends State<ContactSection> {
 
   Widget _buildForm(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          context.translate(LangKeys.contactTitle),
+          context.localized(site.contactTitleEn, site.contactTitleAr),
           style: (context.isMobile ? MyFonts.display36 : MyFonts.display48)
               .copyWith(color: colors.onNavy),
         ),
         SizedBox(height: 14.h),
         Text(
-          context.translate(LangKeys.contactSubtitle),
+          context.localized(site.contactSubtitleEn, site.contactSubtitleAr),
           style: MyFonts.regular16.copyWith(color: colors.onNavyMuted),
         ),
         SizedBox(height: 40.h),

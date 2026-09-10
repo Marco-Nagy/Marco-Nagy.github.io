@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/url_opener.dart';
 import '../../../../core/widgets/chrome/footer_social_icons.dart';
 
@@ -16,6 +16,8 @@ class ContactLinks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
+    final links = context.siteLinks;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,22 +30,19 @@ class ContactLinks extends StatelessWidget {
         _ContactLine(
           icon: Icons.mail_outline_rounded,
           label: context.translate(LangKeys.contactEmail),
-          value: ProfileInfo.email,
-          onTap: UrlOpener.openMailTo,
+          value: links.email,
+          onTap: () => UrlOpener.open(links.mailto()),
         ),
         _ContactLine(
           icon: Icons.phone_outlined,
           label: context.translate(LangKeys.contactPhone),
-          value: ProfileInfo.phone,
-          onTap: UrlOpener.openPhone,
+          value: links.phone,
+          onTap: () => UrlOpener.open(links.tel),
         ),
         _ContactLine(
           icon: Icons.place_outlined,
           label: context.translate(LangKeys.aboutLocationLabel),
-          value: context.localized(
-            ProfileInfo.location,
-            ProfileInfo.locationAr,
-          ),
+          value: context.localized(site.locationEn, site.locationAr),
         ),
         SizedBox(height: 28.h),
         const FooterSocialIcons(),

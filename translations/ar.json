@@ -1,13 +1,6 @@
 {
   "app_title": "ماركو ناجي لوقا — مطوّر تطبيقات Flutter",
 
-  "nav_home": "الرئيسية",
-  "nav_about": "نبذة عني",
-  "nav_experience": "الخبرة العملية",
-  "nav_projects": "المشاريع",
-  "nav_certificates": "الشهادات",
-  "nav_pricing": "الأسعار",
-  "nav_contact": "تواصل معي",
   "nav_resume": "السيرة الذاتية",
   "nav_menu": "القائمة",
 
@@ -15,10 +8,6 @@
   "lang_arabic": "ع",
   "lang_switch_tooltip": "تغيير اللغة",
 
-  "hero_greeting": "أهلًا، أنا",
-  "hero_name": "ماركو.",
-  "hero_role": "مطوّر تطبيقات Flutter.",
-  "hero_role_tags": "مطوّر Flutter / مهندس تطبيقات موبايل / Clean Architecture",
   "hero_cta": "شاهد أعمالي",
   "hero_scroll_down": "مرّر للأسفل",
   "home_works_headline": "صُنع بشغف.",
@@ -26,24 +15,12 @@
   "home_works_more_label": "وهناك المزيد",
   "home_works_view_all": "كل المشاريع",
 
-  "about_title": "نبذة عني",
-  "about_lead": "أبني تطبيقات Flutter حية يستخدمها الناس كل يوم.",
   "about_skills_title": "المهارات",
   "about_location_label": "مقيم في",
 
-  "skills_state_management": "إدارة الحالة",
-  "skills_architecture": "هندسة البرمجيات",
-  "skills_api_integration": "ربط الـ APIs",
-  "skills_database": "قواعد البيانات",
-  "skills_maps": "الخرائط",
-  "skills_ci_cd": "التكامل والنشر المستمر",
-  "skills_other": "مهارات أخرى",
-
-  "experience_title": "الخبرة العملية",
   "experience_present": "حتى الآن",
   "experience_empty": "لا توجد خبرات مضافة بعد.",
 
-  "projects_title": "المشاريع",
   "projects_empty": "لا توجد مشاريع بعد.",
   "projects_view_project": "عرض المشروع",
   "projects_key_features": "أهم المميزات",
@@ -74,12 +51,10 @@
   "admin_add_link": "إضافة رابط",
   "projects_overview": "نظرة عامة",
 
-  "certificates_title": "الشهادات",
   "certificates_empty": "لا توجد شهادات بعد.",
   "certificates_issued_by": "جهة الإصدار",
   "certificates_year": "السنة",
 
-  "pricing_title": "الأسعار",
   "pricing_lead": "باقات واضحة. اختر باقة أساسية، أضف ما تحتاجه، واعرف الإجمالي فورًا.",
   "pricing_base_packages": "الباقات الأساسية",
   "pricing_add_ons": "الإضافات",
@@ -98,8 +73,6 @@
   "pricing_empty": "لم يتم إعداد الأسعار بعد.",
   "pricing_per_unit": "لكل وحدة",
 
-  "contact_title": "تواصل معي.",
-  "contact_subtitle": "لديك مشروع في ذهنك أو وظيفة تراها مناسبة؟ أرسل لي رسالة — أرد سريعًا.",
   "contact_name": "الاسم",
   "contact_email": "البريد الإلكتروني",
   "contact_subject": "الموضوع",
@@ -113,8 +86,6 @@
   "validation_invalid_email": "من فضلك أدخل بريدًا إلكترونيًا صحيحًا",
   "validation_message_too_short": "من فضلك اكتب تفاصيل أكثر قليلًا",
 
-  "footer_headline": "لنعمل معًا.",
-  "footer_availability": "متاح لوظائف بدوام كامل ومشاريع Flutter حرة — عن بُعد أو هجين أو حضوري.",
   "footer_cta": "قل مرحبًا",
   "footer_built_by": "من تنفيذ ماركو ناجي",
   "footer_built_with": "مبني باستخدام Flutter 💙",

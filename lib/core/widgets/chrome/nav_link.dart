@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../features/portfolio_content/domain/entities/section_definition.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
 import '../../routes/route_names.dart';
@@ -13,13 +14,16 @@ import '../motion/motion_durations.dart';
 class NavLink extends StatefulWidget {
   const NavLink({
     required this.label,
-    required this.sectionId,
+    required this.section,
     required this.isActive,
     super.key,
   });
 
   final String label;
-  final String sectionId;
+
+  /// The whole definition rather than just an id: a custom section resolves to
+  /// a different route shape, and only [SectionDefinition] knows which it is.
+  final SectionDefinition section;
   final bool isActive;
 
   @override
@@ -43,7 +47,7 @@ class _NavLinkState extends State<NavLink> {
         onTap: widget.isActive
             ? null
             : () => context.replaceNamed<void>(
-                RouteNames.forSectionId(widget.sectionId),
+                RouteNames.forSection(widget.section),
               ),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),

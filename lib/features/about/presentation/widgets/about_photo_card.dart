@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
-import '../../../../core/styles/app_images.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../../core/widgets/common/app_image.dart';
 import '../../../../core/widgets/common/hatched_circle.dart';
-import '../../../../core/widgets/common/safe_asset_image.dart';
 
 /// Rounded-square portrait sitting on a textured accent backdrop, offset so the
 /// backdrop peeks out behind it.
@@ -55,11 +54,13 @@ class AboutPhotoCard extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(27.r),
-                child: SafeAssetImage(
-                  assetPath: AppImages.profile,
+                child: AppImage(
+                  image: context.site.profileImage,
+                  width: size,
+                  height: size,
                   fallback: Center(
                     child: Text(
-                      ProfileInfo.monogram,
+                      context.site.monogram,
                       style: MyFonts.display48.copyWith(color: colors.accent),
                     ),
                   ),

@@ -6,13 +6,6 @@ class LangKeys {
 
   static const String appTitle = 'app_title';
 
-  static const String navHome = 'nav_home';
-  static const String navAbout = 'nav_about';
-  static const String navExperience = 'nav_experience';
-  static const String navProjects = 'nav_projects';
-  static const String navCertificates = 'nav_certificates';
-  static const String navPricing = 'nav_pricing';
-  static const String navContact = 'nav_contact';
   static const String navResume = 'nav_resume';
   static const String navMenu = 'nav_menu';
 
@@ -20,10 +13,6 @@ class LangKeys {
   static const String langArabic = 'lang_arabic';
   static const String langSwitchTooltip = 'lang_switch_tooltip';
 
-  static const String heroGreeting = 'hero_greeting';
-  static const String heroName = 'hero_name';
-  static const String heroRole = 'hero_role';
-  static const String heroRoleTags = 'hero_role_tags';
   static const String heroCta = 'hero_cta';
   static const String heroScrollDown = 'hero_scroll_down';
 
@@ -32,24 +21,12 @@ class LangKeys {
   static const String homeWorksMoreLabel = 'home_works_more_label';
   static const String homeWorksViewAll = 'home_works_view_all';
 
-  static const String aboutTitle = 'about_title';
-  static const String aboutLead = 'about_lead';
   static const String aboutSkillsTitle = 'about_skills_title';
   static const String aboutLocationLabel = 'about_location_label';
 
-  static const String skillsStateManagement = 'skills_state_management';
-  static const String skillsArchitecture = 'skills_architecture';
-  static const String skillsApiIntegration = 'skills_api_integration';
-  static const String skillsDatabase = 'skills_database';
-  static const String skillsMaps = 'skills_maps';
-  static const String skillsCiCd = 'skills_ci_cd';
-  static const String skillsOther = 'skills_other';
-
-  static const String experienceTitle = 'experience_title';
   static const String experiencePresent = 'experience_present';
   static const String experienceEmpty = 'experience_empty';
 
-  static const String projectsTitle = 'projects_title';
   static const String projectsEmpty = 'projects_empty';
   static const String projectsViewProject = 'projects_view_project';
   static const String projectsKeyFeatures = 'projects_key_features';
@@ -80,12 +57,10 @@ class LangKeys {
   static const String adminAddLink = 'admin_add_link';
   static const String projectsOverview = 'projects_overview';
 
-  static const String certificatesTitle = 'certificates_title';
   static const String certificatesEmpty = 'certificates_empty';
   static const String certificatesIssuedBy = 'certificates_issued_by';
   static const String certificatesYear = 'certificates_year';
 
-  static const String pricingTitle = 'pricing_title';
   static const String pricingLead = 'pricing_lead';
   static const String pricingBasePackages = 'pricing_base_packages';
   static const String pricingAddOns = 'pricing_add_ons';
@@ -104,8 +79,6 @@ class LangKeys {
   static const String pricingEmpty = 'pricing_empty';
   static const String pricingPerUnit = 'pricing_per_unit';
 
-  static const String contactTitle = 'contact_title';
-  static const String contactSubtitle = 'contact_subtitle';
   static const String contactName = 'contact_name';
   static const String contactEmail = 'contact_email';
   static const String contactSubject = 'contact_subject';
@@ -120,8 +93,6 @@ class LangKeys {
   static const String validationMessageTooShort =
       'validation_message_too_short';
 
-  static const String footerHeadline = 'footer_headline';
-  static const String footerAvailability = 'footer_availability';
   static const String footerCta = 'footer_cta';
   static const String footerBuiltBy = 'footer_built_by';
   static const String footerBuiltWith = 'footer_built_with';

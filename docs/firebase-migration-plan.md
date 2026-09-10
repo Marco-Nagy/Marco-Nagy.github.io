@@ -188,6 +188,26 @@ The `<owner-uid>` literal above is the reason the console step records the UID: 
 
 **Verify:** `grep -rn "ProfileInfo\|NavItem.all\|AppLinks\|SkillGroups\.\|TechBadges\." lib/` returns nothing. Editing the site name in the admin form changes nav, hero, splash and footer — on the deployed site, with no rebuild.
 
+**Status 2026-09-10 — done. Three cubits, not two, and one silent bug found on the way.**
+
+`SiteContentCubit`, `SectionsCubit` and **`SkillsCubit`** are provided together in a `MultiBlocProvider` above `MaterialApp`. The third was not in the plan: 3c asks for both the hero orbit badges and the About skills block, and both need `SkillsUseCase`. Per-screen provision would have worked — they are screen content, not chrome — but `@injectable` registers cubits as factories, so a per-screen provider refetches both collections on every navigation through a single-page site whose nav *is* navigation. App-wide costs one read and keeps one provisioning story instead of two.
+
+Each cubit dispatches its `Load*` in the provider's `create:`, so the read is in flight before the first frame; `main()` already awaits `syncFromRemote()` before `runApp`, so these hit a warm cache and settle in a microtask. None of the three has a `Loading` state at all — the invariant "chrome never renders a spinner" is structural rather than a convention a later consumer could break by switching on a state that does not exist.
+
+`context.site` / `context.siteLinks` / `context.visibleSections` / `context.sectionTitle(id)` / `context.skillGroups` / `context.techBadges` live in their own `site_content_extensions.dart` rather than in `context_extensions.dart`. Keeping them apart means the app's most-imported file does not pull `flutter_bloc` and three presentation cubits into every widget that only wanted `context.colors`. Every getter `watch`es, so a call site rebuilds on a content change without a `BlocBuilder` of its own.
+
+**Real bug, caught by a test written for it: the `mailto:` encoder was the form-encoding one.** `UrlOpener.openMailTo` built its query with `Uri.encodeQueryComponent`, which emits `+` for a space — correct for an HTTP form post, wrong in a mail client, where `Project+enquiry` arrives in the subject line with the plus in it. This shipped in the old code and moved into `SiteLinks.mailto()` unchanged before `site_links_test.dart` failed on it; the fix is `Uri.encodeComponent`. It had stayed invisible because `UrlOpener.open` returns `false` for anything it cannot launch and the UI shows one generic error, so a mangled `mailto:` is indistinguishable from "the mail app did not open" — and the contact form puts spaces and newlines in *every* message it sends, so this was the normal path, not an edge case.
+
+**Tech badges: the entity is the content, the logo is not.** The hero rendered 11 branded SVGs from `tech_badges.dart`; the published `techBadges` holds 6 entries carrying only an `iconKey`, and only 2 of those 6 have an SVG on disk. Rather than widen `TechBadgeEntity` with an asset path and brand colours — build configuration masquerading as content, and a schema change this phase does not need — the badge *list* stays editable content and the mark each badge wears is looked up in a new `core/constants/tech_brand_marks.dart`, keyed by normalized label with the id as a fallback so renaming a badge in the admin does not cost it its logo. A badge with no entry falls back to its `AppIconCatalog` glyph, which is what a newly added badge gets until a logo ships for it. `tech_brand_marks_test.dart` asserts every catalogued path against the real directory listing rather than `File.existsSync`, because the case slip that matters (`github.svg` vs `gitHub.svg`) passes an existence check on Windows and 404s only once deployed.
+
+The visible consequence is that the hero now shows the 6 published badges instead of 11. That is not a regression so much as code catching up with content — the constant file and Firestore had drifted apart, and the constant file was winning. Adding the other five back is a content edit (`content/bundle.techBadges` in the console now, or the Phase 4 badge form later), and doing it by hand is exactly the Verify step above.
+
+**Deferred deliberately: the featured-works copy (`home_works_*`) stays in `LangKeys`.** D4 classifies it as content, and it is — but `SiteContent` has no fields for it, and adding them here would render blank headings on the live site, because neither Firestore nor a re-publish can supply a value for a field that has never been authored: publishing writes the local cache, which came from Firestore, which would not have the field either. It needs the Phase 4 `site_content_form_screen` to exist first, so it moves with that form rather than ahead of it.
+
+Also folded in, since the fields existed and were populated and would otherwise have stayed dead: contact title/subtitle from `SiteContent`, and all six section headings from `SectionDefinition.titleEn/titleAr` (D4's "section headings" half, which 3c's call-site list did not spell out). `NavLink` and the drawer now take the whole `SectionDefinition` rather than an id, so `RouteNames.forSection` can route a custom section — the id-only form could only ever reach a built-in.
+
+28 keys left both translation JSONs. `flutter analyze` clean, 67 tests pass (41 before, 26 added across `site_links_test.dart`, `content_cubits_test.dart` and `tech_brand_marks_test.dart`).
+
 ### Phase 4 — The 6 missing forms · 18% · *needs 3 for SiteContent/Skills only*
 
 **Shared abstraction: two small widgets only** — `admin_text_field.dart` (thin wrapper over `UnderlineTextField`) and `bilingual_field_pair.dart` (the en/ar row that recurs ~20 times, 6 of them inside `project_form_screen.dart`). **Not** a schema-driven form engine: the fields are genuinely heterogeneous (`MediaRefField` is 590 lines, plus gradient/sub-list/color fields) and Dart has no reflection, so a generic engine becomes a large tagged union with worse ergonomics. `AdminFormScreen` + `AdminFormSheet` already *are* the scaffold abstraction. Also move `admin_sub_list.dart` from the projects feature into `core/widgets/admin/` — `PricingPackage` needs it and it is not project-specific.
@@ -260,7 +280,7 @@ Skip widget and golden tests.
 | 0 Firebase setup + bundle | 15% | 0% | — |
 | 1 Read path + cache + seed migration | 10% | ~20% (local layer exists) | 0, 7.1 |
 | 2 Auth + rules + write path | 12% | 0% | 0, 1 |
-| 3 Static → dynamic | 22% | ~30% (data layer only) | — (parallel to 0–2) |
+| 3 Static → dynamic | 22% | **100%** | — (parallel to 0–2) |
 | 4 Missing forms | 18% | ~35% (Projects + dead handlers) | 3 (for SiteContent/Skills) |
 | 5 Reorder | 6% | ~15% (repo support) | 4 |
 | 6 Media | 12% | 0% | 0, 2 |

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/localization/lang_keys.dart';
-import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
@@ -20,7 +20,9 @@ class AboutSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SectionDividerHeader(title: context.translate(LangKeys.aboutTitle)),
+        SectionDividerHeader(
+          title: context.sectionTitle(BuiltInSectionIds.about),
+        ),
         ContentContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

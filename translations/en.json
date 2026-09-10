@@ -1,13 +1,6 @@
 {
   "app_title": "Marco Nagy Louka — Flutter Developer",
 
-  "nav_home": "Home",
-  "nav_about": "About",
-  "nav_experience": "Experience",
-  "nav_projects": "Projects",
-  "nav_certificates": "Certificates",
-  "nav_pricing": "Pricing",
-  "nav_contact": "Contact",
   "nav_resume": "Resume",
   "nav_menu": "Menu",
 
@@ -15,10 +8,6 @@
   "lang_arabic": "AR",
   "lang_switch_tooltip": "Switch language",
 
-  "hero_greeting": "Hi, I'm",
-  "hero_name": "Marco.",
-  "hero_role": "Flutter Developer.",
-  "hero_role_tags": "Flutter Developer / Mobile Engineer / Clean Architecture",
   "hero_cta": "See my work",
   "hero_scroll_down": "Scroll down",
   "home_works_headline": "Crafted with love.",
@@ -26,24 +15,12 @@
   "home_works_more_label": "There's more",
   "home_works_view_all": "View all projects",
 
-  "about_title": "About",
-  "about_lead": "I build production Flutter apps that people use every day.",
   "about_skills_title": "Skills",
   "about_location_label": "Based in",
 
-  "skills_state_management": "State Management",
-  "skills_architecture": "Architecture",
-  "skills_api_integration": "API Integration",
-  "skills_database": "Database",
-  "skills_maps": "Maps",
-  "skills_ci_cd": "CI/CD",
-  "skills_other": "Other",
-
-  "experience_title": "Experience",
   "experience_present": "Present",
   "experience_empty": "No experience entries yet.",
 
-  "projects_title": "Projects",
   "projects_empty": "No projects yet.",
   "projects_view_project": "View project",
   "projects_key_features": "Key features",
@@ -74,12 +51,10 @@
   "admin_add_link": "Add link",
   "projects_overview": "Overview",
 
-  "certificates_title": "Certificates",
   "certificates_empty": "No certificates yet.",
   "certificates_issued_by": "Issued by",
   "certificates_year": "Year",
 
-  "pricing_title": "Pricing",
   "pricing_lead": "Transparent packages. Pick a base, add what you need, see the total instantly.",
   "pricing_base_packages": "Base packages",
   "pricing_add_ons": "Add-ons",
@@ -98,8 +73,6 @@
   "pricing_empty": "No pricing configured yet.",
   "pricing_per_unit": "per unit",
 
-  "contact_title": "Get in touch.",
-  "contact_subtitle": "Have a project in mind, or a role you think fits? Send me a message — I reply quickly.",
   "contact_name": "Name",
   "contact_email": "Email",
   "contact_subject": "Subject",
@@ -113,8 +86,6 @@
   "validation_invalid_email": "Please enter a valid email address",
   "validation_message_too_short": "Please write a little more detail",
 
-  "footer_headline": "Let's work together.",
-  "footer_availability": "I'm available for full-time roles and freelance Flutter projects — remote, hybrid, or on-site.",
   "footer_cta": "Say hello",
   "footer_built_by": "Built by Marco Nagy",
   "footer_built_with": "Built with Flutter 💙",

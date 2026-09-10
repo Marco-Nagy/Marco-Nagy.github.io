@@ -4,9 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
 import '../../utils/extension/navigation_extensions.dart';
+import '../../utils/extension/site_content_extensions.dart';
 import 'monogram_logo.dart';
-import 'nav_items.dart';
 import '../../routes/route_names.dart';
+import '../../../features/portfolio_content/domain/entities/section_definition.dart';
 import 'resume_button.dart';
 
 /// The nav collapsed for mobile and tablet. Mirrors automatically in Arabic
@@ -31,11 +32,14 @@ class MobileNavDrawer extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: <Widget>[
-                    for (final item in NavItem.all)
+                    for (final section in context.visibleSections)
                       _DrawerLink(
-                        label: context.translate(item.labelKey),
-                        sectionId: item.sectionId,
-                        isActive: item.sectionId == currentSectionId,
+                        label: context.localized(
+                          section.titleEn,
+                          section.titleAr,
+                        ),
+                        section: section,
+                        isActive: section.id == currentSectionId,
                       ),
                   ],
                 ),
@@ -53,12 +57,12 @@ class MobileNavDrawer extends StatelessWidget {
 class _DrawerLink extends StatelessWidget {
   const _DrawerLink({
     required this.label,
-    required this.sectionId,
+    required this.section,
     required this.isActive,
   });
 
   final String label;
-  final String sectionId;
+  final SectionDefinition section;
   final bool isActive;
 
   @override
@@ -80,7 +84,7 @@ class _DrawerLink extends StatelessWidget {
         // Close the drawer first so it is not left open behind the new screen.
         context.pop();
         if (!isActive) {
-          context.replaceNamed<void>(RouteNames.forSectionId(sectionId));
+          context.replaceNamed<void>(RouteNames.forSection(section));
         }
       },
     );

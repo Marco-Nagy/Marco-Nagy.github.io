@@ -8,8 +8,9 @@ part 'site_content.g.dart';
 /// Every singleton piece of copy on the site — identity, hero, about, footer
 /// and contact details.
 ///
-/// This replaces the compile-time `ProfileInfo` constants so debug builds can
-/// edit it. The old constants survive only as the seed defaults.
+/// This replaced the compile-time identity constants the site used to ship
+/// with, so every string here is editable through the admin and reaches
+/// visitors without a rebuild.
 @freezed
 abstract class SiteContent with _$SiteContent {
   const factory SiteContent({

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/url_opener.dart';
 import '../../../../core/widgets/common/pill_button.dart';
 import '../view_model/pricing_states.dart';
@@ -74,9 +75,11 @@ class QuoteSummary extends StatelessWidget {
           SizedBox(height: 20.h),
           PillButton(
             label: context.translate(LangKeys.pricingRequestQuote),
-            onPressed: () => UrlOpener.openMailTo(
-              subject: context.translate(LangKeys.pricingRequestQuote),
-              body: _quoteBody(context),
+            onPressed: () => UrlOpener.open(
+              context.siteLinks.mailto(
+                subject: context.translate(LangKeys.pricingRequestQuote),
+                body: _quoteBody(context),
+              ),
             ),
           ),
           SizedBox(height: 10.h),

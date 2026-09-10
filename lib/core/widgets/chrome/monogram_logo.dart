@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/profile_info.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
+import '../../utils/extension/site_content_extensions.dart';
 import '../../routes/route_names.dart';
 import '../../utils/extension/navigation_extensions.dart';
 
@@ -21,7 +21,7 @@ class MonogramLogo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              ProfileInfo.monogram,
+              context.site.monogram,
               style: MyFonts.bold28.copyWith(
                 color: context.colors.onNavy,
                 letterSpacing: 1,
