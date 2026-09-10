@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../features/portfolio_content/domain/entities/section_definition.dart';
 import '../../../features/portfolio_content/domain/entities/site_content.dart';
-import '../../../features/portfolio_content/domain/entities/tech_badge_entity.dart';
 import '../../../features/portfolio_content/presentation/view_data/chips_group_data.dart';
 import '../../../features/portfolio_content/presentation/view_data/site_links.dart';
 import '../../../features/portfolio_content/presentation/view_model/sections_view_model.dart';
@@ -52,7 +51,4 @@ extension SiteContentContext on BuildContext {
         .map((group) => ChipsGroupData.fromSkillGroup(group, isArabic))
         .toList(growable: false);
   }
-
-  /// Badges orbiting the hero photo, in `order`.
-  List<TechBadgeEntity> get techBadges => watch<SkillsCubit>().orderedBadges;
 }

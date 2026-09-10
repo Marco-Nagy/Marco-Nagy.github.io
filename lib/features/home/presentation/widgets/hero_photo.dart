@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/app_icon_catalog.dart';
 import '../../../../core/constants/tech_brand_marks.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
@@ -11,7 +10,6 @@ import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/widgets/common/app_image.dart';
 import '../../../../core/widgets/common/safe_asset_image.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
-import '../../../portfolio_content/domain/entities/tech_badge_entity.dart';
 
 /// The headshot on its circular backdrop, with tech badges revolving around it.
 ///
@@ -100,7 +98,7 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
     // Badges ride just outside the photo, inside the outer ring.
     final orbitRadius = widget.diameter * 0.62;
     final canvasSize = widget.diameter + 120.w;
-    final badges = context.techBadges;
+    final badges = TechBrandMarks.all;
 
     return AnimatedBuilder(
       animation: _float,
@@ -228,14 +226,10 @@ class _MonogramFallback extends StatelessWidget {
 /// The mark stands on its own — no chip, no ring — so each logo reads at its
 /// full size and keeps its own brand colours rather than sitting on a disc that
 /// competes with them.
-///
-/// Which badges orbit is editable content; the logo each one wears is not. A
-/// badge with no brand mark, or one whose logo file is missing, falls back to
-/// its `AppIconCatalog` glyph rather than leaving a hole in the orbit.
 class TechBadgeChip extends StatelessWidget {
   const TechBadgeChip({required this.badge, this.size, super.key});
 
-  final TechBadgeEntity badge;
+  final TechBrandMark badge;
   final double? size;
 
   @override
@@ -243,26 +237,19 @@ class TechBadgeChip extends StatelessWidget {
     // The mark occupies the full extent the old padded chip did, so it reads
     // roughly twice the size it did inside it.
     final extent = size ?? 46.r;
-    final mark = TechBrandMarks.resolve(label: badge.label, id: badge.id);
-    final glyph = FittedBox(
-      child: Icon(
-        AppIconCatalog.resolve(badge.iconKey),
-        color: mark?.color ?? context.colors.accent,
-      ),
-    );
 
     return Tooltip(
       message: badge.label,
       child: SizedBox(
         width: extent,
         height: extent,
-        child: mark == null
-            ? glyph
-            : SafeAssetImage(
-                assetPath: mark.assetPath,
-                fit: BoxFit.contain,
-                fallback: glyph,
-              ),
+        child: SafeAssetImage(
+          assetPath: badge.assetPath,
+          fit: BoxFit.contain,
+          fallback: FittedBox(
+            child: Icon(badge.fallbackIcon, color: badge.color),
+          ),
+        ),
       ),
     );
   }

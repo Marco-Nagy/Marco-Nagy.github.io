@@ -1,96 +1,116 @@
 import 'package:flutter/material.dart';
 
-/// The brand logo and colour for a tech badge.
+/// One technology's logo in the hero orbit.
 ///
-/// These are build assets, not content: the file has to be in `pubspec.yaml`
-/// and the colour is the brand's, not Marco's to edit. So the badge *list* is
-/// editable content (`TechBadgeEntity` — which badges, their order, their
-/// labels) while the mark each one wears is looked up here.
+/// [assetPath] points at the brand's own logo. When that file is absent the
+/// badge falls back to [fallbackIcon] tinted with [color], so the hero is never
+/// broken by a missing asset — drop the logo in and it takes over.
 class TechBrandMark {
-  const TechBrandMark({required this.assetPath, required this.color});
+  const TechBrandMark({
+    required this.label,
+    required this.assetPath,
+    required this.color,
+    required this.fallbackIcon,
+  });
+
+  final String label;
 
   /// Case-sensitive: the web build serves assets over HTTP, where `gitHub.svg`
   /// and `github.svg` are different files.
   final String assetPath;
 
-  /// The lighter stop of the brand's colour, used to tint the fallback glyph
-  /// so it stays legible on navy.
+  /// The lighter stop of the brand's colour. Tints the fallback glyph so it
+  /// stays legible on navy.
   final Color color;
+
+  /// Drawn until the logo asset exists.
+  final IconData fallbackIcon;
 }
 
-/// Resolves a badge to its brand mark, or null when there is no logo for it.
+/// The badges orbiting the hero photo, in the order they are placed.
 ///
-/// A badge with no entry here is not broken — it falls back to its
-/// `AppIconCatalog` glyph, which is what a newly added badge gets until a logo
-/// is shipped for it.
+/// This is build configuration, not editable content — decided 2026-09-10.
+/// A badge cannot exist without its SVG being in `assets/tech/` and declared in
+/// `pubspec.yaml`, which is a rebuild either way, so routing the *list* through
+/// Firestore bought only reordering and hiding at the cost of the list and the
+/// logos drifting apart. They had already drifted: the published `techBadges`
+/// held six entries, four of which had no logo at all.
+///
+/// `TechBadgeEntity` still exists in the bundle and the data layer — this
+/// decision governs what the hero renders, not what the schema carries.
 class TechBrandMarks {
   const TechBrandMarks._();
 
   static const String _dir = 'assets/tech';
 
-  /// Keyed by [normalize]d label. A GitHub badge is `GitHub`, `github` or
-  /// `Git Hub` depending on who typed it; all three land here.
-  static const Map<String, TechBrandMark> _marks = <String, TechBrandMark>{
-    'flutter': TechBrandMark(
+  static const List<TechBrandMark> all = <TechBrandMark>[
+    TechBrandMark(
+      label: 'Flutter',
       assetPath: '$_dir/flutter.svg',
       color: Color(0xFF54C5F8),
+      fallbackIcon: Icons.flutter_dash,
     ),
-    'dart': TechBrandMark(
+    TechBrandMark(
+      label: 'Dart',
       assetPath: '$_dir/dart.svg',
       color: Color(0xFF41C4FF),
+      fallbackIcon: Icons.code_rounded,
     ),
-    'firebase': TechBrandMark(
+    TechBrandMark(
+      label: 'Firebase',
       assetPath: '$_dir/firebase.svg',
       color: Color(0xFFFFCA28),
+      fallbackIcon: Icons.local_fire_department_rounded,
     ),
-    'android': TechBrandMark(
+    TechBrandMark(
+      label: 'Android',
       assetPath: '$_dir/android.svg',
       color: Color(0xFF6FE39F),
+      fallbackIcon: Icons.android_rounded,
     ),
-    // A light mark on purpose: the GitHub logo is dark and would disappear
-    // against this navy ground.
-    'github': TechBrandMark(
+    TechBrandMark(
+      label: 'GitHub',
+      // A light colour on purpose: the GitHub mark is dark and would disappear
+      // against a dark one on this navy ground.
       assetPath: '$_dir/gitHub.svg',
       color: Color(0xFFF0F6FC),
+      fallbackIcon: Icons.merge_type_rounded,
     ),
-    'net': TechBrandMark(
+    TechBrandMark(
+      label: '.NET',
       assetPath: '$_dir/dotnet.svg',
       color: Color(0xFF9B7BFF),
+      fallbackIcon: Icons.hexagon_rounded,
     ),
-    'dotnet': TechBrandMark(
-      assetPath: '$_dir/dotnet.svg',
-      color: Color(0xFF9B7BFF),
-    ),
-    // `C#` normalizes to `c`, so both spellings are listed rather than left to
-    // whichever one happens to be typed.
-    'c': TechBrandMark(assetPath: '$_dir/csharp.svg', color: Color(0xFFB980C8)),
-    'csharp': TechBrandMark(
+    TechBrandMark(
+      label: 'C#',
       assetPath: '$_dir/csharp.svg',
       color: Color(0xFFB980C8),
+      fallbackIcon: Icons.tag_rounded,
     ),
-    'graphql': TechBrandMark(
+    TechBrandMark(
+      label: 'GraphQL',
       assetPath: '$_dir/graphQL.svg',
       color: Color(0xFFF06FC4),
+      fallbackIcon: Icons.hub_rounded,
     ),
-    'mysql': TechBrandMark(
+    TechBrandMark(
+      label: 'MySQL',
       assetPath: '$_dir/mysql.svg',
       color: Color(0xFF4FA8C4),
+      fallbackIcon: Icons.storage_rounded,
     ),
-    'sql': TechBrandMark(assetPath: '$_dir/sql.svg', color: Color(0xFF7FB3D5)),
-    'figma': TechBrandMark(
+    TechBrandMark(
+      label: 'SQL',
+      assetPath: '$_dir/sql.svg',
+      color: Color(0xFF7FB3D5),
+      fallbackIcon: Icons.table_chart_rounded,
+    ),
+    TechBrandMark(
+      label: 'Figma',
       assetPath: '$_dir/figma.svg',
       color: Color(0xFFFF7262),
+      fallbackIcon: Icons.brush_rounded,
     ),
-  };
-
-  /// Lowercased with everything but letters and digits stripped, so spacing,
-  /// dots and case in an admin-typed label do not decide whether a logo shows.
-  static String normalize(String value) =>
-      value.toLowerCase().replaceAll(RegExp('[^a-z0-9]'), '');
-
-  /// Tries the label first, then the badge id — a badge seeded with the id
-  /// `rest` and the label `REST` has no mark either way, but one seeded as
-  /// `github` with a label Marco has since reworded still finds its logo.
-  static TechBrandMark? resolve({required String label, required String id}) =>
-      _marks[normalize(label)] ?? _marks[normalize(id)];
+  ];
 }
