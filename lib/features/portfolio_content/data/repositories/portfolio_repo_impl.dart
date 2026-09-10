@@ -31,6 +31,12 @@ class PortfolioRepoImpl implements PortfolioRepo {
 
   /// Every read/write goes through here so a storage failure surfaces as a
   /// [Fail] instead of an unhandled exception inside a cubit.
+  ///
+  /// The raw [error] is logged here — the only place it is, on this path —
+  /// because [failureMessage] is deliberately a short, friendly string for a
+  /// snackbar, not the real exception. Without this, the real cause (a
+  /// Firestore permission-denied, a plugin error, whatever it actually was)
+  /// never reaches anywhere a person can see it.
   Future<DataResult<T>> _guard<T>(
     Future<T> Function() action,
     String failureMessage,
@@ -38,6 +44,8 @@ class PortfolioRepoImpl implements PortfolioRepo {
     try {
       return Success<T>(await action());
     } on Object catch (error, stackTrace) {
+      debugPrint('$failureMessage: $error');
+      debugPrintStack(stackTrace: stackTrace);
       return Fail<T>(failureMessage, error, stackTrace);
     }
   }
@@ -400,6 +408,16 @@ class PortfolioRepoImpl implements PortfolioRepo {
       'fallback exists — nothing trustworthy to reset to.',
     );
   }, 'Could not reset to the published content');
+
+  @override
+  Future<DataResult<PortfolioBundle>> publish() => _guard(() async {
+    final published = await _remote.writeBundle(_local.readAll());
+    // Keeps the cache's version markers in step with what was just published,
+    // so the next syncFromRemote reads its own write as already current
+    // instead of re-fetching the content it just sent.
+    await _local.writeAll(published);
+    return published;
+  }, 'Could not publish to Firestore');
 
   /// Fetches the bundle, applies the same newer-schema refusal
   /// [syncFromRemote] uses, and persists it. Null when the fetch failed or the

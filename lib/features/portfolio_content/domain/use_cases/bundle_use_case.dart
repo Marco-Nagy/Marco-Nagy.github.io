@@ -41,6 +41,45 @@ class BundleUseCase {
       ),
     };
   }
+
+  /// Publishes local content to Firestore, refusing before it ever reaches
+  /// the network if it would not fit or still carries embedded images — the
+  /// same guards [exportJson] already surfaces to the export snackbar,
+  /// checked again here because this is the path that actually writes to
+  /// Firestore rather than just copying to the clipboard for inspection.
+  Future<DataResult<PortfolioBundle>> publish() async {
+    final result = await read();
+    return switch (result) {
+      Fail<PortfolioBundle>(
+        message: final message,
+        error: final error,
+        stackTrace: final stackTrace,
+      ) =>
+        Fail<PortfolioBundle>(message, error, stackTrace),
+      Success<PortfolioBundle>(data: final bundle) => await _publishChecked(
+        bundle,
+      ),
+    };
+  }
+
+  Future<DataResult<PortfolioBundle>> _publishChecked(
+    PortfolioBundle bundle,
+  ) async {
+    final export = BundleExport._of(bundle);
+    if (!export.fitsFirestore) {
+      return Fail<PortfolioBundle>(
+        'Too large to publish (${export.sizeLabel}) — Firestore\'s limit is '
+        '1024 KB per document.',
+      );
+    }
+    if (export.hasEmbeddedImages) {
+      return Fail<PortfolioBundle>(
+        'Still has ${export.embeddedImageCount} image(s) embedded as '
+        'base64 — upload them before publishing.',
+      );
+    }
+    return _repo.publish();
+  }
 }
 
 /// An export plus the two facts that decide whether it can be published.

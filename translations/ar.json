@@ -140,6 +140,13 @@
   "admin_export_failed": "تعذّر تصدير المحتوى",
   "admin_export_oversize": "أكبر من أن يُنشر — حد Firestore هو 1024 كيلوبايت للمستند",
   "admin_export_embedded": "صور ما زالت مضمّنة كـ base64؛ ارفعها قبل النشر",
+  "admin_sign_in": "تسجيل الدخول",
+  "admin_sign_out": "تسجيل الخروج",
+  "admin_sign_in_email": "البريد الإلكتروني",
+  "admin_sign_in_password": "كلمة المرور",
+  "admin_publish": "نشر",
+  "admin_published": "تم النشر إلى Firestore",
+  "admin_publish_failed": "تعذّر النشر",
 
   "form_add_project": "إضافة مشروع",
   "form_edit_project": "تعديل مشروع",

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../core/utils/json_normalize.dart';
 import '../../domain/entities/portfolio_bundle.dart';
 import 'portfolio_remote_data_source.dart';
 
@@ -100,12 +101,21 @@ class PortfolioRemoteDataSourceImpl implements PortfolioRemoteDataSource {
       updatedAt: DateTime.now().toUtc().toIso8601String(),
     );
 
+    // ensurePlainJson matters here specifically: freezed's toJson() does not
+    // recursively pre-convert nested entities (a project's panels, cover, …),
+    // so `published.toJson()` alone still contains raw Dart objects one level
+    // down. Firestore's client SDK does not rescue that the way json.encode
+    // does elsewhere in this codebase — it throws
+    // "Unsupported field value: a custom _X object" instead.
+    final bundleJson = ensurePlainJson(published.toJson());
+    final metaJson = ensurePlainJson(published.meta.toJson());
+
     // One batch, so `meta` never advertises a version whose bundle has not
     // landed. Without this a visitor could read the new version number, skip
     // the fetch as "already current", and cache stale content indefinitely.
     final batch = firestore.batch()
-      ..set(firestore.collection(_collection).doc(_bundleDoc), published.toJson())
-      ..set(firestore.collection(_collection).doc(_metaDoc), published.meta.toJson());
+      ..set(firestore.collection(_collection).doc(_bundleDoc), bundleJson)
+      ..set(firestore.collection(_collection).doc(_metaDoc), metaJson);
     await batch.commit();
 
     return published;

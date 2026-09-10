@@ -153,6 +153,14 @@ class LangKeys {
   static const String adminExportOversize = 'admin_export_oversize';
   static const String adminExportEmbedded = 'admin_export_embedded';
 
+  static const String adminSignIn = 'admin_sign_in';
+  static const String adminSignOut = 'admin_sign_out';
+  static const String adminSignInEmail = 'admin_sign_in_email';
+  static const String adminSignInPassword = 'admin_sign_in_password';
+  static const String adminPublish = 'admin_publish';
+  static const String adminPublished = 'admin_published';
+  static const String adminPublishFailed = 'admin_publish_failed';
+
   static const String formAddProject = 'form_add_project';
   static const String formEditProject = 'form_edit_project';
   static const String formAddCertificate = 'form_add_certificate';

@@ -122,4 +122,17 @@ abstract class PortfolioRepo {
   /// nothing trustworthy to replace it with, and wiping it would be worse than
   /// refusing.
   Future<DataResult<PortfolioBundle>> resetToPublished();
+
+  /// Writes every local collection to Firestore as one new published version,
+  /// via [PortfolioRemoteDataSource.writeBundle] — which bumps
+  /// [PortfolioBundle.contentVersion] and stamps [PortfolioBundle.updatedAt] in
+  /// the same batch that writes `content/bundle`, so a reader can never
+  /// observe the version number ahead of the content it describes.
+  ///
+  /// Requires the signed-in owner account. That is enforced by Firestore's
+  /// security rules, not checked here — a signed-out attempt is expected to
+  /// surface as [Fail] from the write itself, the same as any other rejected
+  /// request, rather than a separate client-side auth check duplicating what
+  /// the rules already guarantee.
+  Future<DataResult<PortfolioBundle>> publish();
 }

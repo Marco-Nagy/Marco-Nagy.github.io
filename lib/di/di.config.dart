@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart' as _i183;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../core/app_cubit/app_cubit.dart' as _i693;
+import '../core/services/auth/admin_auth_service.dart' as _i50;
 import '../core/services/media/image_picker_service.dart' as _i809;
 import '../core/services/shared_preference/shared_preference_helper.dart'
     as _i668;
@@ -68,6 +69,9 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
+    gh.lazySingleton<_i50.AdminAuthService>(
+      () => const _i50.AdminAuthService(),
+    );
     gh.lazySingleton<_i668.SharedPrefHelper>(
       () => registerModule.sharedPrefHelper,
     );

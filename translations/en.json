@@ -140,6 +140,13 @@
   "admin_export_failed": "Could not export the content",
   "admin_export_oversize": "Too large to publish — Firestore's limit is 1024 KB per document",
   "admin_export_embedded": "Images still embedded as base64; upload them before publishing",
+  "admin_sign_in": "Sign in",
+  "admin_sign_out": "Sign out",
+  "admin_sign_in_email": "Email",
+  "admin_sign_in_password": "Password",
+  "admin_publish": "Publish",
+  "admin_published": "Published to Firestore",
+  "admin_publish_failed": "Could not publish",
 
   "form_add_project": "Add project",
   "form_edit_project": "Edit project",
