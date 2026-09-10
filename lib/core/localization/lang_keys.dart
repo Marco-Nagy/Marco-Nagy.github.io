@@ -154,10 +154,8 @@ class LangKeys {
   static const String fieldMediaPick = 'field_media_pick';
   static const String fieldMediaPickPendingCopy =
       'field_media_pick_pending_copy';
-  static const String fieldMediaEmbedInstead = 'field_media_embed_instead';
   static const String fieldMediaPin = 'field_media_pin';
   static const String fieldMediaPinWarning = 'field_media_pin_warning';
-  static const String fieldMediaHeavyEmbed = 'field_media_heavy_embed';
   static const String fieldMediaVideoUrl = 'field_media_video_url';
   static const String fieldMediaYoutubeUnresolved =
       'field_media_youtube_unresolved';

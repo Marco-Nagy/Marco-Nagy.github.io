@@ -38,6 +38,10 @@ dependencies:
   # Cloudinary uploads are a plain multipart POST, so no SDK is needed
   http:
 
+  # SHA-1 for signing Cloudinary uploads — the account uses signed uploads
+  # (api_key + api_secret via --dart-define), not an unsigned preset.
+  crypto:
+
   # Local storage — now the cache in front of Firestore, not the source of
   # truth, and the offline fallback when a fetch fails
   shared_preferences:

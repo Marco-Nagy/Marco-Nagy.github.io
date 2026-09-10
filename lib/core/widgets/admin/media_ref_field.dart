@@ -7,6 +7,7 @@ import '../../../di/di.dart';
 import '../../../features/portfolio_content/domain/entities/image_ref.dart';
 import '../../../features/portfolio_content/domain/entities/media_ref.dart';
 import '../../localization/lang_keys.dart';
+import '../../services/media/cloudinary_upload_service.dart';
 import '../../services/media/image_picker_service.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
@@ -69,15 +70,16 @@ class _MediaRefFieldState extends State<MediaRefField> {
   /// Guards against a second picker opening while one is already up.
   bool _picking = false;
 
-  /// Size of an image picked this session, so the storage warning applies to
-  /// exactly the payload it was measured from. Only meaningful for [_embedFile]
-  /// — [_pickAsset] never embeds, so it never sets this.
-  int? _pickedBytes;
-
-  /// True right after [_pickAsset] fills the box with a path — the file it
+  /// True right after [_pinAsAsset] fills the box with a path — the file it
   /// names may not exist in the project yet, so the reminder to copy it in
   /// stays up until something else changes the source (typing, re-picking).
   bool _pendingAssetCopy = false;
+
+  /// Set by [_pickAndUpload] when the upload itself fails — a size rejection,
+  /// no configuration, or whatever Cloudinary's API reported. Cleared the
+  /// moment anything else changes the field, so a stale error does not sit
+  /// under a box that has since been fixed some other way.
+  String? _uploadError;
 
   static const Duration _previewDelay = Duration(milliseconds: 600);
 
@@ -152,64 +154,33 @@ class _MediaRefFieldState extends State<MediaRefField> {
     );
   }
 
-  /// Reads a file off the device for its name only, then points the field
-  /// straight at the `assets/...` path that file belongs at — no embedding,
-  /// no separate pin step. This assumes the workflow it's built for: the
-  /// exact file was already copied into the project's assets folder by hand
-  /// before picking it here, so the path this resolves to is immediately
-  /// real. If it wasn't, the preview shows broken rather than a false
-  /// "it worked" from an embedded copy — see [_pendingAssetCopy].
-  Future<void> _pickAsset() async {
+  /// Picks a file off the device and uploads it to Cloudinary, storing the
+  /// returned delivery URL as a network [ImageRef] — a real upload, not the
+  /// asset-path guess this used to make. That guess assumed the exact file
+  /// had already been copied into the project by hand before picking it
+  /// here, which was rarely true; this finishes the job itself instead of
+  /// asking the admin to.
+  Future<void> _pickAndUpload() async {
     if (_picking) return;
-    setState(() => _picking = true);
+    setState(() {
+      _picking = true;
+      _uploadError = null;
+    });
     try {
-      final picked = await getIt<ImagePickerService>().pick();
+      final picked = await getIt<ImagePickerService>().pickBytes();
       if (picked == null || !mounted) return;
 
-      final path = ImagePickerService.suggestedAssetPath(
-        widget.assetFolder,
-        picked.fileName,
+      final url = await getIt<CloudinaryUploadService>().uploadImage(
+        picked.bytes,
+        fileName: picked.fileName,
       );
-      _source.text = path;
-      _pickedBytes = null;
+      if (!mounted) return;
+
+      _source.text = url;
 
       final next = _value.copyWith(
         kind: MediaKind.image,
-        image: ImageRef.asset(path),
-        videoUrl: '',
-      );
-      setState(() {
-        _value = next;
-        _preview = next;
-        _normalized = false;
-        _pendingAssetCopy = true;
-      });
-      widget.onChanged(next);
-    } finally {
-      if (mounted) setState(() => _picking = false);
-    }
-  }
-
-  /// Fallback for a file that hasn't been copied into the project yet: embeds
-  /// the bytes so the preview is correct immediately, at the cost of storing
-  /// the payload in `shared_preferences` until [_pinAsAsset] swaps it for the
-  /// real path.
-  Future<void> _embedFile() async {
-    if (_picking) return;
-    setState(() => _picking = true);
-    try {
-      final picked = await getIt<ImagePickerService>().pick();
-      if (picked == null || !mounted) return;
-
-      _source.text = ImagePickerService.suggestedAssetPath(
-        widget.assetFolder,
-        picked.fileName,
-      );
-      _pickedBytes = picked.byteCount;
-
-      final next = _value.copyWith(
-        kind: MediaKind.image,
-        image: picked.ref,
+        image: ImageRef.network(url),
         videoUrl: '',
       );
       setState(() {
@@ -219,6 +190,8 @@ class _MediaRefFieldState extends State<MediaRefField> {
         _pendingAssetCopy = false;
       });
       widget.onChanged(next);
+    } on CloudinaryUploadException catch (error) {
+      if (mounted) setState(() => _uploadError = error.message);
     } finally {
       if (mounted) setState(() => _picking = false);
     }
@@ -241,14 +214,9 @@ class _MediaRefFieldState extends State<MediaRefField> {
     );
     if (!confirmed || !mounted) return;
 
-    _pickedBytes = null;
     _pendingAssetCopy = true;
     _emit(_value.copyWith(image: _imageFrom(path)));
   }
-
-  bool get _isHeavyEmbed =>
-      _value.image.isEmbedded &&
-      (_pickedBytes ?? 0) > ImagePickerService.embeddedWarnBytes;
 
   void _setKind(MediaKind kind) {
     if (kind == _value.kind) return;
@@ -327,7 +295,7 @@ class _MediaRefFieldState extends State<MediaRefField> {
               busy: _picking,
               // Tapping the picture to replace the picture is the gesture
               // everyone tries first.
-              onTap: _pickAsset,
+              onTap: _pickAndUpload,
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -377,14 +345,11 @@ class _MediaRefFieldState extends State<MediaRefField> {
                       ),
                       color: colors.onNavyFaint,
                     ),
-                  if (_isHeavyEmbed)
-                    _Note(
-                      text: context.translate(LangKeys.fieldMediaHeavyEmbed),
-                      color: colors.danger,
-                    ),
-                  // A fresh asset-path pick assumes the file is already in
-                  // the project; this is the one chance to catch "actually
-                  // it isn't yet" before the preview quietly shows broken.
+                  if (_uploadError != null)
+                    _Note(text: _uploadError!, color: colors.danger),
+                  // Pinning assumes the file is already in the project; this
+                  // is the one chance to catch "actually it isn't yet" before
+                  // the preview quietly shows broken.
                   if (_pendingAssetCopy)
                     _Note(
                       text: context.translate(
@@ -404,20 +369,14 @@ class _MediaRefFieldState extends State<MediaRefField> {
                     spacing: 4.w,
                     children: <Widget>[
                       _MiniButton(
-                        icon: Icons.image_outlined,
+                        icon: Icons.cloud_upload_outlined,
                         label: context.translate(LangKeys.fieldMediaPick),
                         color: colors.accent,
-                        onPressed: _picking ? null : _pickAsset,
+                        onPressed: _picking ? null : _pickAndUpload,
                       ),
-                      if (!_value.image.isEmbedded)
-                        _MiniButton(
-                          icon: Icons.cloud_upload_outlined,
-                          label: context.translate(
-                            LangKeys.fieldMediaEmbedInstead,
-                          ),
-                          color: colors.onNavyMuted,
-                          onPressed: _picking ? null : _embedFile,
-                        ),
+                      // Legacy repair only: a real upload never leaves the
+                      // field embedded, so this can only appear for content
+                      // picked before Cloudinary upload existed.
                       if (_value.image.isEmbedded)
                         _MiniButton(
                           icon: Icons.push_pin_outlined,
