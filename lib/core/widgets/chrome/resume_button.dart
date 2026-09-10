@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../localization/lang_keys.dart';
 import '../../utils/extension/context_extensions.dart';
+import '../../utils/extension/site_content_extensions.dart';
 import '../../utils/url_opener.dart';
 import '../common/app_snack_bar.dart';
 import '../common/pill_button.dart';
@@ -15,6 +16,10 @@ class ResumeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Null off the web with no hosted CV set — a bundled asset has no URL to
+    // open there, and the button reports that rather than doing nothing.
+    final resumeUrl = context.siteLinks.resumeUrl;
+
     return PillButton(
       label: context.translate(LangKeys.navResume),
       variant: PillButtonVariant.outlined,
@@ -23,7 +28,7 @@ class ResumeButton extends StatelessWidget {
       dense: dense,
       onPressed: () async {
         final messengerContext = context;
-        final opened = await UrlOpener.openResume();
+        final opened = resumeUrl != null && await UrlOpener.open(resumeUrl);
         if (!opened && messengerContext.mounted) {
           AppSnackBar.show(
             messengerContext,

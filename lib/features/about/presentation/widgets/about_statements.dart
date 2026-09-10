@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/motion/block_reveal_text.dart';
+import '../../../portfolio_content/presentation/view_data/statement_data.dart';
 
 /// The large, lighter statement sentences built from the CV summary.
 class AboutStatements extends StatelessWidget {
@@ -15,9 +16,7 @@ class AboutStatements extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final statements = context.isArabic
-        ? ProfileInfo.aboutStatementsAr
-        : ProfileInfo.aboutStatements;
+    final data = StatementData.fromSiteContent(context.site, context.isArabic);
     final statementStyle = context.isDesktop
         ? MyFonts.statement26
         : MyFonts.statement20;
@@ -27,13 +26,13 @@ class AboutStatements extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         BlockRevealText(
-          context.translate(LangKeys.aboutLead),
+          data.lead,
           style: MyFonts.bold28.copyWith(color: colors.accent),
         ),
         SizedBox(height: 28.h),
         // Every statement shares one timeline: the reference wipes a whole
         // paragraph open at once, so no delay is passed here.
-        for (final statement in statements)
+        for (final statement in data.statements)
           Padding(
             padding: EdgeInsets.only(bottom: 22.h),
             child: BlockRevealText(
@@ -54,6 +53,7 @@ class _LocationLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -62,7 +62,7 @@ class _LocationLine extends StatelessWidget {
         SizedBox(width: 8.w),
         Text(
           '${context.translate(LangKeys.aboutLocationLabel)} '
-          '${context.localized(ProfileInfo.location, ProfileInfo.locationAr)}',
+          '${context.localized(site.locationEn, site.locationAr)}',
           style: MyFonts.regular14.copyWith(color: colors.onNavyMuted),
         ),
       ],

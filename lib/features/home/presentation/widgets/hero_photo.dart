@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
-import '../../../../core/constants/tech_badges.dart';
-import '../../../../core/styles/app_images.dart';
+import '../../../../core/constants/tech_brand_marks.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../../core/widgets/common/app_image.dart';
 import '../../../../core/widgets/common/safe_asset_image.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 
@@ -98,7 +98,7 @@ class _HeroPhotoState extends State<HeroPhoto> with TickerProviderStateMixin {
     // Badges ride just outside the photo, inside the outer ring.
     final orbitRadius = widget.diameter * 0.62;
     final canvasSize = widget.diameter + 120.w;
-    final badges = TechBadge.heroOrbit;
+    final badges = TechBrandMarks.all;
 
     return AnimatedBuilder(
       animation: _float,
@@ -192,8 +192,10 @@ class _PhotoDisc extends StatelessWidget {
         ],
       ),
       child: ClipOval(
-        child: SafeAssetImage(
-          assetPath: AppImages.profile,
+        child: AppImage(
+          image: context.site.profileImage,
+          width: diameter,
+          height: diameter,
           fallback: const _MonogramFallback(),
         ),
       ),
@@ -201,7 +203,7 @@ class _PhotoDisc extends StatelessWidget {
   }
 }
 
-/// Shown until `assets/images/profile.png` is added, so the hero never breaks.
+/// Shown until the profile image resolves, so the hero never breaks.
 class _MonogramFallback extends StatelessWidget {
   const _MonogramFallback();
 
@@ -211,7 +213,7 @@ class _MonogramFallback extends StatelessWidget {
       decoration: BoxDecoration(gradient: context.gradients.surfacePanel),
       child: Center(
         child: Text(
-          ProfileInfo.monogram,
+          context.site.monogram,
           style: MyFonts.display64.copyWith(color: context.colors.accent),
         ),
       ),
@@ -223,18 +225,17 @@ class _MonogramFallback extends StatelessWidget {
 ///
 /// The mark stands on its own — no chip, no ring — so each logo reads at its
 /// full size and keeps its own brand colours rather than sitting on a disc that
-/// competes with them. The brand colours survive on [TechBadge] to tint the
-/// fallback glyph when a logo file is missing.
+/// competes with them.
 class TechBadgeChip extends StatelessWidget {
   const TechBadgeChip({required this.badge, this.size, super.key});
 
-  final TechBadge badge;
+  final TechBrandMark badge;
   final double? size;
 
   @override
   Widget build(BuildContext context) {
-    // The mark now occupies the full extent the chip used to, so it reads
-    // roughly twice the size it did inside the old padded disc.
+    // The mark occupies the full extent the old padded chip did, so it reads
+    // roughly twice the size it did inside it.
     final extent = size ?? 46.r;
 
     return Tooltip(
@@ -246,8 +247,7 @@ class TechBadgeChip extends StatelessWidget {
           assetPath: badge.assetPath,
           fit: BoxFit.contain,
           fallback: FittedBox(
-            // Tinted with the lighter brand stop so it stays legible on navy.
-            child: Icon(badge.fallbackIcon, color: badge.brandStart),
+            child: Icon(badge.fallbackIcon, color: badge.color),
           ),
         ),
       ),

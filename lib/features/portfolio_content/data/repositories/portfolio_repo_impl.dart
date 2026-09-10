@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/common/data_result.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/custom_section_item.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/portfolio_bundle.dart';
 import '../../domain/entities/pricing_add_on.dart';
 import '../../domain/entities/pricing_package.dart';
 import '../../domain/entities/section_definition.dart';
@@ -12,16 +14,29 @@ import '../../domain/entities/skill_group_entity.dart';
 import '../../domain/entities/tech_badge_entity.dart';
 import '../../domain/entities/work_history_entry.dart';
 import '../../domain/repositories/portfolio_repo.dart';
+import '../data_sources/bundled_content_loader.dart';
 import '../data_sources/portfolio_local_data_source.dart';
+import '../data_sources/portfolio_remote_data_source.dart';
 
 @LazySingleton(as: PortfolioRepo)
 class PortfolioRepoImpl implements PortfolioRepo {
-  PortfolioRepoImpl(this._local);
+  PortfolioRepoImpl(this._local, this._remote, this._bundled);
 
+  /// The cache and, for everything except [syncFromRemote], the only source
+  /// these methods read. Kept synchronous on purpose: the view models were
+  /// built around reads that cannot fail or wait.
   final PortfolioLocalDataSource _local;
+  final PortfolioRemoteDataSource _remote;
+  final BundledContentLoader _bundled;
 
   /// Every read/write goes through here so a storage failure surfaces as a
   /// [Fail] instead of an unhandled exception inside a cubit.
+  ///
+  /// The raw [error] is logged here — the only place it is, on this path —
+  /// because [failureMessage] is deliberately a short, friendly string for a
+  /// snackbar, not the real exception. Without this, the real cause (a
+  /// Firestore permission-denied, a plugin error, whatever it actually was)
+  /// never reaches anywhere a person can see it.
   Future<DataResult<T>> _guard<T>(
     Future<T> Function() action,
     String failureMessage,
@@ -29,6 +44,8 @@ class PortfolioRepoImpl implements PortfolioRepo {
     try {
       return Success<T>(await action());
     } on Object catch (error, stackTrace) {
+      debugPrint('$failureMessage: $error');
+      debugPrintStack(stackTrace: stackTrace);
       return Fail<T>(failureMessage, error, stackTrace);
     }
   }
@@ -323,7 +340,101 @@ class PortfolioRepoImpl implements PortfolioRepo {
     return _sorted(next, (i) => i.order);
   }, 'Could not delete the item');
 
+  // Whole-store access --------------------------------------------------------
+
   @override
-  Future<DataResult<void>> resetToSeed() =>
-      _guard(_local.resetToSeed, 'Could not restore the seeded content');
+  Future<DataResult<PortfolioBundle>> readBundle() => _guard(
+    () async => _local.readAll(),
+    'Could not read the content bundle from local storage',
+  );
+
+  /// Decision D2, in order of preference:
+  ///
+  /// 1. Remote says the cache is stale -> fetch, cache, use it.
+  /// 2. Remote agrees with the cache, or cannot be reached -> use the cache.
+  /// 3. No cache either -> the committed JSON asset (D3).
+  /// 4. Not even that -> whatever the store holds, which is empty on a device
+  ///    that has never synced.
+  ///
+  /// Steps 2-4 are why this returns [Success] on a failed fetch: a visitor
+  /// offline is a state the site renders, not an error to report. Only a
+  /// genuine storage fault reaches [Fail].
+  @override
+  Future<DataResult<PortfolioBundle>> syncFromRemote() => _guard(() async {
+    final cached = _local.readAll();
+
+    final meta = await _remote.fetchMeta();
+    if (meta != null && !meta.isFromNewerSchema) {
+      if (meta.isNewerThan(cached.contentVersion)) {
+        final applied = await _fetchAndApply();
+        if (applied != null) return applied;
+      } else {
+        // The common case, and the whole point of the meta document: one read,
+        // no payload, cache already correct.
+        return cached;
+      }
+    } else if (meta != null) {
+      _warnNewerSchema(meta.schemaVersion);
+    }
+
+    if (!cached.isEmpty) return cached;
+
+    // Cold start with nothing to show: a first visit during an outage, or a
+    // cleared browser profile with Firestore unreachable.
+    final bundled = await _bundled.load();
+    if (bundled != null && !bundled.isEmpty) {
+      await _local.writeAll(bundled);
+      return bundled;
+    }
+
+    return _local.readAll();
+  }, 'Could not synchronise content');
+
+  @override
+  Future<DataResult<PortfolioBundle>> resetToPublished() => _guard(() async {
+    // Always re-fetches — see the interface doc for why a version-match
+    // short-circuit (as syncFromRemote uses) would be wrong here.
+    final applied = await _fetchAndApply();
+    if (applied != null) return applied;
+
+    final bundled = await _bundled.load();
+    if (bundled != null && !bundled.isEmpty) {
+      await _local.writeAll(bundled);
+      return bundled;
+    }
+
+    throw StateError(
+      'Firestore is unreachable and no committed content/portfolio_content.json '
+      'fallback exists — nothing trustworthy to reset to.',
+    );
+  }, 'Could not reset to the published content');
+
+  @override
+  Future<DataResult<PortfolioBundle>> publish() => _guard(() async {
+    final published = await _remote.writeBundle(_local.readAll());
+    // Keeps the cache's version markers in step with what was just published,
+    // so the next syncFromRemote reads its own write as already current
+    // instead of re-fetching the content it just sent.
+    await _local.writeAll(published);
+    return published;
+  }, 'Could not publish to Firestore');
+
+  /// Fetches the bundle, applies the same newer-schema refusal
+  /// [syncFromRemote] uses, and persists it. Null when the fetch failed or the
+  /// schema guard rejected it — the caller decides what "nothing usable came
+  /// back" means for it.
+  Future<PortfolioBundle?> _fetchAndApply() async {
+    final fetched = await _remote.fetchBundle();
+    if (fetched == null || fetched.isFromNewerSchema) return null;
+    await _local.writeAll(fetched);
+    return fetched;
+  }
+
+  void _warnNewerSchema(int remoteSchemaVersion) {
+    debugPrint(
+      'Firestore content is schema v$remoteSchemaVersion, newer than this '
+      'build (v${PortfolioBundle.currentSchemaVersion}) — staying on cache. '
+      'Deploy the newer build to pick it up.',
+    );
+  }
 }

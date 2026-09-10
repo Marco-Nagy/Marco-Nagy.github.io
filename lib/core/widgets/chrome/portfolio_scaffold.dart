@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/responsive/app_breakpoints.dart';
+import '../admin/admin_fab.dart';
 import '../common/page_background.dart';
 import '../motion/reveal_scope.dart';
 import 'mobile_nav_drawer.dart';
@@ -50,6 +51,10 @@ class _PortfolioScaffoldState extends State<PortfolioScaffold> {
       drawer: context.isDesktop
           ? null
           : MobileNavDrawer(currentSectionId: widget.activeSectionId),
+      // Mounted here, not per screen: these are store-wide actions, and the
+      // scaffold is the one widget every page already shares. Renders nothing
+      // at all in release — see AdminGate inside it.
+      floatingActionButton: const AdminFab(),
       body: PageBackground(
         child: SafeArea(
           bottom: false,

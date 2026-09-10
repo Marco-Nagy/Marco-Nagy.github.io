@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/localization/lang_keys.dart';
-import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/section/section_divider_header.dart';
 import '../../../../di/di.dart';
@@ -31,7 +31,9 @@ class _ProjectsBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SectionDividerHeader(title: context.translate(LangKeys.projectsTitle)),
+        SectionDividerHeader(
+          title: context.sectionTitle(BuiltInSectionIds.projects),
+        ),
         const ContentContainer(child: ProjectsListView()),
         SizedBox(height: 96.h),
       ],

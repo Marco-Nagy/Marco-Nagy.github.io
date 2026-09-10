@@ -5,7 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
+import '../../../portfolio_content/domain/entities/section_definition.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
+import '../../../../core/widgets/admin/admin_add_button.dart';
+import '../../../../core/widgets/admin/admin_confirm_dialog.dart';
+import '../../../../core/widgets/common/app_snack_bar.dart';
 import '../../../../core/widgets/common/content_container.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 import '../../../../core/widgets/motion/reveal_on_scroll.dart';
@@ -17,6 +22,7 @@ import '../view_model/certificates_actions.dart';
 import '../view_model/certificates_states.dart';
 import '../view_model/certificates_view_model.dart';
 import '../widgets/certificate_card.dart';
+import '../widgets/certificate_form_screen.dart';
 
 /// Certificates render as a responsive grid of certificate cards — explicitly
 /// not the numbered-row pattern used by Projects.
@@ -38,7 +44,7 @@ class _CertificatesBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = context.translate(LangKeys.certificatesTitle);
+    final title = context.sectionTitle(BuiltInSectionIds.certificates);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -75,16 +81,51 @@ class _CertificatesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<CertificatesViewModelCubit>();
+
+    // The add button sits outside the empty check: an empty grid is exactly
+    // when adding the first certificate has to be reachable.
     if (certificates.isEmpty) {
-      return _CertificatesMessage(
-        text: context.translate(LangKeys.certificatesEmpty),
+      return Column(
+        children: <Widget>[
+          _CertificatesMessage(
+            text: context.translate(LangKeys.certificatesEmpty),
+          ),
+          _AddCertificateButton(cubit: cubit),
+        ],
       );
     }
 
-    final cubit = context.read<CertificatesViewModelCubit>();
     // Two columns on tablet and desktop, one on mobile.
     final columns = context.isWide ? 2 : 1;
 
+    return Column(
+      children: <Widget>[
+        _CertificatesGridView(
+          certificates: certificates,
+          columns: columns,
+          cubit: cubit,
+        ),
+        SizedBox(height: 24.h),
+        _AddCertificateButton(cubit: cubit),
+      ],
+    );
+  }
+}
+
+class _CertificatesGridView extends StatelessWidget {
+  const _CertificatesGridView({
+    required this.certificates,
+    required this.columns,
+    required this.cubit,
+  });
+
+  final List<Certificate> certificates;
+  final int columns;
+  final CertificatesViewModelCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -104,13 +145,67 @@ class _CertificatesGrid extends StatelessWidget {
           child: CertificateCard(
             key: ValueKey<String>(certificate.id),
             data: GridCardData.fromCertificate(certificate, context.isArabic),
-            onEdit: () {},
-            onDelete: () => cubit.doAction(DeleteCertificate(certificate.id)),
+            onEdit: () => _editCertificate(context, cubit, certificate),
+            onDelete: () => _deleteCertificate(context, cubit, certificate.id),
           ),
         );
       },
     );
   }
+}
+
+class _AddCertificateButton extends StatelessWidget {
+  const _AddCertificateButton({required this.cubit});
+
+  final CertificatesViewModelCubit cubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return AdminAddButton(
+      label: context.translate(LangKeys.adminAdd),
+      onPressed: () => _editCertificate(context, cubit, null),
+    );
+  }
+}
+
+/// Opens the form for [certificate] (or a blank one when null) and saves what
+/// comes back.
+///
+/// The cubit is passed in rather than read after the await: the card that owns
+/// this context can be rebuilt away while the form is open.
+Future<void> _editCertificate(
+  BuildContext context,
+  CertificatesViewModelCubit cubit,
+  Certificate? certificate,
+) async {
+  final built = await CertificateFormScreen.open(
+    context,
+    certificate: certificate,
+  );
+  if (built == null || !context.mounted) return;
+
+  cubit.doAction(SaveCertificate(built));
+  AppSnackBar.show(
+    context,
+    context.translate(LangKeys.adminSaved),
+    kind: SnackKind.success,
+  );
+}
+
+Future<void> _deleteCertificate(
+  BuildContext context,
+  CertificatesViewModelCubit cubit,
+  String id,
+) async {
+  final confirmed = await AdminConfirmDialog.show(context);
+  if (!confirmed || !context.mounted) return;
+
+  cubit.doAction(DeleteCertificate(id));
+  AppSnackBar.show(
+    context,
+    context.translate(LangKeys.adminDeleted),
+    kind: SnackKind.success,
+  );
 }
 
 class _CertificatesMessage extends StatelessWidget {

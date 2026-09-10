@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart' as _i183;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../core/app_cubit/app_cubit.dart' as _i693;
+import '../core/services/auth/admin_auth_service.dart' as _i50;
 import '../core/services/media/image_picker_service.dart' as _i809;
 import '../core/services/shared_preference/shared_preference_helper.dart'
     as _i668;
@@ -22,14 +23,22 @@ import '../features/certificates/presentation/view_model/certificates_view_model
     as _i337;
 import '../features/experience/presentation/view_model/experience_view_model.dart'
     as _i866;
+import '../features/portfolio_content/data/data_sources/bundled_content_loader.dart'
+    as _i972;
 import '../features/portfolio_content/data/data_sources/portfolio_local_data_source.dart'
     as _i275;
 import '../features/portfolio_content/data/data_sources/portfolio_local_data_source_impl.dart'
     as _i420;
+import '../features/portfolio_content/data/data_sources/portfolio_remote_data_source.dart'
+    as _i109;
+import '../features/portfolio_content/data/data_sources/portfolio_remote_data_source_impl.dart'
+    as _i811;
 import '../features/portfolio_content/data/repositories/portfolio_repo_impl.dart'
     as _i432;
 import '../features/portfolio_content/domain/repositories/portfolio_repo.dart'
     as _i1023;
+import '../features/portfolio_content/domain/use_cases/bundle_use_case.dart'
+    as _i120;
 import '../features/portfolio_content/domain/use_cases/certificates_use_case.dart'
     as _i478;
 import '../features/portfolio_content/domain/use_cases/custom_section_use_case.dart'
@@ -46,6 +55,12 @@ import '../features/portfolio_content/domain/use_cases/skills_use_case.dart'
     as _i1046;
 import '../features/portfolio_content/domain/use_cases/work_history_use_case.dart'
     as _i1028;
+import '../features/portfolio_content/presentation/view_model/sections_view_model.dart'
+    as _i537;
+import '../features/portfolio_content/presentation/view_model/site_content_view_model.dart'
+    as _i783;
+import '../features/portfolio_content/presentation/view_model/skills_view_model.dart'
+    as _i418;
 import '../features/pricing/presentation/view_model/pricing_view_model.dart'
     as _i53;
 import '../features/projects/presentation/view_model/projects_view_model.dart'
@@ -60,10 +75,19 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
+    gh.lazySingleton<_i50.AdminAuthService>(
+      () => const _i50.AdminAuthService(),
+    );
     gh.lazySingleton<_i668.SharedPrefHelper>(
       () => registerModule.sharedPrefHelper,
     );
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
+    gh.lazySingleton<_i972.BundledContentLoader>(
+      () => const _i972.BundledContentLoader(),
+    );
+    gh.lazySingleton<_i109.PortfolioRemoteDataSource>(
+      () => _i811.PortfolioRemoteDataSourceImpl(),
+    );
     gh.factory<_i693.AppCubit>(
       () => _i693.AppCubit(gh<_i668.SharedPrefHelper>()),
     );
@@ -74,7 +98,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i809.ImagePickerService(gh<_i183.ImagePicker>()),
     );
     gh.lazySingleton<_i1023.PortfolioRepo>(
-      () => _i432.PortfolioRepoImpl(gh<_i275.PortfolioLocalDataSource>()),
+      () => _i432.PortfolioRepoImpl(
+        gh<_i275.PortfolioLocalDataSource>(),
+        gh<_i109.PortfolioRemoteDataSource>(),
+        gh<_i972.BundledContentLoader>(),
+      ),
+    );
+    gh.factory<_i120.BundleUseCase>(
+      () => _i120.BundleUseCase(gh<_i1023.PortfolioRepo>()),
     );
     gh.factory<_i478.CertificatesUseCase>(
       () => _i478.CertificatesUseCase(gh<_i1023.PortfolioRepo>()),
@@ -106,11 +137,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i53.PricingViewModelCubit>(
       () => _i53.PricingViewModelCubit(gh<_i249.PricingUseCase>()),
     );
+    gh.factory<_i783.SiteContentCubit>(
+      () => _i783.SiteContentCubit(gh<_i520.SiteContentUseCase>()),
+    );
     gh.factory<_i866.ExperienceViewModelCubit>(
       () => _i866.ExperienceViewModelCubit(gh<_i1028.WorkHistoryUseCase>()),
     );
     gh.factory<_i337.CertificatesViewModelCubit>(
       () => _i337.CertificatesViewModelCubit(gh<_i478.CertificatesUseCase>()),
+    );
+    gh.factory<_i537.SectionsCubit>(
+      () => _i537.SectionsCubit(gh<_i635.SectionsUseCase>()),
+    );
+    gh.factory<_i418.SkillsCubit>(
+      () => _i418.SkillsCubit(gh<_i1046.SkillsUseCase>()),
     );
     return this;
   }

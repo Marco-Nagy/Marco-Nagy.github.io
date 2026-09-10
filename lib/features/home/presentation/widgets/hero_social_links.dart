@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/url_opener.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 
@@ -15,17 +16,19 @@ class HeroSocialLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final links = context.siteLinks;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _SocialTextLink(
           label: context.translate(LangKeys.footerGithub),
-          onPressed: UrlOpener.openGitHub,
+          onPressed: () => UrlOpener.open(links.gitHubUrl),
         ),
         const _Separator(),
         _SocialTextLink(
           label: context.translate(LangKeys.footerLinkedin),
-          onPressed: UrlOpener.openLinkedIn,
+          onPressed: () => UrlOpener.open(links.linkedInUrl),
         ),
       ],
     );

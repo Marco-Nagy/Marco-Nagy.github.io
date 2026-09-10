@@ -1,6 +1,9 @@
-/// Result wrapper used by the local-storage repositories. There's no network in
-/// this app, but storage reads can still fail (corrupt JSON, schema drift), and
-/// the cubits switch on this exactly like the networked apps do.
+/// Result wrapper used by the content repositories.
+///
+/// Covers both failure surfaces: local storage (corrupt JSON, schema drift) and
+/// now Firestore. Note that an *unreachable* Firestore is not a [Fail] — the
+/// read path falls back to cache and still yields [Success], because a visitor
+/// offline is a state this app is designed to render, not an error to report.
 sealed class DataResult<T> {
   const DataResult();
 }

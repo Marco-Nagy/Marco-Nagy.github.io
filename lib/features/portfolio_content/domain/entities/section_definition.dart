@@ -27,7 +27,8 @@ enum SectionType {
 }
 
 enum SectionKind {
-  /// Seeded, content lives in its own typed entity, cannot be deleted.
+  /// Shipped by default, content lives in its own typed entity, cannot be
+  /// deleted.
   builtIn,
 
   /// Created in debug, content lives in [CustomSectionItem].

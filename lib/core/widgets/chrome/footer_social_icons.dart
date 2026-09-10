@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../localization/lang_keys.dart';
 import '../../utils/extension/context_extensions.dart';
+import '../../utils/extension/site_content_extensions.dart';
 import '../../utils/url_opener.dart';
 import '../motion/motion_durations.dart';
 
@@ -14,19 +15,21 @@ class FooterSocialIcons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final links = context.siteLinks;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SocialIconButton(
           icon: Icons.code_rounded,
           label: context.translate(LangKeys.footerGithub),
-          onPressed: UrlOpener.openGitHub,
+          onPressed: () => UrlOpener.open(links.gitHubUrl),
         ),
         SizedBox(width: spacing ?? 12.w),
         SocialIconButton(
           icon: Icons.business_center_outlined,
           label: context.translate(LangKeys.footerLinkedin),
-          onPressed: UrlOpener.openLinkedIn,
+          onPressed: () => UrlOpener.open(links.linkedInUrl),
         ),
       ],
     );

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
-import '../../../../core/localization/lang_keys.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/responsive/app_breakpoints.dart';
 import '../../../../core/widgets/motion/block_reveal_text.dart';
 
@@ -15,6 +14,7 @@ class HeroHeadline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
     final headlineStyle = switch (context.screenKind) {
       ScreenKind.desktop => MyFonts.display96,
       ScreenKind.tablet => MyFonts.display64,
@@ -26,11 +26,11 @@ class HeroHeadline extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         BlockRevealText(
-          context.translate(LangKeys.heroGreeting),
+          context.localized(site.heroGreetingEn, site.heroGreetingAr),
           style: headlineStyle.copyWith(color: colors.onNavyMuted),
         ),
         BlockRevealText(
-          context.translate(LangKeys.heroName),
+          context.localized(site.heroNameEn, site.heroNameAr),
           style: headlineStyle.copyWith(color: colors.onNavy),
         ),
         Row(
@@ -39,7 +39,7 @@ class HeroHeadline extends StatelessWidget {
           children: <Widget>[
             Flexible(
               child: BlockRevealText(
-                context.translate(LangKeys.heroRole),
+                context.localized(site.heroRoleEn, site.heroRoleAr),
                 style: headlineStyle.copyWith(color: colors.accent),
               ),
             ),
@@ -58,9 +58,8 @@ class HeroRoleTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tags = context.isArabic
-        ? ProfileInfo.roleTagsAr
-        : ProfileInfo.roleTags;
+    final site = context.site;
+    final tags = context.localizedList(site.roleTagsEn, site.roleTagsAr);
     final colors = context.colors;
 
     return Wrap(

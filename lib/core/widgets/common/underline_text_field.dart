@@ -16,6 +16,8 @@ class UnderlineTextField extends StatelessWidget {
     this.hint,
     this.textInputAction,
     this.onChanged,
+    this.obscureText = false,
+    this.autofillHints,
     super.key,
   });
 
@@ -26,6 +28,13 @@ class UnderlineTextField extends StatelessWidget {
   final int maxLines;
   final String? hint;
   final TextInputAction? textInputAction;
+
+  /// For a password field — the admin sign-in sheet is the only caller today.
+  final bool obscureText;
+
+  /// Lets the browser/OS offer to fill or save credentials, e.g.
+  /// `[AutofillHints.password]`.
+  final Iterable<String>? autofillHints;
 
   /// Lets a field that mirrors non-text state — a [MediaRef], a parsed number —
   /// react as it is typed rather than only when the form is saved.
@@ -41,7 +50,9 @@ class UnderlineTextField extends StatelessWidget {
         controller: controller,
         validator: validator,
         keyboardType: keyboardType,
-        maxLines: maxLines,
+        maxLines: obscureText ? 1 : maxLines,
+        obscureText: obscureText,
+        autofillHints: autofillHints,
         textInputAction: textInputAction,
         onChanged: onChanged,
         style: MyFonts.regular16.copyWith(color: colors.onNavy),

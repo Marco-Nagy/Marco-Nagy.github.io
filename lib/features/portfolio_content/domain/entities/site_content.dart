@@ -8,8 +8,9 @@ part 'site_content.g.dart';
 /// Every singleton piece of copy on the site — identity, hero, about, footer
 /// and contact details.
 ///
-/// This replaces the compile-time `ProfileInfo` constants so debug builds can
-/// edit it. The old constants survive only as the seed defaults.
+/// This replaced the compile-time identity constants the site used to ship
+/// with, so every string here is editable through the admin and reaches
+/// visitors without a rebuild.
 @freezed
 abstract class SiteContent with _$SiteContent {
   const factory SiteContent({
@@ -61,6 +62,21 @@ abstract class SiteContent with _$SiteContent {
     @Default('') String contactTitleAr,
     @Default('') String contactSubtitleEn,
     @Default('') String contactSubtitleAr,
+
+    // Featured works — the Home page's projects band.
+    //
+    // Added in Phase 4 rather than Phase 3, deliberately: a publish only ever
+    // writes back what Firestore already held, so a field added before the
+    // form that authors it can never be given a value. These land with
+    // `site_content_form_screen`, which is the first thing that can fill them.
+    @Default('') String homeWorksHeadlineEn,
+    @Default('') String homeWorksHeadlineAr,
+    @Default('') String homeWorksSubtitleEn,
+    @Default('') String homeWorksSubtitleAr,
+    @Default('') String homeWorksMoreLabelEn,
+    @Default('') String homeWorksMoreLabelAr,
+    @Default('') String homeWorksViewAllEn,
+    @Default('') String homeWorksViewAllAr,
   }) = _SiteContent;
 
   factory SiteContent.fromJson(Map<String, dynamic> json) =>

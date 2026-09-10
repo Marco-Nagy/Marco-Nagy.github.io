@@ -3,11 +3,12 @@ rules_version = '2';
 // Content is public to read and writable only by the single owner account.
 //
 // `request.auth != null` alone would NOT be safe: the Firebase config ships
-// inside the public web bundle and the Email/Password signUp endpoint is open
-// by default, so anyone could self-register and satisfy it. The rule is pinned
-// to one uid instead.
+// inside the public web bundle, so anyone could self-register and satisfy it.
+// The rule is pinned to one uid instead. (Client sign-up is also disabled in
+// Authentication > Settings > User actions, but that is defence in depth, not
+// the boundary.)
 //
-// This file is deployed with `firebase deploy --only firestore:rules`. It never
+// Deployed with `firebase deploy --only firestore:rules`. This file never
 // enters the Flutter bundle, and a uid is an identifier, not a credential, so
 // committing it here is safe.
 service cloud.firestore {
@@ -17,11 +18,8 @@ service cloud.firestore {
     // content/bundle -> the full PortfolioBundle       — read only on change
     match /content/{doc} {
       allow read: if true;
-
-      // PHASE 2: replace with the line below once the owner account exists.
-      //   allow write: if request.auth != null
-      //                && request.auth.uid == '<owner-uid>';
-      allow write: if false;
+      allow write: if request.auth != null
+                   && request.auth.uid == 'fGxyNkBNLoZDoaj8DHwWowZMevF3';
     }
 
     // Nothing else in this project is reachable from a client.

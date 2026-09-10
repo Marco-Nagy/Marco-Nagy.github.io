@@ -47,3 +47,11 @@ app.*.map.json
 # Large files not needed for deployment
 *.mp4
 sheet_*.jpg
+
+# One-off content export/admin scripts, and the credentials they use.
+# The service account key grants full read/write to the whole Firebase
+# project — it must never be committed, unlike firebase_options.dart or
+# google-services.json, which are public client config, not secrets.
+tool/serviceAccountKey.json
+tool/node_modules/
+bundle.json

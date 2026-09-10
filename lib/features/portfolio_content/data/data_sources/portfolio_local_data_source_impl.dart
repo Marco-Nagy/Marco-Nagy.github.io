@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/services/shared_preference/shared_pref_keys.dart';
@@ -7,6 +8,7 @@ import '../../../../core/services/shared_preference/shared_preference_helper.dar
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/custom_section_item.dart';
 import '../../domain/entities/personal_project.dart';
+import '../../domain/entities/portfolio_bundle.dart';
 import '../../domain/entities/pricing_add_on.dart';
 import '../../domain/entities/pricing_package.dart';
 import '../../domain/entities/section_definition.dart';
@@ -14,13 +16,6 @@ import '../../domain/entities/site_content.dart';
 import '../../domain/entities/skill_group_entity.dart';
 import '../../domain/entities/tech_badge_entity.dart';
 import '../../domain/entities/work_history_entry.dart';
-import '../seed/seed_certificates.dart';
-import '../seed/seed_pricing.dart';
-import '../seed/seed_projects.dart';
-import '../seed/seed_sections.dart';
-import '../seed/seed_site_content.dart';
-import '../seed/seed_skills.dart';
-import '../seed/seed_work_history.dart';
 import 'portfolio_local_data_source.dart';
 
 @LazySingleton(as: PortfolioLocalDataSource)
@@ -61,16 +56,48 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   final Map<String, List<CustomSectionItem>> _customItemsCache =
       <String, List<CustomSectionItem>>{};
 
+  // Whole-store access --------------------------------------------------------
+
   @override
-  Future<void> seedIfEmpty() async {
-    if (_prefs.getBool(key: SharedPrefKeys.seeded)) return;
-    await resetToSeed();
+  PortfolioBundle readAll() {
+    return PortfolioBundle(
+      projects: getProjects(),
+      certificates: getCertificates(),
+      workHistory: getWorkHistory(),
+      pricingPackages: getPricingPackages(),
+      pricingAddOns: getPricingAddOns(),
+      siteContent: getSiteContent(),
+      skillGroups: getSkillGroups(),
+      techBadges: getTechBadges(),
+      sections: getSections(),
+      customItems: _readAllCustomItems(),
+      schemaVersion: _prefs.containPreference(key: SharedPrefKeys.schemaVersion)
+          ? _prefs.getInt(key: SharedPrefKeys.schemaVersion)
+          : PortfolioBundle.currentSchemaVersion,
+      contentVersion: _prefs.getInt(key: SharedPrefKeys.contentVersion),
+    );
+  }
+
+  /// Sweeps every `portfolio_custom_items_*` key rather than deriving the ids
+  /// from [getSections]: a section row and its items are separate keys, so
+  /// reading from the sections list would silently drop items whose section
+  /// row is missing — exactly the case worth surfacing rather than hiding.
+  Map<String, List<CustomSectionItem>> _readAllCustomItems() {
+    final prefix = SharedPrefKeys.customSectionItemsPrefix;
+    final result = <String, List<CustomSectionItem>>{};
+    for (final key in _prefs.keysWithPrefix(prefix)) {
+      final sectionId = key.substring(prefix.length);
+      if (sectionId.isEmpty) continue;
+      final items = getCustomItems(sectionId);
+      if (items.isNotEmpty) result[sectionId] = items;
+    }
+    return result;
   }
 
   @override
-  Future<void> resetToSeed() async {
-    // Custom sections are a debug-time creation, so a reset clears them
-    // entirely rather than trying to merge them with the seed.
+  Future<void> writeAll(PortfolioBundle bundle) async {
+    // Sweep first: a custom section deleted upstream must not survive here as
+    // an orphaned key that `readAll` would then hand back on the next export.
     for (final key in _prefs.keysWithPrefix(
       SharedPrefKeys.customSectionItemsPrefix,
     )) {
@@ -78,23 +105,46 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     }
     _customItemsCache.clear();
 
-    await saveProjects(SeedProjects.all);
-    await saveCertificates(SeedCertificates.all);
-    await saveWorkHistory(SeedWorkHistory.all);
-    await savePricingPackages(SeedPricing.packages);
-    await savePricingAddOns(SeedPricing.addOns);
-    await saveSiteContent(SeedSiteContent.value);
-    await saveSkillGroups(SeedSkills.groups);
-    await saveTechBadges(SeedSkills.techBadges);
-    await saveSections(SeedSections.all);
-    await _prefs.setBool(key: SharedPrefKeys.seeded, value: true);
+    await saveProjects(bundle.projects);
+    await saveCertificates(bundle.certificates);
+    await saveWorkHistory(bundle.workHistory);
+    await savePricingPackages(bundle.pricingPackages);
+    await savePricingAddOns(bundle.pricingAddOns);
+    await saveSiteContent(bundle.siteContent);
+    await saveSkillGroups(bundle.skillGroups);
+    await saveTechBadges(bundle.techBadges);
+    await saveSections(bundle.sections);
+    for (final entry in bundle.customItems.entries) {
+      await saveCustomItems(entry.key, entry.value);
+    }
+
+    // Written last, so an interrupted write leaves the version *behind* the
+    // content rather than ahead of it. A stale-low version costs one extra
+    // fetch; a stale-high one would pin the visitor to a half-written cache.
+    await _prefs.setInt(
+      key: SharedPrefKeys.schemaVersion,
+      value: bundle.schemaVersion,
+    );
+    await _prefs.setInt(
+      key: SharedPrefKeys.contentVersion,
+      value: bundle.contentVersion,
+    );
   }
 
   // Shared JSON helpers -------------------------------------------------------
 
-  /// A corrupt or schema-drifted payload falls back rather than leaving the
-  /// visitor on an empty page. Only reached on a cache miss — see the class
-  /// doc comment on the cache fields above.
+  /// Distinguishes the two ways a key can yield nothing, because they mean
+  /// opposite things.
+  ///
+  /// **Absent or blank** is normal: nothing has been stored under that key
+  /// yet. Falling back quietly is correct — a collection added in a later
+  /// schema reads as empty until content for it arrives, and the startup sync
+  /// fills it the moment the published version moves ahead of the cache.
+  ///
+  /// **Present but undecodable** is schema drift or corruption, and returning
+  /// the fallback silently is how a whole section disappears from the site
+  /// with nothing in any log to say why. That case is loud in debug and, in
+  /// release, at least leaves a breadcrumb.
   List<T> _decodeList<T>(
     String key,
     T Function(Map<String, dynamic>) fromJson,
@@ -109,9 +159,22 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
       return decoded
           .map((e) => fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(growable: false);
-    } on Object {
+    } on Object catch (error, stack) {
+      _reportDrift(key, error, stack);
       return fallback;
     }
+  }
+
+  /// Stored content that exists but cannot be read back. In debug this stops
+  /// the app at the point of the mistake; in release it prints and carries on,
+  /// because losing one section is better than losing the page.
+  void _reportDrift(String key, Object error, StackTrace stack) {
+    debugPrint(
+      'Stored content under "$key" could not be decoded and was dropped. '
+      'This is schema drift or corruption, not an empty collection: $error',
+    );
+    debugPrintStack(stackTrace: stack);
+    assert(false, 'Undecodable stored content under "$key": $error');
   }
 
   Future<void> _writeList<T>(
@@ -136,7 +199,8 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
     if (raw == null || raw.trim().isEmpty) return fallback;
     try {
       return fromJson(Map<String, dynamic>.from(json.decode(raw) as Map));
-    } on Object {
+    } on Object catch (error, stack) {
+      _reportDrift(key, error, stack);
       return fallback;
     }
   }
@@ -226,10 +290,15 @@ class PortfolioLocalDataSourceImpl implements PortfolioLocalDataSource {
   SiteContent getSiteContent() {
     final cached = _siteContentCache;
     if (cached != null) return cached;
+    // No seed fallback any more: an absent key means the startup sync in
+    // main() has not populated it yet (or Firestore has never been reached),
+    // not that this device is new. `const SiteContent()` — every field
+    // blank — is what chrome renders in that gap; see SiteContentCubit
+    // (Phase 3) for how call sites are meant to tolerate that.
     final content = _decodeObject(
       SharedPrefKeys.siteContent,
       SiteContent.fromJson,
-      SeedSiteContent.value,
+      const SiteContent(),
     );
     _siteContentCache = content;
     return content;

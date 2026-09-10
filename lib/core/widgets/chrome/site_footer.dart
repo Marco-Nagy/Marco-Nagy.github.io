@@ -6,6 +6,7 @@ import '../../routes/route_names.dart';
 import '../../utils/extension/navigation_extensions.dart';
 import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
+import '../../utils/extension/site_content_extensions.dart';
 import '../../utils/responsive/app_breakpoints.dart';
 import '../common/hatched_circle.dart';
 import '../common/pill_button.dart';
@@ -58,9 +59,10 @@ class _FooterCallToAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     final headline = BlockRevealText(
-      context.translate(LangKeys.footerHeadline),
+      context.localized(site.footerHeadlineEn, site.footerHeadlineAr),
       textAlign: TextAlign.center,
       style: (context.isMobile ? MyFonts.display36 : MyFonts.display48)
           .copyWith(color: colors.onNavy),
@@ -90,7 +92,10 @@ class _FooterCallToAction extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 520.w),
           child: BlockRevealText(
-            context.translate(LangKeys.footerAvailability),
+            context.localized(
+              site.footerAvailabilityEn,
+              site.footerAvailabilityAr,
+            ),
             textAlign: TextAlign.center,
             style: MyFonts.regular16.copyWith(color: colors.onNavyMuted),
           ),

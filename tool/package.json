@@ -1,0 +1,8 @@
+{
+  "name": "portfolio-content-tools",
+  "private": true,
+  "description": "One-off scripts for bootstrapping/inspecting the Firestore content bundle. Not part of the Flutter app.",
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

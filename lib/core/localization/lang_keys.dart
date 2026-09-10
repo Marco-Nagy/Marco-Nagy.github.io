@@ -6,13 +6,6 @@ class LangKeys {
 
   static const String appTitle = 'app_title';
 
-  static const String navHome = 'nav_home';
-  static const String navAbout = 'nav_about';
-  static const String navExperience = 'nav_experience';
-  static const String navProjects = 'nav_projects';
-  static const String navCertificates = 'nav_certificates';
-  static const String navPricing = 'nav_pricing';
-  static const String navContact = 'nav_contact';
   static const String navResume = 'nav_resume';
   static const String navMenu = 'nav_menu';
 
@@ -20,36 +13,15 @@ class LangKeys {
   static const String langArabic = 'lang_arabic';
   static const String langSwitchTooltip = 'lang_switch_tooltip';
 
-  static const String heroGreeting = 'hero_greeting';
-  static const String heroName = 'hero_name';
-  static const String heroRole = 'hero_role';
-  static const String heroRoleTags = 'hero_role_tags';
   static const String heroCta = 'hero_cta';
   static const String heroScrollDown = 'hero_scroll_down';
 
-  static const String homeWorksHeadline = 'home_works_headline';
-  static const String homeWorksSubtitle = 'home_works_subtitle';
-  static const String homeWorksMoreLabel = 'home_works_more_label';
-  static const String homeWorksViewAll = 'home_works_view_all';
-
-  static const String aboutTitle = 'about_title';
-  static const String aboutLead = 'about_lead';
   static const String aboutSkillsTitle = 'about_skills_title';
   static const String aboutLocationLabel = 'about_location_label';
 
-  static const String skillsStateManagement = 'skills_state_management';
-  static const String skillsArchitecture = 'skills_architecture';
-  static const String skillsApiIntegration = 'skills_api_integration';
-  static const String skillsDatabase = 'skills_database';
-  static const String skillsMaps = 'skills_maps';
-  static const String skillsCiCd = 'skills_ci_cd';
-  static const String skillsOther = 'skills_other';
-
-  static const String experienceTitle = 'experience_title';
   static const String experiencePresent = 'experience_present';
   static const String experienceEmpty = 'experience_empty';
 
-  static const String projectsTitle = 'projects_title';
   static const String projectsEmpty = 'projects_empty';
   static const String projectsViewProject = 'projects_view_project';
   static const String projectsKeyFeatures = 'projects_key_features';
@@ -80,12 +52,10 @@ class LangKeys {
   static const String adminAddLink = 'admin_add_link';
   static const String projectsOverview = 'projects_overview';
 
-  static const String certificatesTitle = 'certificates_title';
   static const String certificatesEmpty = 'certificates_empty';
   static const String certificatesIssuedBy = 'certificates_issued_by';
   static const String certificatesYear = 'certificates_year';
 
-  static const String pricingTitle = 'pricing_title';
   static const String pricingLead = 'pricing_lead';
   static const String pricingBasePackages = 'pricing_base_packages';
   static const String pricingAddOns = 'pricing_add_ons';
@@ -104,8 +74,6 @@ class LangKeys {
   static const String pricingEmpty = 'pricing_empty';
   static const String pricingPerUnit = 'pricing_per_unit';
 
-  static const String contactTitle = 'contact_title';
-  static const String contactSubtitle = 'contact_subtitle';
   static const String contactName = 'contact_name';
   static const String contactEmail = 'contact_email';
   static const String contactSubject = 'contact_subject';
@@ -120,8 +88,6 @@ class LangKeys {
   static const String validationMessageTooShort =
       'validation_message_too_short';
 
-  static const String footerHeadline = 'footer_headline';
-  static const String footerAvailability = 'footer_availability';
   static const String footerCta = 'footer_cta';
   static const String footerBuiltBy = 'footer_built_by';
   static const String footerBuiltWith = 'footer_built_with';
@@ -136,10 +102,30 @@ class LangKeys {
   static const String adminCancel = 'admin_cancel';
   static const String adminDeleteConfirmTitle = 'admin_delete_confirm_title';
   static const String adminDeleteConfirmBody = 'admin_delete_confirm_body';
-  static const String adminResetSeed = 'admin_reset_seed';
-  static const String adminResetSeedConfirm = 'admin_reset_seed_confirm';
+  static const String adminResetPublished = 'admin_reset_published';
+  static const String adminResetPublishedConfirm =
+      'admin_reset_published_confirm';
   static const String adminSaved = 'admin_saved';
   static const String adminDeleted = 'admin_deleted';
+
+  // Admin speed-dial. These label a widget rather than describe content, so
+  // they belong here and not in SiteContent — see decision D4 in
+  // docs/firebase-migration-plan.md.
+  static const String adminMenu = 'admin_menu';
+  static const String adminMenuClose = 'admin_menu_close';
+  static const String adminExport = 'admin_export';
+  static const String adminExportCopied = 'admin_export_copied';
+  static const String adminExportFailed = 'admin_export_failed';
+  static const String adminExportOversize = 'admin_export_oversize';
+  static const String adminExportEmbedded = 'admin_export_embedded';
+
+  static const String adminSignIn = 'admin_sign_in';
+  static const String adminSignOut = 'admin_sign_out';
+  static const String adminSignInEmail = 'admin_sign_in_email';
+  static const String adminSignInPassword = 'admin_sign_in_password';
+  static const String adminPublish = 'admin_publish';
+  static const String adminPublished = 'admin_published';
+  static const String adminPublishFailed = 'admin_publish_failed';
 
   static const String formAddProject = 'form_add_project';
   static const String formEditProject = 'form_edit_project';
@@ -270,4 +256,73 @@ class LangKeys {
   static const String commonLoading = 'common_loading';
   static const String commonError = 'common_error';
   static const String commonClose = 'common_close';
+
+  // Site content form — labels for the screen that edits every
+  // SiteContent field. The values themselves are content, not keys.
+  static const String formEditSiteContent = 'form_edit_site_content';
+  static const String adminSiteContent = 'admin_site_content';
+  static const String groupIdentity = 'group_identity';
+  static const String groupHero = 'group_hero';
+  static const String groupAbout = 'group_about';
+  static const String groupContact = 'group_contact';
+  static const String groupFooter = 'group_footer';
+  static const String groupFeaturedWorks = 'group_featured_works';
+  static const String fieldFullNameEn = 'field_full_name_en';
+  static const String fieldFullNameAr = 'field_full_name_ar';
+  static const String fieldMonogram = 'field_monogram';
+  static const String fieldProfileImage = 'field_profile_image';
+  static const String fieldEmail = 'field_email';
+  static const String fieldPhone = 'field_phone';
+  static const String fieldGithubUrl = 'field_github_url';
+  static const String fieldLinkedinUrl = 'field_linkedin_url';
+  static const String fieldHostedCvUrl = 'field_hosted_cv_url';
+  static const String fieldHeroGreetingEn = 'field_hero_greeting_en';
+  static const String fieldHeroGreetingAr = 'field_hero_greeting_ar';
+  static const String fieldHeroNameEn = 'field_hero_name_en';
+  static const String fieldHeroNameAr = 'field_hero_name_ar';
+  static const String fieldHeroRoleEn = 'field_hero_role_en';
+  static const String fieldHeroRoleAr = 'field_hero_role_ar';
+  static const String fieldRoleTagsEn = 'field_role_tags_en';
+  static const String fieldRoleTagsAr = 'field_role_tags_ar';
+  static const String fieldSummaryEn = 'field_summary_en';
+  static const String fieldSummaryAr = 'field_summary_ar';
+  static const String fieldAboutLeadEn = 'field_about_lead_en';
+  static const String fieldAboutLeadAr = 'field_about_lead_ar';
+  static const String fieldAboutStatementsEn = 'field_about_statements_en';
+  static const String fieldAboutStatementsAr = 'field_about_statements_ar';
+  static const String fieldFooterHeadlineEn = 'field_footer_headline_en';
+  static const String fieldFooterHeadlineAr = 'field_footer_headline_ar';
+  static const String fieldFooterAvailabilityEn =
+      'field_footer_availability_en';
+  static const String fieldFooterAvailabilityAr =
+      'field_footer_availability_ar';
+  static const String fieldContactTitleEn = 'field_contact_title_en';
+  static const String fieldContactTitleAr = 'field_contact_title_ar';
+  static const String fieldContactSubtitleEn = 'field_contact_subtitle_en';
+  static const String fieldContactSubtitleAr = 'field_contact_subtitle_ar';
+  static const String fieldHomeWorksHeadlineEn = 'field_home_works_headline_en';
+  static const String fieldHomeWorksHeadlineAr = 'field_home_works_headline_ar';
+  static const String fieldHomeWorksSubtitleEn = 'field_home_works_subtitle_en';
+  static const String fieldHomeWorksSubtitleAr = 'field_home_works_subtitle_ar';
+  static const String fieldHomeWorksMoreLabelEn =
+      'field_home_works_more_label_en';
+  static const String fieldHomeWorksMoreLabelAr =
+      'field_home_works_more_label_ar';
+  static const String fieldHomeWorksViewAllEn = 'field_home_works_view_all_en';
+  static const String fieldHomeWorksViewAllAr = 'field_home_works_view_all_ar';
+
+  // Skills and Sections manager screens.
+  static const String adminSkills = 'admin_skills';
+  static const String adminSections = 'admin_sections';
+  static const String formAddSkillGroup = 'form_add_skill_group';
+  static const String formEditSkillGroup = 'form_edit_skill_group';
+  static const String fieldSkillGroupLabelEn = 'field_skill_group_label_en';
+  static const String fieldSkillGroupLabelAr = 'field_skill_group_label_ar';
+  static const String fieldSkillNames = 'field_skill_names';
+  static const String skillsEmpty = 'skills_empty';
+  static const String formEditSection = 'form_edit_section';
+  static const String fieldSectionTitleEn = 'field_section_title_en';
+  static const String fieldSectionTitleAr = 'field_section_title_ar';
+  static const String fieldSectionVisible = 'field_section_visible';
+  static const String sectionsHiddenHint = 'sections_hidden_hint';
 }

@@ -18,37 +18,36 @@
   <title>Marco Nagy — Flutter Developer</title>
   <link rel="manifest" href="manifest.json">
 
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+
   <style>
     /*
-      This is the real splash screen on web. It is plain HTML/CSS because it
+      This is the real splash screen on web. It is plain HTML/CSS/JS because it
       must be on screen *before* the Flutter engine and app bundle have
       downloaded — a Flutter widget cannot cover that window by definition.
-      Colours mirror AppColorTheme.navy so the handoff to the app is seamless.
+      The {MN} mark animation and palette mirror the brand identity so the
+      handoff to the app is seamless.
     */
     :root {
-      --navy-deep: #050B1B;
-      --navy-lift: #122350;
-      --accent: #4CC9F0;
-      --on-navy: #F7F9FC;
+      --bg: #0d1319;
+      --accent: #54C5F8;
+      --paper: #EBF2F8;
     }
 
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: var(--navy-deep);
+      background-color: var(--bg);
     }
 
     #splash {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-lift) 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      background: var(--bg);
       transition: opacity 400ms ease-out;
     }
 
@@ -58,20 +57,129 @@
       pointer-events: none;
     }
 
-    #splash-name {
-      color: var(--on-navy);
-      font-size: clamp(24px, 4vw, 40px);
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      opacity: 0;
-      animation: splash-fade-in 600ms ease-out forwards;
+    #logo-scale {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1600px;
+      height: 900px;
+      margin-left: -800px;
+      margin-top: -450px;
+      transform-origin: center;
+    }
+
+    #ambient-glow,
+    #ambient-vignette {
+      position: absolute;
+      inset: 0;
+    }
+
+    #ambient-vignette {
+      background: radial-gradient(125% 95% at 50% 50%, rgba(13, 19, 25, 0) 52%, rgba(8, 12, 16, 0.72) 100%);
+    }
+
+    #comp-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #comp-box {
+      position: relative;
+      width: 900px;
+      height: 560px;
+    }
+
+    #mark-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brace {
+      overflow: visible;
+    }
+
+    #initials {
+      width: 300px;
+      height: 240px;
+      position: relative;
+    }
+
+    .letter {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-weight: 500;
+      font-size: 208px;
+      line-height: 1;
+      letter-spacing: 0.005em;
+      color: var(--paper);
+      white-space: nowrap;
+    }
+
+    #wordmark {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 372px;
+      text-align: center;
+    }
+
+    #wm-name {
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 52px;
+      letter-spacing: 0.34em;
+      padding-left: 0.36em;
+      color: var(--paper);
+    }
+
+    #wm-rule {
+      height: 2px;
+      border-radius: 2px;
+      background: var(--accent);
+      margin: 30px auto 26px;
+      opacity: 0.75;
+    }
+
+    #wm-sub {
+      font-family: 'Poppins', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 26px;
+      letter-spacing: 0.32em;
+      padding-left: 0.32em;
+      color: var(--accent);
+    }
+
+    #caret {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 11px;
+      height: 152px;
+      border-radius: 6px;
+      margin-left: -5.5px;
+      margin-top: -76px;
+      background: var(--accent);
+      transform-origin: center;
     }
 
     #splash-track {
-      margin-top: 18px;
-      width: min(240px, 60vw);
+      position: fixed;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      width: min(200px, 50vw);
       height: 2px;
-      background-color: rgba(247, 249, 252, 0.15);
+      background-color: rgba(235, 242, 248, 0.15);
       overflow: hidden;
     }
 
@@ -94,29 +202,209 @@
       transition: width 220ms ease-out;
     }
 
-    @keyframes splash-fade-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: none; }
-    }
-
     @keyframes splash-progress {
       from { width: 0; }
       to   { width: 90%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #splash-name { animation: none; opacity: 1; }
       #splash-bar { animation: none; width: 90%; }
     }
   </style>
 </head>
 <body>
   <div id="splash">
-    <div id="splash-name">Marco Nagy Louka</div>
+    <div id="logo-scale">
+      <div id="ambient-glow"></div>
+      <div id="ambient-vignette"></div>
+      <div id="comp-wrap">
+        <div id="comp-box">
+          <div id="mark-row">
+            <svg class="brace" id="brace-l" viewBox="0 0 104 340" width="104" height="330">
+              <path d="M 92 14 C 54 14 54 62 54 90 C 54 134 22 152 12 170 C 22 188 54 206 54 250 C 54 278 54 326 92 326"
+                    fill="none" stroke="#54C5F8" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div id="initials">
+              <span class="letter" id="letter-m">M</span>
+              <span class="letter" id="letter-n">N</span>
+            </div>
+            <svg class="brace" id="brace-r" viewBox="0 0 104 340" width="104" height="330">
+              <path d="M 92 14 C 54 14 54 62 54 90 C 54 134 22 152 12 170 C 22 188 54 206 54 250 C 54 278 54 326 92 326"
+                    fill="none" stroke="#54C5F8" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div id="wordmark">
+            <div id="wm-name">MARCO NAGY</div>
+            <div id="wm-rule"></div>
+            <div id="wm-sub">FLUTTER DEVELOPER</div>
+          </div>
+        </div>
+      </div>
+      <div id="caret"></div>
+    </div>
     <div id="splash-track"><div id="splash-bar"></div></div>
   </div>
 
   <script>
+    (function () {
+      // ── Easing + tween helpers (ported from the design's animations-v3.jsx) ──
+      var Easing = {
+        easeOutCubic: function (t) { t -= 1; return t * t * t + 1; },
+        easeOutQuart: function (t) { t -= 1; return 1 - t * t * t * t; },
+        easeInOutQuart: function (t) {
+          if (t < 0.5) return 8 * t * t * t * t;
+          t -= 1; return 1 - 8 * t * t * t * t;
+        },
+      };
+      function animate(from, to, start, end, ease) {
+        return function (t) {
+          if (t <= start) return from;
+          if (t >= end) return to;
+          var local = (t - start) / (end - start);
+          return from + (to - from) * ease(local);
+        };
+      }
+      function enter(from, to, start, end) { return animate(from, to, start, end, Easing.easeOutCubic); }
+      function pop(from, to, start, end) { return animate(from, to, start, end, Easing.easeOutQuart); }
+      function draw(from, to, start, end) { return animate(from, to, start, end, Easing.easeInOutQuart); }
+
+      // ── Authored timeline (mirrors OM_SCENES durations in MN Logo Animation.dc.html) ──
+      var DUR = { Cursor: 1.6, Braces: 2.4, Initials: 2.6, Lockup: 3.2, Reset: 1.6 };
+      var CUES = {};
+      CUES.Cursor = 0;
+      CUES.Braces = CUES.Cursor + DUR.Cursor;
+      CUES.Initials = CUES.Braces + DUR.Braces;
+      CUES.Lockup = CUES.Initials + DUR.Initials;
+      CUES.Reset = CUES.Lockup + DUR.Lockup;
+      var END = CUES.Reset + DUR.Reset;
+
+      var ACCENT = '#54C5F8';
+
+      var els = {
+        glow: document.getElementById('ambient-glow'),
+        compWrap: document.getElementById('comp-wrap'),
+        markRow: document.getElementById('mark-row'),
+        braceL: document.getElementById('brace-l'),
+        braceR: document.getElementById('brace-r'),
+        m: document.getElementById('letter-m'),
+        n: document.getElementById('letter-n'),
+        wmName: document.getElementById('wm-name'),
+        wmRule: document.getElementById('wm-rule'),
+        wmSub: document.getElementById('wm-sub'),
+        caret: document.getElementById('caret'),
+        scale: document.getElementById('logo-scale'),
+      };
+
+      function render(T) {
+        // camera — never fully static
+        var camScale = draw(1.08, 1.0, 0, CUES.Lockup + 1)(T) + Math.sin(T * 0.7) * 0.004;
+        var glow = 0.5 + 0.5 * Math.sin(T * 1.1 - 1.2);
+
+        // caret — flashes through the whole open, then births the initials out of itself
+        var blink = (T > 0.35 && T < CUES.Initials)
+          ? ((Math.floor((T - 0.35) / 0.42) % 2) ? 0.18 : 1) : 1;
+        var flash = draw(0, 1, CUES.Initials - 0.18, CUES.Initials + 0.16)(T);
+        var gone = draw(0, 1, CUES.Initials + 0.16, CUES.Initials + 0.7)(T);
+        var caretBack = enter(0, 1, END - 0.75, END - 0.2)(T);
+        var caretOpacity = Math.max((1 - gone) * blink, caretBack);
+        var caretSX = 1 + 2.4 * flash * (1 - gone);
+        var caretSY = 1 + 0.22 * flash * (1 - gone);
+
+        // braces
+        var gap = pop(0, 118, CUES.Braces + 0.45, CUES.Initials - 0.15)(T)
+                + enter(0, -16, CUES.Lockup, CUES.Lockup + 0.8)(T);
+        var braceL = pop(0, 1, CUES.Braces, CUES.Braces + 0.55)(T);
+        var braceR = pop(0, 1, CUES.Braces + 0.16, CUES.Braces + 0.71)(T);
+
+        // initials — born out of the caret, one sliding left, one right
+        var birth = draw(0, 1, CUES.Initials + 0.18, CUES.Initials + 1.65)(T);
+        var mOp = enter(0, 1, CUES.Initials + 0.14, CUES.Initials + 0.6)(T);
+        var nOp = enter(0, 1, CUES.Initials + 0.14, CUES.Initials + 0.6)(T);
+
+        // lockup
+        var markScale = enter(1, 0.7, CUES.Lockup - 0.1, CUES.Lockup + 0.9)(T);
+        var markY = enter(0, -78, CUES.Lockup - 0.1, CUES.Lockup + 0.9)(T);
+        var nameOp = enter(0, 1, CUES.Lockup + 0.55, CUES.Lockup + 1.25)(T);
+        var nameY = enter(26, 0, CUES.Lockup + 0.55, CUES.Lockup + 1.35)(T);
+        var ruleW = draw(0, 300, CUES.Lockup + 0.8, CUES.Lockup + 1.6)(T);
+        var subOp = enter(0, 1, CUES.Lockup + 1.15, CUES.Lockup + 1.8)(T);
+
+        // reset back to the opening frame (loop seam)
+        var out = draw(1, 0, CUES.Reset + 0.25, END - 0.35)(T);
+        var outLift = draw(0, -26, CUES.Reset + 0.25, END - 0.35)(T);
+
+        els.glow.style.background = 'radial-gradient(66% 86% at 50% 46%, ' + ACCENT + (glow > 0.5 ? '1f' : '15') + ' 0%, rgba(13,19,25,0) 70%)';
+        els.glow.style.opacity = 0.5 + glow * 0.5;
+
+        els.compWrap.style.transform = 'scale(' + camScale + ') translateY(' + outLift + 'px)';
+        els.compWrap.style.opacity = out;
+
+        els.markRow.style.transform = 'translateY(' + markY + 'px) scale(' + markScale + ')';
+
+        setBrace(els.braceL, braceL, -gap, false);
+        setBrace(els.braceR, braceR, gap, true);
+
+        setLetter(els.m, -1, mOp, birth);
+        setLetter(els.n, 1, nOp, birth);
+
+        els.wmName.style.opacity = nameOp;
+        els.wmName.style.transform = 'translateY(' + nameY + 'px)';
+        els.wmRule.style.width = ruleW + 'px';
+        els.wmSub.style.opacity = subOp;
+
+        els.caret.style.opacity = caretOpacity;
+        els.caret.style.transform = 'scaleX(' + caretSX + ') scaleY(' + caretSY + ')';
+        els.caret.style.boxShadow = '0 0 55px ' + ACCENT + '80';
+      }
+
+      function setBrace(el, s, x, flip) {
+        el.style.opacity = s;
+        el.style.transform = 'scale(' + (0.6 + 0.4 * s) + ') translateX(' + x + 'px) scaleX(' + (flip ? -1 : 1) + ')';
+        el.style.filter = 'drop-shadow(0 0 44px ' + ACCENT + '80) drop-shadow(0 0 130px ' + ACCENT + '40)';
+      }
+
+      function setLetter(el, dir, op, birth) {
+        el.style.opacity = op;
+        el.style.transform = 'translateX(-50%) translateX(' + (dir * 88 * birth) + 'px) scale(' + (0.62 + 0.38 * birth) + ')';
+        el.style.filter = 'blur(' + ((1 - birth) * 2.5) + 'px)';
+        el.style.textShadow = '0 0 ' + (26 * (1 - birth)) + 'px ' + ACCENT;
+      }
+
+      function fitStage() {
+        var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+        els.scale.style.transform = 'scale(' + Math.max(0.05, s) + ')';
+      }
+      fitStage();
+      window.addEventListener('resize', fitStage);
+
+      // Plays once and holds the settled lockup frame — stops before the
+      // Reset scene, which exists in the source design only to close a loop.
+      var HOLD_T = CUES.Reset - 0.05;
+
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        render(HOLD_T);
+      } else {
+        var rafId = null;
+        var start = null;
+        function frame(ts) {
+          if (start === null) start = ts;
+          var T = (ts - start) / 1000;
+          if (T >= HOLD_T) {
+            render(HOLD_T);
+            rafId = null;
+            return;
+          }
+          render(T);
+          rafId = window.requestAnimationFrame(frame);
+        }
+        rafId = window.requestAnimationFrame(frame);
+        window.__stopSplashAnim = function () {
+          if (rafId !== null) window.cancelAnimationFrame(rafId);
+        };
+      }
+    })();
+
     // Flutter fires this once it has painted its first frame, which is the
     // only reliable moment the app is actually visible.
     window.addEventListener('flutter-first-frame', function () {
@@ -126,11 +414,15 @@
 
       if (bar) bar.classList.add('is-complete');
 
-      // Let the bar finish before fading, then drop the node so it can never
-      // intercept a pointer event over the app.
+      // Let the bar finish before fading, then drop the node (and stop the
+      // animation loop) so it can never intercept a pointer event or spend
+      // CPU over the app.
       window.setTimeout(function () {
         splash.classList.add('is-done');
-        window.setTimeout(function () { splash.remove(); }, 400);
+        window.setTimeout(function () {
+          if (window.__stopSplashAnim) window.__stopSplashAnim();
+          splash.remove();
+        }, 400);
       }, 220);
     });
   </script>

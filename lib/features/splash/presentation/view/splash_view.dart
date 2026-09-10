@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/profile_info.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/styles/fonts/my_fonts.dart';
 import '../../../../core/utils/extension/context_extensions.dart';
+import '../../../../core/utils/extension/site_content_extensions.dart';
 import '../../../../core/utils/extension/navigation_extensions.dart';
 import '../../../../core/widgets/motion/motion_durations.dart';
 import 'splash_metrics.dart';
@@ -130,6 +130,7 @@ class _SplashMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final site = context.site;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -137,7 +138,7 @@ class _SplashMark extends StatelessWidget {
         Opacity(
           opacity: (fill / SplashMetrics.nameFadeFraction).clamp(0.0, 1.0),
           child: Text(
-            ProfileInfo.fullName,
+            context.localized(site.fullNameEn, site.fullNameAr),
             textAlign: TextAlign.center,
             style: MyFonts.display36.copyWith(color: colors.onNavy),
           ),

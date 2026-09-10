@@ -1,5 +1,5 @@
 name: marco_portfolio
-description: "Marco Nagy Louka — Flutter Developer portfolio (mobile + web, self-contained, no backend)."
+description: "Marco Nagy Louka — Flutter Developer portfolio (mobile + web). Content lives in Firestore and is edited from the debug-only admin; media is hosted on Cloudinary."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -29,7 +29,17 @@ dependencies:
   # UI / responsiveness
   flutter_screenutil:
 
-  # Local storage (the app's only persistence layer — no backend)
+  # Content backend: Firestore holds one bundle document that every visitor
+  # reads; auth gates writes to the single owner account
+  firebase_core:
+  cloud_firestore:
+  firebase_auth:
+
+  # Cloudinary uploads are a plain multipart POST, so no SDK is needed
+  http:
+
+  # Local storage — now the cache in front of Firestore, not the source of
+  # truth, and the offline fallback when a fetch fails
   shared_preferences:
 
   # External links: CV pdf, GitHub, LinkedIn, mailto

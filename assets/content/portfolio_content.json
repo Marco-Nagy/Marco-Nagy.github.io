@@ -1,0 +1,1088 @@
+{
+  "projects": [
+    {
+      "id": "flowery_store",
+      "title": "Flowery Store",
+      "titleAr": "فلاوري ستور",
+      "description": "E-commerce platform for floral products, delivering a smooth shopping experience with live order tracking, secure payments and a clean, simple interface.",
+      "descriptionAr": "منصة تجارة إلكترونية لبيع الزهور، توفر تجربة تسوّق سلسة مع تتبع مباشر للطلبات ومدفوعات آمنة وواجهة استخدام بسيطة.",
+      "features": [
+        "User Authentication",
+        "Product Browsing",
+        "Shopping Cart",
+        "Real-Time Order Tracking",
+        "Secure Payment Processing",
+        "Delivery Notifications"
+      ],
+      "featuresAr": [
+        "تسجيل الدخول والمصادقة",
+        "تصفح المنتجات",
+        "سلة التسوق",
+        "تتبع الطلبات في الوقت الفعلي",
+        "معالجة مدفوعات آمنة",
+        "إشعارات التوصيل"
+      ],
+      "category": "E-Commerce.",
+      "categoryAr": "تجارة إلكترونية.",
+      "cover": {
+        "kind": "image",
+        "image": {
+          "kind": "asset",
+          "value": "assets/projects/flowery_store_1.png"
+        },
+        "videoUrl": "",
+        "muted": true,
+        "loop": true,
+        "autoplay": true
+      },
+      "panels": [
+        {
+          "id": "flowery_store_0",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_store_1.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 0
+        },
+        {
+          "id": "flowery_store_1",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_store_2.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 1
+        },
+        {
+          "id": "flowery_store_2",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_store_3.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 2
+        }
+      ],
+      "videos": [],
+      "showcaseBackground": {
+        "style": "linearGradient",
+        "colorHex": "FF6FA5",
+        "colorHex2": "FFC2D8",
+        "image": {
+          "kind": "asset",
+          "value": ""
+        },
+        "overlayOpacity": 0.05,
+        "blurSigma": 0
+      },
+      "links": [],
+      "skills": [
+        "Clean Architecture",
+        "State Management (Bloc)",
+        "REST API Integration",
+        "Real-Time Data Sync",
+        "Secure Payment Integration"
+      ],
+      "skillsAr": [
+        "العمارة النظيفة",
+        "إدارة الحالة (Bloc)",
+        "ربط REST APIs",
+        "مزامنة بيانات لحظية",
+        "تكامل مدفوعات آمنة"
+      ],
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Firebase"
+      ],
+      "tools": [
+        "Git",
+        "Figma"
+      ],
+      "accentHex": "FF6FA5",
+      "order": 0
+    },
+    {
+      "id": "flowery_delivery",
+      "title": "Flowery Delivery",
+      "titleAr": "فلاوري ديليفري",
+      "description": "Real-time flower delivery tracking app that helps drivers navigate efficiently with live maps, keeps customers updated on order status, and onboards drivers automatically by scanning ID and licence.",
+      "descriptionAr": "تطبيق موبايل لتتبع توصيل الزهور في الوقت الفعلي، يساعد السائقين على التنقل بكفاءة عبر خرائط حية، ويُبقي العملاء على اطلاع بحالة الطلب، مع تسجيل تلقائي للسائقين عبر مسح الهوية والرخصة.",
+      "features": [
+        "Real-Time Tracking",
+        "Notification System",
+        "Map Integration",
+        "Order Management",
+        "Automated Driver Registration (ID/licence scan)"
+      ],
+      "featuresAr": [
+        "تتبع في الوقت الفعلي",
+        "نظام الإشعارات",
+        "تكامل الخرائط",
+        "إدارة الطلبات",
+        "تسجيل تلقائي للسائقين (مسح الهوية والرخصة)"
+      ],
+      "category": "Delivery / Tracking.",
+      "categoryAr": "توصيل / تتبع.",
+      "cover": {
+        "kind": "image",
+        "image": {
+          "kind": "asset",
+          "value": "assets/projects/flowery_delivery_1.png"
+        },
+        "videoUrl": "",
+        "muted": true,
+        "loop": true,
+        "autoplay": true
+      },
+      "panels": [
+        {
+          "id": "flowery_delivery_0",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_delivery_1.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 0
+        },
+        {
+          "id": "flowery_delivery_1",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_delivery_2.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 1
+        },
+        {
+          "id": "flowery_delivery_2",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/flowery_delivery_3.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "iphone",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 2
+        }
+      ],
+      "videos": [],
+      "showcaseBackground": {
+        "style": "linearGradient",
+        "colorHex": "E91E63",
+        "colorHex2": "F8BBD0",
+        "image": {
+          "kind": "asset",
+          "value": ""
+        },
+        "overlayOpacity": 0.05,
+        "blurSigma": 0
+      },
+      "links": [],
+      "skills": [
+        "Clean Architecture",
+        "Live Location Tracking",
+        "Maps Integration",
+        "Push Notifications",
+        "Document/ID Scanning"
+      ],
+      "skillsAr": [
+        "العمارة النظيفة",
+        "تتبع الموقع اللحظي",
+        "تكامل الخرائط",
+        "إشعارات فورية",
+        "مسح المستندات"
+      ],
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Firebase",
+        "Google Maps"
+      ],
+      "tools": [
+        "Git",
+        "Figma"
+      ],
+      "accentHex": "3DDC97",
+      "order": 1
+    },
+    {
+      "id": "fitness_app",
+      "title": "Fitness App",
+      "titleAr": "تطبيق اللياقة",
+      "description": "Structured workout plans with instructional videos for every level, meal preparation guides with nutrition info, and a Gemini-powered AI chatbot that supports fitness and diet questions personally.",
+      "descriptionAr": "تطبيق يقدّم خطط تمارين منظمة مع فيديوهات تعليمية لكل المستويات، وأدلة تحضير وجبات بمعلومات غذائية، وشات بوت ذكاء اصطناعي (مدعوم بـ Gemini) لدعم اللياقة والنظام الغذائي بشكل شخصي.",
+      "features": [
+        "User Authentication",
+        "Structured Workout Plans",
+        "Instructional Workout Videos",
+        "Meal Preparation Guides",
+        "AI-Powered Chatbot Assistance",
+        "Progress Tracking"
+      ],
+      "featuresAr": [
+        "تسجيل الدخول والمصادقة",
+        "خطط تمارين منظمة",
+        "فيديوهات تعليمية للتمارين",
+        "أدلة تحضير الوجبات",
+        "مساعدة عبر شات بوت ذكاء اصطناعي",
+        "تتبع التقدم"
+      ],
+      "category": "Fitness.",
+      "categoryAr": "لياقة.",
+      "cover": {
+        "kind": "image",
+        "image": {
+          "kind": "asset",
+          "value": "assets/projects/fitness_app_1.png"
+        },
+        "videoUrl": "",
+        "muted": true,
+        "loop": true,
+        "autoplay": true
+      },
+      "panels": [
+        {
+          "id": "fitness_app_0",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/fitness_app_1.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "samsungS",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 0
+        },
+        {
+          "id": "fitness_app_1",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/fitness_app_2.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "samsungS",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 1
+        },
+        {
+          "id": "fitness_app_2",
+          "format": "screenshot",
+          "backgroundOverride": null,
+          "shots": [
+            {
+              "image": {
+                "kind": "image",
+                "image": {
+                  "kind": "asset",
+                  "value": "assets/projects/fitness_app_3.png"
+                },
+                "videoUrl": "",
+                "muted": true,
+                "loop": true,
+                "autoplay": true
+              },
+              "frame": "samsungS",
+              "rotationDegrees": 0,
+              "scale": 1.12,
+              "offsetX": 0,
+              "offsetY": 0.16
+            }
+          ],
+          "captionEn": "",
+          "captionAr": "",
+          "subtitleEn": "",
+          "subtitleAr": "",
+          "captionPlacement": "top",
+          "captionColorHex": "FFFFFF",
+          "order": 2
+        }
+      ],
+      "videos": [],
+      "showcaseBackground": {
+        "style": "linearGradient",
+        "colorHex": "3A1C71",
+        "colorHex2": "FFAF7B",
+        "image": {
+          "kind": "asset",
+          "value": ""
+        },
+        "overlayOpacity": 0.1,
+        "blurSigma": 0
+      },
+      "links": [],
+      "skills": [
+        "Clean Architecture",
+        "Video Playback",
+        "AI Chat Integration",
+        "Progress Analytics"
+      ],
+      "skillsAr": [
+        "العمارة النظيفة",
+        "تشغيل الفيديو",
+        "تكامل شات بوت ذكاء اصطناعي",
+        "تحليلات التقدم"
+      ],
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "Firebase",
+        "Gemini API"
+      ],
+      "tools": [
+        "Git",
+        "Figma"
+      ],
+      "accentHex": "FFB020",
+      "order": 2
+    }
+  ],
+  "certificates": [
+    {
+      "id": "bsc_commerce",
+      "title": "Bachelor of Commerce",
+      "titleAr": "بكالوريوس تجارة",
+      "provider": "Alexandria University",
+      "providerAr": "جامعة الإسكندرية",
+      "year": "",
+      "location": "Alexandria, Egypt",
+      "locationAr": "الإسكندرية، مصر",
+      "imageAsset": "",
+      "order": 0
+    },
+    {
+      "id": "elevate_bootcamp_c1",
+      "title": "Flutter Advanced Bootcamp C1",
+      "titleAr": "معسكر Flutter المتقدم C1",
+      "provider": "Elevate",
+      "providerAr": "Elevate",
+      "year": "2024",
+      "location": "Egypt",
+      "locationAr": "مصر",
+      "imageAsset": "",
+      "order": 1
+    },
+    {
+      "id": "udemy_bloc_mvvm",
+      "title": "Flutter Advanced Course: Bloc and MVVM Pattern (Arabic)",
+      "titleAr": "دورة Flutter المتقدمة: نمط Bloc وMVVM (بالعربية)",
+      "provider": "Udemy",
+      "providerAr": "Udemy",
+      "year": "2023",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 2
+    },
+    {
+      "id": "route_cs_diploma",
+      "title": "Computer Science Programming Fundamentals Diploma (C++)",
+      "titleAr": "دبلومة أساسيات البرمجة وعلوم الحاسب (C++)",
+      "provider": "Route IT Training Center",
+      "providerAr": "مركز Route لتدريب تكنولوجيا المعلومات",
+      "year": "2023",
+      "location": "Alexandria, Egypt",
+      "locationAr": "الإسكندرية، مصر",
+      "imageAsset": "",
+      "order": 3
+    },
+    {
+      "id": "udemy_clean_arch",
+      "title": "Clean Architecture in Flutter 3 (Arabic)",
+      "titleAr": "Clean Architecture في Flutter 3 (بالعربية)",
+      "provider": "Udemy",
+      "providerAr": "Udemy",
+      "year": "2022",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 4
+    },
+    {
+      "id": "udemy_complete_2022",
+      "title": "The Complete 2022 Flutter & Dart Development Course (Arabic)",
+      "titleAr": "الدورة الشاملة لتطوير Flutter وDart 2022 (بالعربية)",
+      "provider": "Udemy",
+      "providerAr": "Udemy",
+      "year": "2022",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 5
+    },
+    {
+      "id": "senior_steps_android",
+      "title": "Android Native Diploma",
+      "titleAr": "دبلومة Android Native",
+      "provider": "Senior Steps IT Training Center",
+      "providerAr": "مركز Senior Steps لتدريب تكنولوجيا المعلومات",
+      "year": "2021",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 6
+    },
+    {
+      "id": "udacity_android_nanodegree",
+      "title": "Android Basic Nanodegree",
+      "titleAr": "Android Basic Nanodegree",
+      "provider": "Udacity (Google)",
+      "providerAr": "Udacity (Google)",
+      "year": "2021",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 7
+    },
+    {
+      "id": "reload_android",
+      "title": "Android Native Diploma",
+      "titleAr": "دبلومة Android Native",
+      "provider": "Reload Academy",
+      "providerAr": "أكاديمية Reload",
+      "year": "2020",
+      "location": "",
+      "locationAr": "",
+      "imageAsset": "",
+      "order": 8
+    }
+  ],
+  "workHistory": [
+    {
+      "id": "vetanoia",
+      "company": "Vetanoia",
+      "role": "Flutter Developer",
+      "roleAr": "مطوّر تطبيقات Flutter",
+      "startDate": "03/2022",
+      "endDate": "",
+      "location": "Alexandria, Egypt",
+      "locationAr": "الإسكندرية، مصر",
+      "bullets": [
+        "Built and shipped GARAS ERP (accounting, admin, reporting) used by 3+ companies",
+        "Implemented role-based access control and financial workflows",
+        "Delivered Royal Tents (3D tent measurement and quotation app) on Google Play and the App Store",
+        "Built apps on Clean Architecture + Bloc, with REST API integration and offline persistence",
+        "Reduced production crashes through unit testing and structured error handling"
+      ],
+      "bulletsAr": [
+        "بناء وإطلاق نظام GARAS ERP المستخدم في أكثر من 3 شركات، يغطي المحاسبة والإدارة والتقارير",
+        "تنفيذ صلاحيات الوصول حسب الدور وسير العمل المالي",
+        "تطوير تطبيق Royal Tents لقياس وتسعير الخيام ثلاثي الأبعاد، منشور على Google Play وApp Store",
+        "بناء التطبيقات باستخدام Clean Architecture وBloc، مع ربط REST APIs والتخزين المحلي دون اتصال",
+        "تقليل الأعطال الإنتاجية عبر الاختبارات الوحدوية ومعالجة الأخطاء المنظمة"
+      ],
+      "order": 0
+    }
+  ],
+  "pricingPackages": [
+    {
+      "id": "mvp",
+      "name": "MVP / Simple App",
+      "nameAr": "تطبيق مبدئي / بسيط",
+      "basePrice": 400,
+      "timelineLabel": "~2 weeks",
+      "timelineLabelAr": "حوالي أسبوعين",
+      "description": "A focused first version: a handful of screens, one core flow, ready to put in front of real users.",
+      "descriptionAr": "نسخة أولى مركّزة: عدد محدود من الشاشات ومسار أساسي واحد، جاهزة لعرضها على مستخدمين حقيقيين.",
+      "order": 0
+    },
+    {
+      "id": "medium",
+      "name": "Medium App",
+      "nameAr": "تطبيق متوسط",
+      "basePrice": 900,
+      "timelineLabel": "~4 weeks",
+      "timelineLabelAr": "حوالي 4 أسابيع",
+      "description": "A full product: multiple flows, API integration, state management and a polished, responsive UI.",
+      "descriptionAr": "منتج متكامل: مسارات متعددة وربط APIs وإدارة حالة وواجهة متجاوبة ومصقولة.",
+      "order": 1
+    },
+    {
+      "id": "advanced",
+      "name": "Advanced / ERP-style App",
+      "nameAr": "تطبيق متقدم / بنمط ERP",
+      "basePrice": 1800,
+      "timelineLabel": "~6–8 weeks",
+      "timelineLabelAr": "حوالي 6–8 أسابيع",
+      "description": "Complex business logic: roles and permissions, reporting, offline support and Clean Architecture built to be maintained for years.",
+      "descriptionAr": "منطق أعمال معقّد: أدوار وصلاحيات وتقارير ودعم العمل بدون إنترنت، مبني على Clean Architecture ليُصان لسنوات.",
+      "order": 2
+    }
+  ],
+  "pricingAddOns": [
+    {
+      "id": "auth",
+      "name": "User Authentication",
+      "nameAr": "تسجيل الدخول والمصادقة",
+      "unitPrice": 60,
+      "unitTimeDays": 2,
+      "hasCounter": false,
+      "category": "Core features",
+      "categoryAr": "المميزات الأساسية",
+      "order": 0
+    },
+    {
+      "id": "push_notifications",
+      "name": "Push Notifications",
+      "nameAr": "الإشعارات الفورية",
+      "unitPrice": 50,
+      "unitTimeDays": 1,
+      "hasCounter": false,
+      "category": "Core features",
+      "categoryAr": "المميزات الأساسية",
+      "order": 1
+    },
+    {
+      "id": "maps_tracking",
+      "name": "Real-time Maps & Live Tracking",
+      "nameAr": "الخرائط والتتبع المباشر",
+      "unitPrice": 150,
+      "unitTimeDays": 4,
+      "hasCounter": false,
+      "category": "Core features",
+      "categoryAr": "المميزات الأساسية",
+      "order": 2
+    },
+    {
+      "id": "payment_gateway",
+      "name": "Payment Gateway",
+      "nameAr": "بوابة الدفع",
+      "unitPrice": 120,
+      "unitTimeDays": 3,
+      "hasCounter": false,
+      "category": "Core features",
+      "categoryAr": "المميزات الأساسية",
+      "order": 3
+    },
+    {
+      "id": "offline_mode",
+      "name": "Offline Mode (Local DB)",
+      "nameAr": "وضع العمل بدون إنترنت (قاعدة بيانات محلية)",
+      "unitPrice": 80,
+      "unitTimeDays": 2,
+      "hasCounter": false,
+      "category": "Core features",
+      "categoryAr": "المميزات الأساسية",
+      "order": 4
+    },
+    {
+      "id": "admin_dashboard",
+      "name": "Admin Web Dashboard",
+      "nameAr": "لوحة تحكم ويب للإدارة",
+      "unitPrice": 250,
+      "unitTimeDays": 5,
+      "hasCounter": false,
+      "category": "Advanced",
+      "categoryAr": "مميزات متقدمة",
+      "order": 5
+    },
+    {
+      "id": "chat",
+      "name": "Chat / Messaging",
+      "nameAr": "المحادثات والرسائل",
+      "unitPrice": 150,
+      "unitTimeDays": 4,
+      "hasCounter": false,
+      "category": "Advanced",
+      "categoryAr": "مميزات متقدمة",
+      "order": 6
+    },
+    {
+      "id": "ai_chatbot",
+      "name": "AI Chatbot Integration",
+      "nameAr": "دمج شات بوت ذكاء اصطناعي",
+      "unitPrice": 200,
+      "unitTimeDays": 4,
+      "hasCounter": false,
+      "category": "Advanced",
+      "categoryAr": "مميزات متقدمة",
+      "order": 7
+    },
+    {
+      "id": "multi_language",
+      "name": "Multi-language Support",
+      "nameAr": "دعم تعدد اللغات",
+      "unitPrice": 40,
+      "unitTimeDays": 1,
+      "hasCounter": true,
+      "category": "Customization",
+      "categoryAr": "التخصيص",
+      "order": 8
+    },
+    {
+      "id": "custom_api",
+      "name": "Custom API Integration",
+      "nameAr": "ربط APIs مخصصة",
+      "unitPrice": 70,
+      "unitTimeDays": 2,
+      "hasCounter": true,
+      "category": "Customization",
+      "categoryAr": "التخصيص",
+      "order": 9
+    },
+    {
+      "id": "extra_screen",
+      "name": "Extra Screen",
+      "nameAr": "شاشة إضافية",
+      "unitPrice": 30,
+      "unitTimeDays": 1,
+      "hasCounter": true,
+      "category": "Customization",
+      "categoryAr": "التخصيص",
+      "order": 10
+    },
+    {
+      "id": "theme_support",
+      "name": "Dark/Light Theme Support",
+      "nameAr": "دعم الوضع الليلي والنهاري",
+      "unitPrice": 40,
+      "unitTimeDays": 1,
+      "hasCounter": false,
+      "category": "Customization",
+      "categoryAr": "التخصيص",
+      "order": 11
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics & Reporting",
+      "nameAr": "التحليلات والتقارير",
+      "unitPrice": 100,
+      "unitTimeDays": 2,
+      "hasCounter": false,
+      "category": "Launch",
+      "categoryAr": "الإطلاق",
+      "order": 12
+    },
+    {
+      "id": "publishing",
+      "name": "App Store + Google Play Publishing",
+      "nameAr": "النشر على App Store وGoogle Play",
+      "unitPrice": 80,
+      "unitTimeDays": 1,
+      "hasCounter": false,
+      "category": "Launch",
+      "categoryAr": "الإطلاق",
+      "order": 13
+    }
+  ],
+  "siteContent": {
+    "fullNameEn": "Marco Nagy Louka",
+    "fullNameAr": "ماركو ناجي لوقا",
+    "roleEn": "Flutter Developer",
+    "roleAr": "مطوّر تطبيقات Flutter",
+    "monogram": "MN",
+    "locationEn": "Alexandria, Egypt",
+    "locationAr": "الإسكندرية، مصر",
+    "profileImage": {
+      "kind": "asset",
+      "value": "assets/images/profile.png"
+    },
+    "email": "marconbishay@gmail.com",
+    "phone": "01220407005",
+    "gitHubUrl": "https://github.com/Marco-Nagy",
+    "linkedInUrl": "https://linkedin.com/in/marco-nagy",
+    "hostedCvUrl": "",
+    "heroGreetingEn": "Hi, I'm",
+    "heroGreetingAr": "أهلًا، أنا",
+    "heroNameEn": "Marco.",
+    "heroNameAr": "ماركو.",
+    "heroRoleEn": "Flutter Developer.",
+    "heroRoleAr": "مطوّر تطبيقات Flutter.",
+    "roleTagsEn": [
+      "Flutter Developer",
+      "Mobile Engineer",
+      "Clean Architecture"
+    ],
+    "roleTagsAr": [
+      "مطوّر Flutter",
+      "مهندس تطبيقات موبايل",
+      "Clean Architecture"
+    ],
+    "summaryEn": "Flutter Developer with 4+ years of experience building and maintaining production mobile applications, including ERP and e-commerce systems. Hands-on experience managing application state with Bloc, integrating REST APIs, and implementing local data persistence for offline usage. Open to remote, hybrid, or on-site Flutter roles within product-driven teams.",
+    "summaryAr": "مطوّر تطبيقات Flutter بخبرة تتجاوز 4 سنوات في بناء وصيانة تطبيقات موبايل حية، منها أنظمة ERP ومنصات تجارة إلكترونية. خبرة عملية في إدارة الحالة باستخدام Bloc، وربط REST APIs، وتنفيذ التخزين المحلي لدعم العمل بدون إنترنت. متاح للعمل عن بُعد أو هجين أو حضوري ضمن فرق منتج.",
+    "aboutLeadEn": "I build production Flutter apps that people use every day.",
+    "aboutLeadAr": "أبني تطبيقات Flutter حية يستخدمها الناس كل يوم.",
+    "aboutStatementsEn": [
+      "I build and maintain production Flutter apps — ERP systems, e-commerce platforms, and real-time delivery tracking — with 4+ years of shipping to real users.",
+      "I specialize in Clean Architecture and Bloc, integrating REST APIs and implementing local persistence so apps stay useful offline.",
+      "I also have a strong passion for reliability — unit testing, structured error handling, and CI/CD pipelines that keep releases boring."
+    ],
+    "aboutStatementsAr": [
+      "أبني وأصون تطبيقات Flutter حية — أنظمة ERP ومنصات تجارة إلكترونية وتتبع توصيل في الوقت الفعلي — بخبرة تتجاوز 4 سنوات من الإطلاق لمستخدمين حقيقيين.",
+      "أتخصص في Clean Architecture وBloc، مع ربط REST APIs وتنفيذ التخزين المحلي ليظل التطبيق مفيدًا بدون إنترنت.",
+      "ولديّ شغف كبير بالاعتمادية — الاختبارات الوحدوية ومعالجة الأخطاء المنظمة وخطوط CI/CD التي تجعل الإصدارات هادئة وخالية من المفاجآت."
+    ],
+    "footerHeadlineEn": "Let's work together.",
+    "footerHeadlineAr": "لنعمل معًا.",
+    "footerAvailabilityEn": "I'm available for full-time roles and freelance Flutter projects — remote, hybrid, or on-site.",
+    "footerAvailabilityAr": "متاح لوظائف بدوام كامل ومشاريع Flutter حرة — عن بُعد أو هجين أو حضوري.",
+    "contactTitleEn": "Get in touch.",
+    "contactTitleAr": "تواصل معي.",
+    "contactSubtitleEn": "Have a project in mind, or a role you think fits? Send me a message — I reply quickly.",
+    "contactSubtitleAr": "لديك مشروع في ذهنك أو وظيفة تراها مناسبة؟ أرسل لي رسالة — أرد سريعًا."
+  },
+  "skillGroups": [
+    {
+      "id": "state_management",
+      "labelEn": "State Management",
+      "labelAr": "إدارة الحالة",
+      "skills": [
+        "Bloc",
+        "Provider"
+      ],
+      "order": 0
+    },
+    {
+      "id": "architecture",
+      "labelEn": "Architecture",
+      "labelAr": "هندسة البرمجيات",
+      "skills": [
+        "Clean Architecture",
+        "MVVM",
+        "MVI"
+      ],
+      "order": 1
+    },
+    {
+      "id": "api_integration",
+      "labelEn": "API Integration",
+      "labelAr": "ربط الـ APIs",
+      "skills": [
+        "RESTful APIs",
+        "GraphQL"
+      ],
+      "order": 2
+    },
+    {
+      "id": "database",
+      "labelEn": "Database",
+      "labelAr": "قواعد البيانات",
+      "skills": [
+        "Firebase",
+        "SQLite",
+        "Hive"
+      ],
+      "order": 3
+    },
+    {
+      "id": "maps",
+      "labelEn": "Maps",
+      "labelAr": "الخرائط",
+      "skills": [
+        "Live Tracking",
+        "Search Places",
+        "Polylines"
+      ],
+      "order": 4
+    },
+    {
+      "id": "ci_cd",
+      "labelEn": "CI/CD",
+      "labelAr": "التكامل والنشر المستمر",
+      "skills": [
+        "Fastlane",
+        "GitHub Actions"
+      ],
+      "order": 5
+    },
+    {
+      "id": "other",
+      "labelEn": "Other",
+      "labelAr": "مهارات أخرى",
+      "skills": [
+        "OOP",
+        "SOLID",
+        "Design Patterns",
+        "Unit Testing",
+        "Flutter Flavors",
+        "GitFlow"
+      ],
+      "order": 6
+    }
+  ],
+  "techBadges": [
+    {
+      "id": "flutter",
+      "label": "Flutter",
+      "iconKey": "flutter",
+      "order": 0
+    },
+    {
+      "id": "firebase",
+      "label": "Firebase",
+      "iconKey": "firebase",
+      "order": 1
+    },
+    {
+      "id": "bloc",
+      "label": "Bloc",
+      "iconKey": "bloc",
+      "order": 2
+    },
+    {
+      "id": "rest",
+      "label": "REST",
+      "iconKey": "api",
+      "order": 3
+    },
+    {
+      "id": "maps",
+      "label": "Maps",
+      "iconKey": "maps",
+      "order": 4
+    },
+    {
+      "id": "cicd",
+      "label": "CI/CD",
+      "iconKey": "cicd",
+      "order": 5
+    }
+  ],
+  "sections": [
+    {
+      "id": "home",
+      "type": "hero",
+      "kind": "builtIn",
+      "titleEn": "Home",
+      "titleAr": "الرئيسية",
+      "order": 0,
+      "visible": true
+    },
+    {
+      "id": "about",
+      "type": "statement",
+      "kind": "builtIn",
+      "titleEn": "About",
+      "titleAr": "نبذة عني",
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "experience",
+      "type": "timeline",
+      "kind": "builtIn",
+      "titleEn": "Experience",
+      "titleAr": "الخبرة العملية",
+      "order": 2,
+      "visible": true
+    },
+    {
+      "id": "projects",
+      "type": "listRows",
+      "kind": "builtIn",
+      "titleEn": "Projects",
+      "titleAr": "المشاريع",
+      "order": 3,
+      "visible": true
+    },
+    {
+      "id": "certificates",
+      "type": "imageGrid",
+      "kind": "builtIn",
+      "titleEn": "Certificates",
+      "titleAr": "الشهادات",
+      "order": 4,
+      "visible": true
+    },
+    {
+      "id": "pricing",
+      "type": "pricing",
+      "kind": "builtIn",
+      "titleEn": "Pricing",
+      "titleAr": "الأسعار",
+      "order": 5,
+      "visible": true
+    },
+    {
+      "id": "contact",
+      "type": "contact",
+      "kind": "builtIn",
+      "titleEn": "Contact",
+      "titleAr": "تواصل معي",
+      "order": 6,
+      "visible": true
+    }
+  ],
+  "customItems": {},
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "updatedAt": "2026-09-09T21:52:41.874Z"
+}

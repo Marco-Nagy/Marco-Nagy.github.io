@@ -2,6 +2,7 @@ import '../../../../core/common/data_result.dart';
 import '../entities/certificate.dart';
 import '../entities/custom_section_item.dart';
 import '../entities/personal_project.dart';
+import '../entities/portfolio_bundle.dart';
 import '../entities/pricing_add_on.dart';
 import '../entities/pricing_package.dart';
 import '../entities/section_definition.dart';
@@ -86,5 +87,52 @@ abstract class PortfolioRepo {
     String itemId,
   );
 
-  Future<DataResult<void>> resetToSeed();
+  // Whole-store access.
+
+  /// Every collection as one [PortfolioBundle] — the shape Firestore stores
+  /// and the admin exports. Reads the same in-memory caches the per-entity
+  /// getters use, so this is not a fresh decode of the whole store.
+  Future<DataResult<PortfolioBundle>> readBundle();
+
+  /// Brings the local cache up to date with Firestore, once, at startup.
+  ///
+  /// Every other read on this interface stays a plain cache read. Putting the
+  /// version check inside each of them instead would turn one page into
+  /// dozens of round trips, and none of them could then be synchronous.
+  ///
+  /// Never fails in a way a visitor sees: an unreachable Firestore, a missing
+  /// document and a stale cache all resolve to "render what we have", falling
+  /// back through cache, then the committed JSON asset (D3), then whatever the
+  /// local store holds — empty, on a device that has never synced at all.
+  Future<DataResult<PortfolioBundle>> syncFromRemote();
+
+  /// Discards local edits and reloads the last published content — what the
+  /// admin's "Reset" action means now that content lives in Firestore rather
+  /// than in hardcoded seed constants.
+  ///
+  /// Unlike [syncFromRemote], this always re-fetches: an admin's unpublished
+  /// local edit never changes the cached [PortfolioBundle.contentVersion] (only
+  /// a publish does), so a version-matches-cache check would treat "identical
+  /// version, different content" as nothing to do and silently keep the edit —
+  /// exactly the case this exists to undo.
+  ///
+  /// Falls back to the committed JSON asset if Firestore is unreachable, and
+  /// fails outright — leaving the current local content untouched — only when
+  /// neither is available. Untouched is the right failure mode: there is
+  /// nothing trustworthy to replace it with, and wiping it would be worse than
+  /// refusing.
+  Future<DataResult<PortfolioBundle>> resetToPublished();
+
+  /// Writes every local collection to Firestore as one new published version,
+  /// via [PortfolioRemoteDataSource.writeBundle] — which bumps
+  /// [PortfolioBundle.contentVersion] and stamps [PortfolioBundle.updatedAt] in
+  /// the same batch that writes `content/bundle`, so a reader can never
+  /// observe the version number ahead of the content it describes.
+  ///
+  /// Requires the signed-in owner account. That is enforced by Firestore's
+  /// security rules, not checked here — a signed-out attempt is expected to
+  /// surface as [Fail] from the write itself, the same as any other rejected
+  /// request, rather than a separate client-side auth check duplicating what
+  /// the rules already guarantee.
+  Future<DataResult<PortfolioBundle>> publish();
 }

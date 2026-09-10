@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "60073568220",
+    "project_id": "marco-nagy",
+    "storage_bucket": "marco-nagy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60073568220:android:920b78d8962b7c2f5f5119",
+        "android_client_info": {
+          "package_name": "com.example.marco_portfolio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTW0oN97PZjhNAqe8yEXU79DxIbh45uXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
