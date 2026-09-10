@@ -308,18 +308,24 @@ Skip widget and golden tests.
 
 ## Effort & sequencing
 
-| Phase | Share | Done today | Blocked by |
+*Updated 2026-09-10 — the percentages below are current, not the original snapshot.*
+
+| Phase | Share | Done | Blocked by |
 |---|---|---|---|
-| 0 Firebase setup + bundle | 15% | 0% | — |
-| 1 Read path + cache + seed migration | 10% | ~20% (local layer exists) | 0, 7.1 |
-| 2 Auth + rules + write path | 12% | 0% | 0, 1 |
+| 0 Firebase setup + bundle | 15% | **100%** | — |
+| 1 Read path + cache + seed migration | 10% | **100%** | 0, 7.1 |
+| 2 Auth + rules + write path | 12% | **100%** | 0, 1 |
 | 3 Static → dynamic | 22% | **100%** | — (parallel to 0–2) |
 | 4 Missing forms | 18% | **100%** | 3 (for SiteContent/Skills) |
-| 5 Reorder | 6% | ~15% (repo support) | 4 |
+| 5 Reorder | 6% | ~30% (repo support + rename/hide shipped in 4c) | 4 |
 | 6 Media | 12% | 0% | 0, 2 |
-| 7 Tests | 5% | 0% | interleaved |
+| 7 Tests | 5% | ~80% (7.1–7.3 landed, plus five not on the original list) | interleaved |
 
-Critical path: **0 → 7.1 → 1 → 2 → 6**. Phase 3 is the largest single chunk and runs in parallel with 0–2.
+**77% done.** What remains is Phase 6 (12%), Phase 5 (6%) and the last of Phase 7 (~1%).
+
+Critical path was **0 → 7.1 → 1 → 2 → 6**; everything before 6 is now behind us, so **Phase 6 is the whole remaining critical path**. Phase 5 blocks nothing and can be taken at any time.
+
+**Phase 6 is also the only remaining phase a visitor can see.** Nine of the ten image paths in the published bundle point at files that do not exist (`assets/projects/flowery_store_1.png` and its eight siblings), so every project on the live site renders a placeholder today, while ~40 MB of real media sits orphaned in `assets/projects/` wired to nothing. Phase 5 is admin convenience by comparison.
 
 Suggested PR order: `0` · `7.1` · `1` · `2` · `3a+3b` · `3c` · `4` · `5` · `6` · `7.2–7.5`.
 

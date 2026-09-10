@@ -58,31 +58,43 @@ class MarcoPortfolioApp extends StatelessWidget {
           // The design size is chosen from the real window width before
           // ScreenUtil initialises. A fixed phone design size would scale
           // everything ~4.9x on a 1920px window and overflow every row.
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return ScreenUtilInit(
-                designSize: AppBreakpoints.designSizeOf(constraints.maxWidth),
-                minTextAdapt: true,
-                splitScreenMode: true,
-                builder: (context, child) {
-                  return MaterialApp(
-                    debugShowCheckedModeBanner: false,
-                    // Runs with a localized context, so the browser tab title
-                    // follows the selected language.
-                    onGenerateTitle: (context) =>
-                        context.translate(LangKeys.appTitle),
-                    theme: AppTheme.navy(),
-                    locale: locale,
-                    supportedLocales: AppLocalizationsSetup.supportedLocales,
-                    localizationsDelegates:
-                        AppLocalizationsSetup.localizationsDelegates,
-                    localeResolutionCallback:
-                        AppLocalizationsSetup.localeResolutionCallback,
-                    initialRoute: RouteNames.splash,
-                    onGenerateRoute: AppRoutes.onGenerateRoute,
-                    navigatorObservers: <NavigatorObserver>[appRouteObserver],
-                  );
-                },
+          //
+          // Read from the view's MediaQuery — the one `View` installs above
+          // this widget — and deliberately NOT from a LayoutBuilder. A
+          // LayoutBuilder here would build MaterialApp, and with it the
+          // Navigator and its Overlay, from inside a layout callback: every
+          // resize would then reparent overlay entries (each Tooltip is one)
+          // during layout, and `Overlay._addDeferredChild` would mark a
+          // render object outside the current layout scope as needing layout.
+          // That is the "_RenderLayoutBuilder was mutated in
+          // _RenderLayoutBuilder.performLayout" assertion. MediaQuery gives
+          // the same width one phase earlier, during build, where rebuilding
+          // the app subtree is legal.
+          final designSize = AppBreakpoints.designSizeOf(
+            MediaQuery.sizeOf(context).width,
+          );
+
+          return ScreenUtilInit(
+            designSize: designSize,
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (context, child) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                // Runs with a localized context, so the browser tab title
+                // follows the selected language.
+                onGenerateTitle: (context) =>
+                    context.translate(LangKeys.appTitle),
+                theme: AppTheme.navy(),
+                locale: locale,
+                supportedLocales: AppLocalizationsSetup.supportedLocales,
+                localizationsDelegates:
+                    AppLocalizationsSetup.localizationsDelegates,
+                localeResolutionCallback:
+                    AppLocalizationsSetup.localeResolutionCallback,
+                initialRoute: RouteNames.splash,
+                onGenerateRoute: AppRoutes.onGenerateRoute,
+                navigatorObservers: <NavigatorObserver>[appRouteObserver],
               );
             },
           );
