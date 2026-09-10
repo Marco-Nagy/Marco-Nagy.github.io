@@ -310,4 +310,19 @@ class LangKeys {
       'field_home_works_more_label_ar';
   static const String fieldHomeWorksViewAllEn = 'field_home_works_view_all_en';
   static const String fieldHomeWorksViewAllAr = 'field_home_works_view_all_ar';
+
+  // Skills and Sections manager screens.
+  static const String adminSkills = 'admin_skills';
+  static const String adminSections = 'admin_sections';
+  static const String formAddSkillGroup = 'form_add_skill_group';
+  static const String formEditSkillGroup = 'form_edit_skill_group';
+  static const String fieldSkillGroupLabelEn = 'field_skill_group_label_en';
+  static const String fieldSkillGroupLabelAr = 'field_skill_group_label_ar';
+  static const String fieldSkillNames = 'field_skill_names';
+  static const String skillsEmpty = 'skills_empty';
+  static const String formEditSection = 'form_edit_section';
+  static const String fieldSectionTitleEn = 'field_section_title_en';
+  static const String fieldSectionTitleAr = 'field_section_title_ar';
+  static const String fieldSectionVisible = 'field_section_visible';
+  static const String sectionsHiddenHint = 'sections_hidden_hint';
 }

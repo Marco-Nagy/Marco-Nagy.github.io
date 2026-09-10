@@ -280,5 +280,19 @@
   "field_home_works_more_label_en": "Works \"more\" label (English)",
   "field_home_works_more_label_ar": "Works \"more\" label (Arabic)",
   "field_home_works_view_all_en": "Works \"view all\" link (English)",
-  "field_home_works_view_all_ar": "Works \"view all\" link (Arabic)"
+  "field_home_works_view_all_ar": "Works \"view all\" link (Arabic)",
+
+  "admin_skills": "Skills",
+  "admin_sections": "Sections",
+  "form_add_skill_group": "Add skill group",
+  "form_edit_skill_group": "Edit skill group",
+  "field_skill_group_label_en": "Group label (English)",
+  "field_skill_group_label_ar": "Group label (Arabic)",
+  "field_skill_names": "Skills (one per line, not translated)",
+  "skills_empty": "No skill groups yet.",
+  "form_edit_section": "Rename section",
+  "field_section_title_en": "Section title (English)",
+  "field_section_title_ar": "Section title (Arabic)",
+  "field_section_visible": "Shown in the nav",
+  "sections_hidden_hint": "Hidden sections keep their content and can be shown again."
 }

@@ -280,5 +280,19 @@
   "field_home_works_more_label_en": "وسم المزيد (إنجليزي)",
   "field_home_works_more_label_ar": "وسم المزيد (عربي)",
   "field_home_works_view_all_en": "رابط عرض الكل (إنجليزي)",
-  "field_home_works_view_all_ar": "رابط عرض الكل (عربي)"
+  "field_home_works_view_all_ar": "رابط عرض الكل (عربي)",
+
+  "admin_skills": "المهارات",
+  "admin_sections": "الأقسام",
+  "form_add_skill_group": "إضافة مجموعة مهارات",
+  "form_edit_skill_group": "تعديل مجموعة المهارات",
+  "field_skill_group_label_en": "اسم المجموعة (إنجليزي)",
+  "field_skill_group_label_ar": "اسم المجموعة (عربي)",
+  "field_skill_names": "المهارات (واحدة بكل سطر، بدون ترجمة)",
+  "skills_empty": "لا توجد مجموعات مهارات بعد.",
+  "form_edit_section": "إعادة تسمية القسم",
+  "field_section_title_en": "عنوان القسم (إنجليزي)",
+  "field_section_title_ar": "عنوان القسم (عربي)",
+  "field_section_visible": "ظاهر في القائمة",
+  "sections_hidden_hint": "الأقسام المخفية تحتفظ بمحتواها ويمكن إظهارها مرة أخرى."
 }

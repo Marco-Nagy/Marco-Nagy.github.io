@@ -151,6 +151,134 @@ void main() {
     );
   });
 
+  // Phase 4c gave both of these cubits a UI that dispatches Save*, which
+  // nothing had ever done. The failure mode to guard is an upsert that appends
+  // instead of replacing: on screen that reads as the edited record appearing
+  // twice, or a hidden section quietly coming back, and it survives a reload
+  // because the duplicate is really in the store.
+  group('editing through the cubits', () {
+    test('hiding a section replaces it rather than adding a second', () async {
+      await local.writeAll(
+        PortfolioBundle(
+          sections: <SectionDefinition>[
+            const SectionDefinition(id: 'home', type: SectionType.hero),
+            const SectionDefinition(
+              id: 'pricing',
+              type: SectionType.pricing,
+              order: 1,
+            ),
+          ],
+        ),
+      );
+
+      final cubit = SectionsCubit(SectionsUseCase(repo))
+        ..doAction(LoadSections());
+      await Future<void>.delayed(Duration.zero);
+
+      cubit.doAction(
+        SaveSection(cubit.byId('pricing')!.copyWith(visible: false)),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.sections, hasLength(2));
+      expect(cubit.visible.map((s) => s.id), <String>['home']);
+
+      // A fresh cubit over the same store: the toggle has to have reached
+      // storage, not just the in-memory list the screen was reading.
+      final reloaded = SectionsCubit(SectionsUseCase(repo))
+        ..doAction(LoadSections());
+      await Future<void>.delayed(Duration.zero);
+
+      expect(reloaded.sections, hasLength(2));
+      expect(reloaded.byId('pricing')!.visible, isFalse);
+    });
+
+    test('renaming a section keeps everything else on it', () async {
+      await local.writeAll(
+        PortfolioBundle(
+          sections: <SectionDefinition>[
+            const SectionDefinition(
+              id: 'about',
+              type: SectionType.statement,
+              titleEn: 'About',
+              titleAr: 'نبذة',
+              order: 3,
+            ),
+          ],
+        ),
+      );
+
+      final cubit = SectionsCubit(SectionsUseCase(repo))
+        ..doAction(LoadSections());
+      await Future<void>.delayed(Duration.zero);
+
+      cubit.doAction(
+        SaveSection(cubit.byId('about')!.copyWith(titleEn: 'Who I am')),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      final saved = cubit.byId('about')!;
+      expect(saved.titleEn, 'Who I am');
+      expect(saved.titleAr, 'نبذة');
+      expect(saved.order, 3);
+      expect(saved.type, SectionType.statement);
+    });
+
+    test(
+      'editing a skill group replaces it rather than adding a second',
+      () async {
+        await local.writeAll(
+          PortfolioBundle(
+            skillGroups: <SkillGroupEntity>[
+              const SkillGroupEntity(
+                id: 'state',
+                labelEn: 'State',
+                skills: <String>['Bloc'],
+              ),
+            ],
+          ),
+        );
+
+        final cubit = SkillsCubit(SkillsUseCase(repo))..doAction(LoadSkills());
+        await Future<void>.delayed(Duration.zero);
+
+        cubit.doAction(
+          SaveSkillGroup(
+            cubit.orderedGroups.single.copyWith(
+              skills: <String>['Bloc', 'Provider'],
+            ),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        expect(cubit.orderedGroups, hasLength(1));
+        expect(cubit.orderedGroups.single.skills, <String>['Bloc', 'Provider']);
+      },
+    );
+
+    test('adding a skill group leaves the existing ones alone', () async {
+      await local.writeAll(
+        PortfolioBundle(
+          skillGroups: <SkillGroupEntity>[
+            const SkillGroupEntity(id: 'state', labelEn: 'State'),
+          ],
+        ),
+      );
+
+      final cubit = SkillsCubit(SkillsUseCase(repo))..doAction(LoadSkills());
+      await Future<void>.delayed(Duration.zero);
+
+      cubit.doAction(
+        SaveSkillGroup(
+          const SkillGroupEntity(id: 'ci', labelEn: 'CI/CD', order: 1),
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.orderedGroups.map((g) => g.id), <String>['state', 'ci']);
+    });
+  });
+
   group('SiteContentCubit', () {
     test('holds usable defaults before any read lands', () {
       final cubit = SiteContentCubit(SiteContentUseCase(repo));

@@ -11,7 +11,9 @@ import '../../../features/portfolio_content/domain/use_cases/bundle_use_case.dar
     show BundleExport, BundleUseCase;
 import '../../../features/portfolio_content/presentation/view_model/site_content_actions.dart';
 import '../../../features/portfolio_content/presentation/view_model/site_content_view_model.dart';
+import '../../../features/portfolio_content/presentation/widgets/sections_manager_screen.dart';
 import '../../../features/portfolio_content/presentation/widgets/site_content_form_screen.dart';
+import '../../../features/portfolio_content/presentation/widgets/skills_manager_screen.dart';
 import '../../common/data_result.dart';
 import '../../localization/lang_keys.dart';
 import '../../services/auth/admin_auth_service.dart';
@@ -76,6 +78,19 @@ class _AdminFabState extends State<AdminFab> {
     // Saves to the local cache only. Publish is what sends it to Firestore —
     // deliberately two steps, so editing and going live stay separate.
     cubit.doAction(SaveSiteContent(built));
+  }
+
+  /// Both managers save as they go, so there is nothing to dispatch here —
+  /// unlike the site-content form, which pops a value for this widget to hand
+  /// to the cubit.
+  Future<void> _manageSkills() async {
+    setState(() => _open = false);
+    await SkillsManagerScreen.open(context);
+  }
+
+  Future<void> _manageSections() async {
+    setState(() => _open = false);
+    await SectionsManagerScreen.open(context);
   }
 
   Future<void> _publish() async {
@@ -195,6 +210,18 @@ class _AdminFabState extends State<AdminFab> {
                   icon: Icons.article_outlined,
                   busy: _busy,
                   onPressed: _editSiteContent,
+                ),
+                _AdminFabAction(
+                  label: context.translate(LangKeys.adminSkills),
+                  icon: Icons.workspace_premium_outlined,
+                  busy: _busy,
+                  onPressed: _manageSkills,
+                ),
+                _AdminFabAction(
+                  label: context.translate(LangKeys.adminSections),
+                  icon: Icons.view_agenda_outlined,
+                  busy: _busy,
+                  onPressed: _manageSections,
                 ),
               ],
               SizedBox(height: 12.h),
