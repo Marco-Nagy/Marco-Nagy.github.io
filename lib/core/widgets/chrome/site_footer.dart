@@ -8,6 +8,8 @@ import '../../styles/fonts/my_fonts.dart';
 import '../../utils/extension/context_extensions.dart';
 import '../../utils/extension/site_content_extensions.dart';
 import '../../utils/responsive/app_breakpoints.dart';
+import '../admin/admin_gate.dart';
+import '../admin/admin_sign_in_sheet.dart';
 import '../common/hatched_circle.dart';
 import '../common/pill_button.dart';
 import '../motion/block_reveal_text.dart';
@@ -131,12 +133,40 @@ class _FooterCredits extends StatelessWidget {
           style: style,
         ),
         SizedBox(height: 6.h),
-        Text(
-          context.translate(LangKeys.footerBuiltWith),
-          textAlign: TextAlign.center,
-          style: style,
-        ),
+        const _BuiltWithLine(),
       ],
+    );
+  }
+}
+
+/// "Built with Flutter 💙" — and, in the admin build only, the way in.
+///
+/// Deliberately *outside* [AdminGate]: when nothing is signed in, every other
+/// admin affordance is hidden, so this has to be reachable to open the sign-in
+/// sheet at all. It stays a plain, inert line in a public build, where
+/// [AdminGate.isEnabled] is a compile-time `false` and the branch below is
+/// dropped along with the sheet it would have opened.
+class _BuiltWithLine extends StatelessWidget {
+  const _BuiltWithLine();
+
+  @override
+  Widget build(BuildContext context) {
+    final style = MyFonts.regular12.copyWith(color: context.colors.onNavyFaint);
+    final line = Text(
+      context.translate(LangKeys.footerBuiltWith),
+      textAlign: TextAlign.center,
+      style: style,
+    );
+
+    if (!AdminGate.isEnabled) return line;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => AdminSignInSheet.show(context),
+        child: line,
+      ),
     );
   }
 }

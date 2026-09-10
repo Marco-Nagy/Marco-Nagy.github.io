@@ -1,1 +1,49 @@
-{"firestore":{"rules":"firestore.rules"},"flutter":{"platforms":{"android":{"default":{"projectId":"marco-nagy","appId":"1:60073568220:android:920b78d8962b7c2f5f5119","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"marco-nagy","configurations":{"android":"1:60073568220:android:920b78d8962b7c2f5f5119","ios":"1:60073568220:ios:a70bc63d0ba452305f5119","macos":"1:60073568220:ios:a70bc63d0ba452305f5119","web":"1:60073568220:web:18c0d23b707c09805f5119","windows":"1:60073568220:web:5a6cec09e0acc6b95f5119"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "build/admin",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "marco-nagy",
+          "appId": "1:60073568220:android:920b78d8962b7c2f5f5119",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "marco-nagy",
+          "configurations": {
+            "android": "1:60073568220:android:920b78d8962b7c2f5f5119",
+            "ios": "1:60073568220:ios:a70bc63d0ba452305f5119",
+            "macos": "1:60073568220:ios:a70bc63d0ba452305f5119",
+            "web": "1:60073568220:web:18c0d23b707c09805f5119",
+            "windows": "1:60073568220:web:5a6cec09e0acc6b95f5119"
+          }
+        }
+      }
+    }
+  }
+}
