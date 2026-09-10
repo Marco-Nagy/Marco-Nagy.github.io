@@ -276,7 +276,6 @@ class LangKeys {
   static const String adminChangePhoto = 'admin_change_photo';
   static const String adminRemovePhoto = 'admin_remove_photo';
   static const String adminCropPhoto = 'admin_crop_photo';
-  static const String adminPhotoHeavyEmbed = 'admin_photo_heavy_embed';
   static const String fieldEmail = 'field_email';
   static const String fieldPhone = 'field_phone';
   static const String fieldGithubUrl = 'field_github_url';

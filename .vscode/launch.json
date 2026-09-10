@@ -4,12 +4,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // Cloudinary's api_key/api_secret are read via --dart-define-from-file
+      // rather than typed here, because launch.json itself is committed —
+      // create cloudinary.local.json (gitignored; copy
+      // cloudinary.local.json.example) before using this configuration.
       "name": "Web (debug) — admin visible",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "deviceId": "chrome",
-      "args": ["--web-port", "8080"]
+      "args": [
+        "--web-port",
+        "8080",
+        "--dart-define-from-file",
+        "cloudinary.local.json"
+      ]
     },
     {
       "name": "Web (release) — verify no admin UI",

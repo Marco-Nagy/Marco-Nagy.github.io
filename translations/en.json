@@ -252,7 +252,6 @@
   "admin_change_photo": "Change photo",
   "admin_remove_photo": "Remove photo",
   "admin_crop_photo": "Crop photo",
-  "admin_photo_heavy_embed": "This photo is large for browser storage — try a smaller or simpler source photo.",
   "field_email": "Email",
   "field_phone": "Phone",
   "field_github_url": "GitHub URL",
