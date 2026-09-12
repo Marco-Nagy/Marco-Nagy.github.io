@@ -1,27 +1,14 @@
 /// Every asset path in one place — no raw asset strings in widgets.
+///
+/// Only two entries left, and deliberately so: project media now lives on
+/// Cloudinary with its URL stored in Firestore, so there is nothing for a
+/// hardcoded `assets/projects/...` list to point at. The three that used to
+/// sit here (`floweryStoreShots`, `floweryDeliveryShots`, `fitnessAppShots`)
+/// named nine files that were never in the repo at all — they logged a 404
+/// each on every web run and had no call sites.
 class AppImages {
   const AppImages._();
 
   static const String profile = 'assets/images/profile.png';
   static const String cvPdf = 'assets/cv/marco_nagy_cv.pdf';
-
-  static const String _projects = 'assets/projects';
-
-  static const List<String> floweryStoreShots = <String>[
-    '$_projects/flowery_store_1.png',
-    '$_projects/flowery_store_2.png',
-    '$_projects/flowery_store_3.png',
-  ];
-
-  static const List<String> floweryDeliveryShots = <String>[
-    '$_projects/flowery_delivery_1.png',
-    '$_projects/flowery_delivery_2.png',
-    '$_projects/flowery_delivery_3.png',
-  ];
-
-  static const List<String> fitnessAppShots = <String>[
-    '$_projects/fitness_app_1.png',
-    '$_projects/fitness_app_2.png',
-    '$_projects/fitness_app_3.png',
-  ];
 }

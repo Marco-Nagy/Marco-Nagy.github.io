@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 
@@ -13,4 +14,10 @@ abstract class RegisterModule {
   /// it unconditionally keeps the DI graph identical across build modes.
   @lazySingleton
   ImagePicker get imagePicker => ImagePicker();
+
+  /// [CloudinaryUploadService] takes its client as a constructor argument so a
+  /// test can hand in a MockClient; in a real run injectable resolves that
+  /// parameter from here, and without this registration it throws instead.
+  @lazySingleton
+  http.Client get httpClient => http.Client();
 }

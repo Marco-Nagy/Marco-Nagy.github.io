@@ -16,7 +16,6 @@ import '../../utils/youtube_thumbnail.dart';
 import '../common/app_media.dart';
 import '../common/underline_text_field.dart';
 import 'admin_choice_field.dart';
-import 'admin_confirm_dialog.dart';
 
 /// Edits one [MediaRef]: pick what kind of thing it is, paste a path or a URL,
 /// and watch the thumbnail resolve underneath.
@@ -70,10 +69,6 @@ class _MediaRefFieldState extends State<MediaRefField> {
   /// Guards against a second picker opening while one is already up.
   bool _picking = false;
 
-  /// True right after [_pinAsAsset] fills the box with a path — the file it
-  /// names may not exist in the project yet, so the reminder to copy it in
-  /// stays up until something else changes the source (typing, re-picking).
-  bool _pendingAssetCopy = false;
 
   /// Set by [_pickAndUpload] when the upload itself fails — a size rejection,
   /// no configuration, or whatever Cloudinary's API reported. Cleared the
@@ -93,11 +88,9 @@ class _MediaRefFieldState extends State<MediaRefField> {
     return media.isVideo ? media.videoUrl : media.image.value;
   }
 
-  /// An http source is a network image; anything else is a bundled asset. Same
-  /// rule the rest of the app reads [ImageRef] by.
-  static ImageRef _imageFrom(String value) => value.startsWith('http')
-      ? ImageRef.network(value)
-      : ImageRef.asset(value);
+  /// The same rule the rest of the app reads a stored source string by —
+  /// see [ImageRef.fromSource], which this used to duplicate.
+  static ImageRef _imageFrom(String value) => ImageRef.fromSource(value);
 
   @override
   void dispose() {
@@ -146,7 +139,6 @@ class _MediaRefFieldState extends State<MediaRefField> {
 
   void _onTyped(String text) {
     final value = text.trim();
-    _pendingAssetCopy = false;
     _emit(
       _value.isVideo
           ? _value.copyWith(videoUrl: value)
@@ -187,7 +179,6 @@ class _MediaRefFieldState extends State<MediaRefField> {
         _value = next;
         _preview = next;
         _normalized = false;
-        _pendingAssetCopy = false;
       });
       widget.onChanged(next);
     } on CloudinaryUploadException catch (error) {
@@ -195,27 +186,6 @@ class _MediaRefFieldState extends State<MediaRefField> {
     } finally {
       if (mounted) setState(() => _picking = false);
     }
-  }
-
-  /// Swaps the embedded bytes for the `assets/...` path a release build ships.
-  /// The path only resolves after the file is copied in and the app rebuilt,
-  /// which is why this is a separate, deliberate press — confirmed rather
-  /// than instant, since the file disappears everywhere it's used the moment
-  /// this runs and stays gone until that copy actually happens.
-  Future<void> _pinAsAsset() async {
-    final path = _source.text.trim();
-    if (path.isEmpty) return;
-
-    final confirmed = await AdminConfirmDialog.show(
-      context,
-      title: context.translate(LangKeys.fieldMediaPin),
-      body: context.translate(LangKeys.fieldMediaPinWarning),
-      confirmLabel: context.translate(LangKeys.fieldMediaPin),
-    );
-    if (!confirmed || !mounted) return;
-
-    _pendingAssetCopy = true;
-    _emit(_value.copyWith(image: _imageFrom(path)));
   }
 
   void _setKind(MediaKind kind) {
@@ -267,7 +237,10 @@ class _MediaRefFieldState extends State<MediaRefField> {
       _malformedSource == null;
 
   String get _sourceHint => switch (_value.kind) {
-    MediaKind.image => 'assets/projects/cover.png',
+    // A Cloudinary URL, not an `assets/...` path: Upload fills this box with
+    // one, and a bundled path is now only a legacy value, not what to aim a
+    // new entry at.
+    MediaKind.image => 'https://res.cloudinary.com/.../cover.png',
     MediaKind.videoFile => 'https://cloud.example.com/s/AbC123/download',
     MediaKind.videoEmbed => 'https://youtu.be/dQw4w9WgXcQ',
   };
@@ -347,23 +320,14 @@ class _MediaRefFieldState extends State<MediaRefField> {
                     ),
                   if (_uploadError != null)
                     _Note(text: _uploadError!, color: colors.danger),
-                  // Pinning assumes the file is already in the project; this
-                  // is the one chance to catch "actually it isn't yet" before
-                  // the preview quietly shows broken.
-                  if (_pendingAssetCopy)
-                    _Note(
-                      text: context.translate(
-                        LangKeys.fieldMediaPickPendingCopy,
-                      ),
-                      color: colors.onNavyFaint,
-                    ),
-                  // Shown as long as the Pin button is: pinning is silent
-                  // and immediate, so the warning has to land before the
-                  // press, not after the file has already vanished.
+                  // Only reachable for content picked before uploads existed:
+                  // nothing embeds any more. Publishing refuses a bundle that
+                  // still carries base64, so this says what actually fixes it
+                  // — re-upload — rather than leaving the admin to guess.
                   if (_value.image.isEmbedded)
                     _Note(
-                      text: context.translate(LangKeys.fieldMediaPinWarning),
-                      color: colors.onNavyFaint,
+                      text: context.translate(LangKeys.fieldMediaEmbeddedLegacy),
+                      color: colors.danger,
                     ),
                   Wrap(
                     spacing: 4.w,
@@ -374,16 +338,6 @@ class _MediaRefFieldState extends State<MediaRefField> {
                         color: colors.accent,
                         onPressed: _picking ? null : _pickAndUpload,
                       ),
-                      // Legacy repair only: a real upload never leaves the
-                      // field embedded, so this can only appear for content
-                      // picked before Cloudinary upload existed.
-                      if (_value.image.isEmbedded)
-                        _MiniButton(
-                          icon: Icons.push_pin_outlined,
-                          label: context.translate(LangKeys.fieldMediaPin),
-                          color: colors.accent,
-                          onPressed: _pinAsAsset,
-                        ),
                     ],
                   ),
                 ],

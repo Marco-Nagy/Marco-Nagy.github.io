@@ -55,3 +55,8 @@ sheet_*.jpg
 tool/serviceAccountKey.json
 tool/node_modules/
 bundle.json
+
+# Cloudinary's api_key/api_secret for signed uploads (Phase 6b) — read via
+# --dart-define-from-file, never hardcoded in launch.json, which IS
+# committed. See cloudinary.local.json.example for the shape to copy.
+cloudinary.local.json

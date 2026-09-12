@@ -39,7 +39,7 @@ class GridCardData {
         certificate.location,
         certificate.locationAr,
       ),
-      image: ImageRef.asset(certificate.imageAsset),
+      image: ImageRef.fromSource(certificate.imageAsset),
     );
   }
 

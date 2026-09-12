@@ -170,6 +170,21 @@ Same shape for Storage. Create a single owner account (email/password), add a si
 
 **Where the sign-in lives — confirmed 2026-09-09.** `AdminGate.isEnabled` stays `kDebugMode`. The sign-in sheet hangs off the `AdminFab` speed-dial *inside* the gate, so it exists only under `flutter run`. There is deliberately **no hidden `/#/admin` route and no release-build sign-in**: Marco edits from his dev machine, and the writes reach visitors live. Rejected alternatives were `kDebugMode || signedIn` behind a hidden route (ships the whole admin form tree — `MediaRefField` alone is 590 lines — to every visitor, against the per-visitor weight budget in "Media is the actual constraint") and the same thing behind a deferred chunk (same reach, more build complexity, still unnecessary). Tree-shaking means admin code is not merely hidden in release; it is absent.
 
+**Superseded 2026-09-11 — there is now a third build, and admin UI does ship in it.** The paragraph above is kept as the record of what was decided; the `kDebugMode`-only gate and the "no release-build sign-in" rule it states are no longer what the code does.
+
+The reasoning holds for the *public* build and is unchanged there. What changed is the premise that "Marco edits from his dev machine": editing from a phone, or from any machine without a Flutter toolchain, was impossible. So `AdminGate` now answers to three cases:
+
+| build | behaviour |
+|---|---|
+| public release (`flutter build web`) | renders nothing; no `ADMIN_BUILD` define, no Cloudinary credential compiled in |
+| admin release (`--dart-define=ADMIN_BUILD=true`) | renders only once Firebase Auth reports a signed-in owner |
+| debug (`flutter run`) | renders immediately, no sign-in — a dev machine is already trusted |
+
+The admin build deploys to Firebase Hosting (free on Spark) at its own unlisted URL, with `X-Robots-Tag: noindex, nofollow`; the public site still goes to GitHub Pages, built exactly as before. The weight objection that sank `kDebugMode || signedIn` above is answered by the separate build rather than by a deferred chunk — visitors fetch a bundle the admin tree was tree-shaken out of, so they carry none of it.
+
+Sign-in is reachable from the footer's "Built with Flutter" line, which sits deliberately *outside* the gate — when nothing is signed in every other admin affordance is hidden, so it is the only way in. On the public build that line is inert text. This remains a UI gate, not the security boundary: Firestore's rules still accept a write only from the owner uid, so whoever finds the admin URL meets a locked screen and would be refused by the server even past it.
+
+
 The `<owner-uid>` literal above is the reason the console step records the UID: `request.auth != null` alone is not enough, because the public `signUp` endpoint stays open by default and the Firebase config ships in the web bundle — anyone could self-register and satisfy it. The UID is an identifier, not a credential, so it is safe to commit in `firestore.rules`; that file deploys via the CLI and never enters the Flutter bundle.
 
 **Status 2026-09-09 — the console half of this phase is already done, ahead of schedule.** The project is `marco-nagy` (project number 60073568220), Firestore is Standard edition in production mode, Email/Password is the only sign-in provider (Email link left off), client sign-up and client delete are both disabled in Authentication → Settings → User actions, and the owner account exists with uid `fGxyNkBNLoZDoaj8DHwWowZMevF3`. `firestore.rules` is committed at the repo root with that uid inlined and deploys with `firebase deploy --only firestore:rules` against the committed `firebase.json` / `.firebaserc` — no `firebase init` is needed. The project is on **Spark**; there is no `storage.rules` because Cloud Storage is not used. Scheduled backups were skipped deliberately: D3's exported JSON in git is the backup, and it versions better than a daily snapshot. What remains of Phase 2 is the app-side work — the sign-in sheet on the `AdminFab`, session persistence, and `writeBundle()` batching the bundle with the `meta.contentVersion` bump.
@@ -257,6 +272,20 @@ Four upsert tests were added with them. These cubits got a UI that dispatches `S
 
 **Build drag-and-drop.** The cost is unusually low: the data source **already** has `saveX(List<T>)` for all 9 collections, each repo method is a `_guard` one-liner, and each use case is a 3-line passthrough (`SectionsUseCase.saveAll` is the template). One new widget — `admin_reorderable_list.dart` wrapping `ReorderableListView` inside an `AdminGate`, so no drag handles ship to visitors. With numeric fields instead, swapping two rows means editing two records and getting the arithmetic right, across 9 entities. Remove the numeric `order` field from `project_form_screen.dart` once this lands — two sources of truth for ordering will drift.
 
+**Status 2026-09-11 — done, for seven collections rather than nine, and the plan's cost estimate above was wrong in one specific way.**
+
+"The data source **already** has `saveX(List<T>)` for all 9 collections" is true — but only of the *data source*. At the repository and use-case layers only `saveSections` existed, so six collections needed a new method at each of three layers before a single row could be dragged. Not hard, but not the one-liner the estimate implied.
+
+Seven collections, not nine: `techBadges` and `customItems` were left out deliberately, because nothing renders them. The hero orbit reads `TechBrandMarks.all` (the Phase 3 decision above), and custom sections still have no renderer — reordering either would have been a control over something invisible.
+
+**Inline drag does not survive contact with two of the seven, so none of them use it.** The plan assumed a `ReorderableListView` could wrap each section in place. Projects and Experience are single-column and would have been fine. Certificates is a two-column `GridView`, which `ReorderableListView` cannot do at all, and Pricing packages render as a horizontal `Row` on desktop. On top of that every section sits inside `PortfolioScaffold`'s own `SingleChildScrollView`, where drag auto-scroll fights the page.
+
+Put to Marco, who chose one uniform answer over a mixed one: a **reorder mode** per section. A `⇅` button (inside `AdminGate`) swaps that section's body for a single-column list of compact rows with drag handles; pressing Done swaps it back. Same gesture everywhere regardless of how the section normally renders, and the compact rows are short enough that the nested-scroll problem mostly stops mattering. `admin_reorderable_list.dart` + `admin_reorder_button.dart`, used seven times.
+
+Ordering is renumbered from list position in the repository (`saveSections`'s existing pattern), not by the caller — so a reorder cannot produce two records claiming the same slot. The numeric `order` field came out of **six** forms, not the one the plan names: certificate, work history, skill group, pricing add-on, pricing package and project all had one, and every one of them was a second source of truth for the same ordering.
+
+`flutter analyze` clean, 70 tests at the time (10 added).
+
 ### Phase 6 — Media: compression + Cloudinary upload · 12% · *needs 0, 2*
 
 **Status 2026-09-09 — the host changed; the shape of the phase did not.** Cloud Storage is no longer offered on Spark for new projects, and upgrading to Blaze turned out to require a **one-time $30 activation payment** on an Egyptian billing account — a real cost, not the $0 the quota analysis had assumed. The project was returned to **Spark** and media moved to **Cloudinary's** free tier. Two alternatives were weighed and rejected: serving media from the repo via GitHub Pages (free and uncapped, but `flutter run -d chrome` cannot write to disk, so the picker could never copy a file into the repo and 6b's honest-upload fix would be impossible), and Supabase Storage (a real storage service with proper per-object policies, but it brings a full SDK, less monthly bandwidth, and no transcoding). Verify Cloudinary's current free-tier numbers before relying on them.
@@ -292,6 +321,40 @@ The account's stock `ml_default` preset is reused rather than adding one: it is 
 
 **6d. `tool/validate_assets.dart`** (plain Dart, CI before release build) — fails on referenced-but-missing local paths, paths outside declared assets directories, orphan files, filenames outside `[a-z0-9._/-]`, and **any `ImageSourceKind.embedded` in the bundle** (base64 must never reach Firestore — it would blow the 1 MiB document limit).
 
+**Status 2026-09-12 — 6b and 6d done; 6a and 6c were overtaken by events and closed differently.**
+
+**The upload is signed, not the unsigned preset this plan argued for.** Marco's call, and it changes the security reasoning above rather than merely the mechanism. `api_key`/`api_secret` are read with `String.fromEnvironment` and supplied by `--dart-define-from-file=cloudinary.local.json`, a gitignored file (`cloudinary.local.json.example` is the committed template). Nothing lands in source, so the "unsigned is safe because the preset name is not a credential" argument is moot — there is a real credential now, and it lives only on the machine that runs the build.
+
+That claim was checked rather than asserted. Building both variants and grepping the output:
+
+```
+public build (flutter build web):   no secret, no api key, no api.cloudinary.com at all
+admin build (ADMIN_BUILD=true):     all three present, as intended — it is never published
+difference in main.dart.js:         ~57 KB
+```
+
+The tree-shaker removed `CloudinaryUploadService` outright from the public build. Worth noting the guarantee that actually matters is the *build command*, not the tree-shaker: compiled without the defines, `String.fromEnvironment` is the empty string, so there is no secret in those binaries to find regardless of how much code survives.
+
+**`uploadDocument` deliberately skips `f_auto,q_auto`.** Cloudinary treats a PDF as an image it is willing to rasterise, so asking it for an automatic format returns a picture of page one instead of the document. Also note a Cloudinary account can block PDF *delivery* by default (`Settings → Security`) — the upload succeeds and the URL then 401s. This account allows it; a new one may not.
+
+**Three places were still not on Cloudinary after the first pass, and two were silent.**
+
+- `ProfilePhotoField` (hero and About photos) was never wired up at all — it still cropped and embedded base64 locally. It failed silently: no error, the photo simply never left the browser. Found only because Marco tried it.
+- Certificate images rendered through a hardcoded `ImageRef.asset(certificate.imageAsset)`, so even a correctly pasted Cloudinary URL would have been read as a local path and shown broken. The rule for reading such a string now lives once, as `ImageRef.fromSource`, instead of being duplicated per form.
+- The CV had no upload at all. `image_picker` cannot open a PDF on any platform, so `file_picker` joined the dependencies for that one job — `image_picker` stays for its `maxWidth`/`imageQuality` resize, which `file_picker` has no equivalent for and which is what keeps a raw phone photo out of the crop editor.
+
+**The crop editor was rewritten by hand, and `crop_your_image` is gone.** Marco reported lag twice. Resizing at pick time (`maxDimension: 1600`, `imageQuality: 85`) helped but was not the cause: that package does its crop in the pure-Dart `image` package inside `compute()`, and `compute()` does not reach a real thread on Flutter Web — there is no general isolate spawning there, so the "background" work runs on the UI thread. The replacement captures the crop natively through `RepaintBoundary.toImage()`, which is both faster and one dependency lighter. Three real bugs came out of rebuilding it: `Transform` passes its incoming constraints through unchanged, which squashed the zoomed image back to frame size so dragging appeared to do nothing (fixed with `OverflowBox`); only pinch-zoom was wired, which a desktop mouse cannot produce (a `Slider` was added); and that slider then overflowed the card by 67px, pushing Save off-screen so it looked dead (the content is now in a `SingleChildScrollView`).
+
+**6a and 6c did not happen as written — the orphaned media was deleted instead of compressed and uploaded.** The five GIFs and the screenshot in `assets/projects/` (~40 MB) were removed with `git rm`, along with `AppImages.floweryStoreShots`/`floweryDeliveryShots`/`fitnessAppShots` — nine paths with zero call sites, each logging a 404 on every web run. They remain in git history if the clips are ever wanted back. The ffmpeg pass in 6a therefore has nothing left to compress; it stays here as the recipe for whenever a clip is next uploaded.
+
+**6d shipped and immediately paid for itself.** `tool/validate_assets.dart` (plain Dart, no Flutter) checks the five things listed above. Its first real run found 15 problems, including two nobody had flagged: `gitHub.svg` and `graphQL.svg` carried capitals, which worked only because the machine they were written on has a case-insensitive filesystem — on a Linux web host they would have 404'd. Both renamed. It now reports clean across 7 directories and 21 files.
+
+**Dead code the Cloudinary decision left behind, now removed.** "Pin as asset" was the notable one: it replaced the field's value with `assets/projects/<name>`, a directory that is now empty, so pressing it would have *broken* a working Cloudinary URL. The workflow it assumed — copy the file into the repo, declare it, rebuild — is exactly what uploading replaced. It is gone, and a legacy embedded image now says to re-upload instead. With it went `ImagePickerService.pick()`, `suggestedAssetPath()` and `embeddedWarnBytes`, all defined and none called, plus three translation keys.
+
+Still open: `MediaKind.videoFile` takes a pasted URL rather than an upload. Deliberate — Marco scoped this pass to images.
+
+`flutter analyze` clean, **100 tests**, `validate_assets` clean.
+
 ### Phase 7 — Tests · 5% · *interleaved; round-trip test precedes deleting the seeds*
 
 Zero tests exist today. Target what can silently destroy content, using `SharedPreferences.setMockInitialValues` and `fake_cloud_firestore`.
@@ -317,15 +380,15 @@ Skip widget and golden tests.
 | 2 Auth + rules + write path | 12% | **100%** | 0, 1 |
 | 3 Static → dynamic | 22% | **100%** | — (parallel to 0–2) |
 | 4 Missing forms | 18% | **100%** | 3 (for SiteContent/Skills) |
-| 5 Reorder | 6% | ~30% (repo support + rename/hide shipped in 4c) | 4 |
-| 6 Media | 12% | 0% | 0, 2 |
-| 7 Tests | 5% | ~80% (7.1–7.3 landed, plus five not on the original list) | interleaved |
+| 5 Reorder | 6% | **100%** (7 of 9 collections; 2 have no renderer) | 4 |
+| 6 Media | 12% | **100%** (6a/6c closed by deleting the orphans instead) | 0, 2 |
+| 7 Tests | 5% | ~95% (7.1–7.3 plus nine not on the original list) | interleaved |
 
-**77% done.** What remains is Phase 6 (12%), Phase 5 (6%) and the last of Phase 7 (~1%).
+**~99% done.** Every phase has landed. What is left is not a phase but a short list: the video half of `MediaRefField` still takes a pasted URL rather than an upload (images only was a deliberate scope call), and the remaining Phase 7 cases from the original list.
 
-Critical path was **0 → 7.1 → 1 → 2 → 6**; everything before 6 is now behind us, so **Phase 6 is the whole remaining critical path**. Phase 5 blocks nothing and can be taken at any time.
+The critical path **0 → 7.1 → 1 → 2 → 6** is complete: content is editable from a deployed admin build, media uploads to Cloudinary, and the resulting URL is stored in Firestore.
 
-**Phase 6 is also the only remaining phase a visitor can see.** Nine of the ten image paths in the published bundle point at files that do not exist (`assets/projects/flowery_store_1.png` and its eight siblings), so every project on the live site renders a placeholder today, while ~40 MB of real media sits orphaned in `assets/projects/` wired to nothing. Phase 5 is admin convenience by comparison.
+**Resolved 2026-09-12.** The nine image paths pointing at files that did not exist (`assets/projects/flowery_store_1.png` and its eight siblings) are gone, along with the ~40 MB of orphaned media they were never wired to, so no project renders a placeholder from a dead asset path any more. `tool/validate_assets.dart` now fails the build if such a path is reintroduced.
 
 Suggested PR order: `0` · `7.1` · `1` · `2` · `3a+3b` · `3c` · `4` · `5` · `6` · `7.2–7.5`.
 

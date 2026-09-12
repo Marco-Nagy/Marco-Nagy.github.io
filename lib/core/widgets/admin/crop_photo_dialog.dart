@@ -184,7 +184,15 @@ class _CropPhotoDialogState extends State<CropPhotoDialog> {
       insetPadding: EdgeInsets.all(24.r),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 480.w, maxHeight: 560.h),
-        child: Padding(
+        // A fixed maxHeight plus a fixed-size crop frame (_frameSize is a
+        // literal 280, not ScreenUtil-scaled like the rest of this dialog)
+        // do not always agree — on a shorter viewport the title, frame, zoom
+        // row and button row together can exceed what actually got laid out,
+        // and the Save button then renders past the visible card instead of
+        // being reachable. Scrolling means that mismatch is never a dead
+        // button again, on any window size, rather than something to keep
+        // re-tuning by hand.
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(20.r),
           child: Column(
             mainAxisSize: MainAxisSize.min,
