@@ -7,6 +7,7 @@ import '../../../../core/utils/id_generator.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/admin/admin_form_screen.dart';
 import '../../../../core/widgets/admin/bilingual_field_pair.dart';
+import '../../../../core/widgets/admin/url_upload_field.dart';
 import '../../../../core/widgets/common/underline_text_field.dart';
 import '../../../portfolio_content/domain/entities/certificate.dart';
 
@@ -122,13 +123,13 @@ class _CertificateFormScreenState extends State<CertificateFormScreen> {
         controllerEn: _locationEn,
         controllerAr: _locationAr,
       ),
-      // A raw asset path rather than a MediaRefField: Certificate.imageAsset is
-      // a plain String, and widening it to ImageRef is a schema change this
-      // phase has no reason to make.
-      UnderlineTextField(
+      // Still a plain String on the entity rather than a full ImageRef —
+      // widening it is a schema change this does not need, because
+      // `ImageRef.fromSource` reads an uploaded Cloudinary URL out of the
+      // same field a bundled `assets/...` path used to live in.
+      UrlUploadField.image(
         label: context.translate(LangKeys.fieldImageAsset),
         controller: _imageAsset,
-        textInputAction: TextInputAction.next,
       ),
     ];
   }

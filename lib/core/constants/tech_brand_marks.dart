@@ -16,7 +16,9 @@ class TechBrandMark {
   final String label;
 
   /// Case-sensitive: the web build serves assets over HTTP, where `gitHub.svg`
-  /// and `github.svg` are different files.
+  /// and `github.svg` are different files. Every file here is lowercase for
+  /// that reason — two of them were not, and only worked because the machine
+  /// they were tested on had a case-insensitive filesystem.
   final String assetPath;
 
   /// The lighter stop of the brand's colour. Tints the fallback glyph so it
@@ -72,7 +74,7 @@ class TechBrandMarks {
       label: 'GitHub',
       // A light colour on purpose: the GitHub mark is dark and would disappear
       // against a dark one on this navy ground.
-      assetPath: '$_dir/gitHub.svg',
+      assetPath: '$_dir/github.svg',
       color: Color(0xFFF0F6FC),
       fallbackIcon: Icons.merge_type_rounded,
     ),
@@ -90,7 +92,7 @@ class TechBrandMarks {
     ),
     TechBrandMark(
       label: 'GraphQL',
-      assetPath: '$_dir/graphQL.svg',
+      assetPath: '$_dir/graphql.svg',
       color: Color(0xFFF06FC4),
       fallbackIcon: Icons.hub_rounded,
     ),

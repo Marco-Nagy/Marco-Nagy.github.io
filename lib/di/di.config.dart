@@ -11,12 +11,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'package:get_it/get_it.dart' as _i174;
+import 'package:http/http.dart' as _i519;
 import 'package:image_picker/image_picker.dart' as _i183;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../core/app_cubit/app_cubit.dart' as _i693;
 import '../core/services/auth/admin_auth_service.dart' as _i50;
 import '../core/services/media/cloudinary_upload_service.dart' as _i583;
+import '../core/services/media/document_picker_service.dart' as _i85;
 import '../core/services/media/image_picker_service.dart' as _i809;
 import '../core/services/shared_preference/shared_preference_helper.dart'
     as _i668;
@@ -79,13 +81,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i50.AdminAuthService>(
       () => const _i50.AdminAuthService(),
     );
-    gh.lazySingleton<_i583.CloudinaryUploadService>(
-      () => _i583.CloudinaryUploadService(),
+    gh.lazySingleton<_i85.DocumentPickerService>(
+      () => const _i85.DocumentPickerService(),
     );
     gh.lazySingleton<_i668.SharedPrefHelper>(
       () => registerModule.sharedPrefHelper,
     );
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
+    gh.lazySingleton<_i519.Client>(() => registerModule.httpClient);
     gh.lazySingleton<_i972.BundledContentLoader>(
       () => const _i972.BundledContentLoader(),
     );
@@ -97,6 +100,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i275.PortfolioLocalDataSource>(
       () => _i420.PortfolioLocalDataSourceImpl(gh<_i668.SharedPrefHelper>()),
+    );
+    gh.lazySingleton<_i583.CloudinaryUploadService>(
+      () => _i583.CloudinaryUploadService(gh<_i519.Client>()),
     );
     gh.lazySingleton<_i809.ImagePickerService>(
       () => _i809.ImagePickerService(gh<_i183.ImagePicker>()),

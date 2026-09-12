@@ -9,6 +9,7 @@ import '../../../../core/utils/text_list_converter.dart';
 import '../../../../core/widgets/admin/admin_form_screen.dart';
 import '../../../../core/widgets/admin/bilingual_field_pair.dart';
 import '../../../../core/widgets/admin/crop_photo_dialog.dart';
+import '../../../../core/widgets/admin/url_upload_field.dart';
 import '../../../../core/widgets/admin/profile_photo_field.dart';
 import '../../../../core/widgets/common/underline_text_field.dart';
 import '../../domain/entities/image_ref.dart';
@@ -398,10 +399,9 @@ class _SiteContentFormScreenState extends State<SiteContentFormScreen> {
             controller: _linkedInUrl,
             textInputAction: TextInputAction.next,
           ),
-          UnderlineTextField(
+          UrlUploadField.pdf(
             label: t(LangKeys.fieldHostedCvUrl),
             controller: _hostedCvUrl,
-            textInputAction: TextInputAction.next,
           ),
         ],
       ),

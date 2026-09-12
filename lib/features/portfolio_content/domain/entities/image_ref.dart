@@ -38,6 +38,21 @@ abstract class ImageRef with _$ImageRef {
   static ImageRef embedded(String base64) =>
       ImageRef(kind: ImageSourceKind.embedded, value: base64);
 
+  /// Reads a stored string that could be either kind: an `http(s)` source is
+  /// a network image, anything else a bundled asset.
+  ///
+  /// Lives here rather than in each form because it is a rule about what a
+  /// stored value *means* — a Cloudinary URL saved into a field that used to
+  /// hold only `assets/...` paths has to resolve as a network image
+  /// everywhere it is read, not just wherever someone remembered to check.
+  static ImageRef fromSource(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return const ImageRef();
+    return trimmed.startsWith('http')
+        ? ImageRef.network(trimmed)
+        : ImageRef.asset(trimmed);
+  }
+
   bool get isEmpty => value.trim().isEmpty;
   bool get isEmbedded => kind == ImageSourceKind.embedded;
 }

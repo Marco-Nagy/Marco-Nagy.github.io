@@ -152,10 +152,8 @@ class LangKeys {
   static const String fieldCoverImage = 'field_cover_image';
   static const String fieldMediaImagePath = 'field_media_image_path';
   static const String fieldMediaPick = 'field_media_pick';
-  static const String fieldMediaPickPendingCopy =
-      'field_media_pick_pending_copy';
-  static const String fieldMediaPin = 'field_media_pin';
-  static const String fieldMediaPinWarning = 'field_media_pin_warning';
+  static const String fieldMediaEmbeddedLegacy =
+      'field_media_embedded_legacy';
   static const String fieldMediaVideoUrl = 'field_media_video_url';
   static const String fieldMediaYoutubeUnresolved =
       'field_media_youtube_unresolved';
@@ -276,6 +274,7 @@ class LangKeys {
   static const String adminChangePhoto = 'admin_change_photo';
   static const String adminRemovePhoto = 'admin_remove_photo';
   static const String adminCropPhoto = 'admin_crop_photo';
+  static const String adminUploadCv = 'admin_upload_cv';
   static const String fieldEmail = 'field_email';
   static const String fieldPhone = 'field_phone';
   static const String fieldGithubUrl = 'field_github_url';

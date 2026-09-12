@@ -68,7 +68,28 @@ class CloudinaryUploadService {
   ///
   /// Throws [CloudinaryUploadException] for anything that stops the upload
   /// from producing a usable URL — never returns a partial or malformed one.
-  Future<String> uploadImage(Uint8List bytes, {required String fileName}) async {
+  Future<String> uploadImage(Uint8List bytes, {required String fileName}) =>
+      _upload(bytes, fileName: fileName, kind: 'Image', transform: true);
+
+  /// Uploads a document — the CV PDF — and returns its plain `secure_url`.
+  ///
+  /// Deliberately skips the `f_auto,q_auto` transform [uploadImage] applies:
+  /// those are *image* directives, and Cloudinary treats a PDF as an image it
+  /// is willing to rasterise, so asking it for an automatic format would hand
+  /// back a picture of page one instead of the document.
+  ///
+  /// Note that a Cloudinary account blocks PDF delivery by default — the
+  /// upload succeeds and the URL then 401s until
+  /// `Settings → Security → PDF and ZIP files delivery` is enabled.
+  Future<String> uploadDocument(Uint8List bytes, {required String fileName}) =>
+      _upload(bytes, fileName: fileName, kind: 'File', transform: false);
+
+  Future<String> _upload(
+    Uint8List bytes, {
+    required String fileName,
+    required String kind,
+    required bool transform,
+  }) async {
     if (!isConfigured) {
       throw const CloudinaryUploadException(
         'Cloudinary is not configured for this run — start it with '
@@ -79,7 +100,7 @@ class CloudinaryUploadService {
     if (bytes.length > maxImageBytes) {
       final mb = (bytes.length / (1024 * 1024)).toStringAsFixed(1);
       throw CloudinaryUploadException(
-        'Image is $mb MB — Cloudinary\'s free plan caps a single image at '
+        '$kind is $mb MB — Cloudinary\'s free plan caps a single upload at '
         '${maxImageBytes ~/ (1024 * 1024)} MB.',
       );
     }
@@ -128,7 +149,7 @@ class CloudinaryUploadService {
         'Cloudinary\'s response had no secure_url.',
       );
     }
-    return withDeliveryTransform(secureUrl);
+    return transform ? withDeliveryTransform(secureUrl) : secureUrl;
   }
 
   /// Cloudinary's signature scheme: every param that will actually be sent
