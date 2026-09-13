@@ -60,3 +60,8 @@ bundle.json
 # --dart-define-from-file, never hardcoded in launch.json, which IS
 # committed. See cloudinary.local.json.example for the shape to copy.
 cloudinary.local.json
+
+# Firebase CLI's own record of the last `firebase deploy`, local to this
+# machine and rewritten on every deploy — not a build artifact anyone else
+# needs.
+.firebase/

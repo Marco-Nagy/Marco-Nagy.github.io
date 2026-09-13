@@ -381,9 +381,29 @@
       // Reset scene, which exists in the source design only to close a loop.
       var HOLD_T = CUES.Reset - 0.05;
 
+      // `flutter-first-frame` fires whenever the bundle finishes downloading,
+      // which has nothing to do with this timeline's own pace — on a slow
+      // connection it used to arrive well after HOLD_T (the brand moment sat
+      // there finished, waiting on the network) and on a fast one, after this
+      // migration shrank the bundle, it now arrives well *before* HOLD_T,
+      // cutting the animation off mid-scene. `splashAnimDone`/`onAnimDone`
+      // let the `flutter-first-frame` handler below wait for whichever of the
+      // two actually finishes last, instead of only ever caring about Flutter.
+      var splashAnimDone = false;
+      var onAnimDone = null;
+      function markAnimDone() {
+        if (splashAnimDone) return;
+        splashAnimDone = true;
+        if (onAnimDone) { var cb = onAnimDone; onAnimDone = null; cb(); }
+      }
+      window.__setOnSplashAnimDone = function (cb) {
+        if (splashAnimDone) { cb(); } else { onAnimDone = cb; }
+      };
+
       var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduceMotion) {
         render(HOLD_T);
+        markAnimDone();
       } else {
         var rafId = null;
         var start = null;
@@ -393,6 +413,7 @@
           if (T >= HOLD_T) {
             render(HOLD_T);
             rafId = null;
+            markAnimDone();
             return;
           }
           render(T);
@@ -405,25 +426,35 @@
       }
     })();
 
-    // Flutter fires this once it has painted its first frame, which is the
-    // only reliable moment the app is actually visible.
+    // Flutter fires this once it has painted its first frame — necessary
+    // before the splash can come down, but not sufficient: see
+    // `splashAnimDone` above. Whichever of the two finishes last decides when
+    // the handoff actually happens.
     window.addEventListener('flutter-first-frame', function () {
       var splash = document.getElementById('splash');
       var bar = document.getElementById('splash-bar');
       if (!splash) return;
 
-      if (bar) bar.classList.add('is-complete');
+      function reveal() {
+        if (bar) bar.classList.add('is-complete');
 
-      // Let the bar finish before fading, then drop the node (and stop the
-      // animation loop) so it can never intercept a pointer event or spend
-      // CPU over the app.
-      window.setTimeout(function () {
-        splash.classList.add('is-done');
+        // Let the bar finish before fading, then drop the node (and stop the
+        // animation loop) so it can never intercept a pointer event or spend
+        // CPU over the app.
         window.setTimeout(function () {
-          if (window.__stopSplashAnim) window.__stopSplashAnim();
-          splash.remove();
-        }, 400);
-      }, 220);
+          splash.classList.add('is-done');
+          window.setTimeout(function () {
+            if (window.__stopSplashAnim) window.__stopSplashAnim();
+            splash.remove();
+          }, 400);
+        }, 220);
+      }
+
+      if (window.__setOnSplashAnimDone) {
+        window.__setOnSplashAnimDone(reveal);
+      } else {
+        reveal();
+      }
     });
   </script>
 
