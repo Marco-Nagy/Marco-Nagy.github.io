@@ -366,6 +366,16 @@ Zero tests exist today. Target what can silently destroy content, using `SharedP
 5. **`certificates_view_model_test.dart`** — one `bloc_test` as the pattern reference.
 
 Skip widget and golden tests.
+**Status 2026-09-12 — all five written, plus nine that were not on this list. 110 tests.**
+
+7.4 was the last one standing, and it was worth the wait rather than the haste: writing it surfaced that `MediaRef.fromJson(media.toJson())` does not round-trip at all. freezed leaves a nested entity as a raw object in `toJson()` (`explicitToJson` is off project-wide), so the cast inside the generated `fromJson` throws on it. Nothing in production does that, though — local storage flattens through `json.encode` and the Firestore writer calls `ensurePlainJson`, both of which produce plain maps. The test therefore re-reads through `ensurePlainJson`, the same helper the write path uses, instead of asserting a round-trip the app never performs. The first draft asserted the bare version and failed; the code was right.
+
+It also pins the invariant the discriminator depends on, which was previously implicit: `toJson()` must always emit the `image` key. A posterless video's `image` is an empty `ImageRef` default, so anyone who later makes that field conditional — `includeIfNull`, or excluding defaults — would send every posterless video down the legacy branch, where `kind: "videoFile"` fails to decode as an `ImageSourceKind`. That test fails first and says so.
+
+Checked by mutation rather than by assumption: replacing `json.containsKey('image')` with `true` fails 6 of the 10 cases.
+
+The nine beyond the list: `image_ref_test` (`fromSource`, the rule every media field now depends on), `cloudinary_upload_service_test` (signature + delivery transform), `bundle_publish_guard_test`, `local_data_source_bundle_test`, `content_cubits_test` (three cubits rather than the one 7.5 asked for), `site_content_test`, `site_links_test`, `json_normalize_test`, `tech_brand_marks_test`, and the two date/duration utils.
+
 
 ---
 
@@ -382,9 +392,9 @@ Skip widget and golden tests.
 | 4 Missing forms | 18% | **100%** | 3 (for SiteContent/Skills) |
 | 5 Reorder | 6% | **100%** (7 of 9 collections; 2 have no renderer) | 4 |
 | 6 Media | 12% | **100%** (6a/6c closed by deleting the orphans instead) | 0, 2 |
-| 7 Tests | 5% | ~95% (7.1–7.3 plus nine not on the original list) | interleaved |
+| 7 Tests | 5% | **100%** (all five, plus nine not on the original list) | interleaved |
 
-**~99% done.** Every phase has landed. What is left is not a phase but a short list: the video half of `MediaRefField` still takes a pasted URL rather than an upload (images only was a deliberate scope call), and the remaining Phase 7 cases from the original list.
+**Every phase has landed.** What is left is not build work: the `End-to-end verification` steps below have not been run, and nothing is deployed yet. The one deliberate gap in the code is that the video half of `MediaRefField` takes a pasted URL rather than an upload — images only was a scope call, not an omission.
 
 The critical path **0 → 7.1 → 1 → 2 → 6** is complete: content is editable from a deployed admin build, media uploads to Cloudinary, and the resulting URL is stored in Firestore.
 
