@@ -4,7 +4,14 @@
     {
       "name": "portfolio-web",
       "runtimeExecutable": "flutter",
-      "runtimeArgs": ["run", "-d", "chrome", "--web-port", "8080"],
+      "runtimeArgs": [
+        "run",
+        "-d",
+        "chrome",
+        "--web-port",
+        "8080",
+        "--dart-define-from-file=cloudinary.local.json"
+      ],
       "port": 8080
     },
     {
@@ -16,14 +23,19 @@
         "chrome",
         "--release",
         "--web-port",
-        "8081"
+        "8081",
+        "--dart-define-from-file=cloudinary.local.json"
       ],
       "port": 8081
     },
     {
       "name": "portfolio-windows",
       "runtimeExecutable": "flutter",
-      "runtimeArgs": ["run", "-d", "windows"]
+      "runtimeArgs": [
+        "run",
+        "-d",
+        "windows"
+      ]
     }
   ]
 }

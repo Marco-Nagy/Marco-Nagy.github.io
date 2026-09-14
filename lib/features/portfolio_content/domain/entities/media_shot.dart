@@ -14,7 +14,8 @@ enum DeviceFrameType {
   iphone,
   samsungS;
 
-  /// Portrait frames sit in a side column; the laptop takes full width.
+  /// The laptop's screen is wider than it is tall, unlike every phone frame —
+  /// callers that lay out a panel around the frame size it accordingly.
   bool get isLandscape => this == DeviceFrameType.laptop;
 
   static const List<DeviceFrameType> selectable = <DeviceFrameType>[
