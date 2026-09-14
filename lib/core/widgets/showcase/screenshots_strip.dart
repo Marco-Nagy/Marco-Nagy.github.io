@@ -72,18 +72,41 @@ class ScreenshotsStrip extends StatelessWidget {
   /// browsed by scrolling sideways.
   final double? maxWidth;
 
+  /// Portrait slot for a phone-framed shot.
   static const double aspectRatio = 9 / 16;
+
+  /// A laptop's screen is wider than it is tall, so its slot has to be too —
+  /// the same portrait slot every phone frame uses would leave a landscape
+  /// frame shrunk down to a sliver in the middle of a mostly-empty column.
+  static const double laptopAspectRatio = 16 / 10;
+
+  MediaShot _shotOf(ShowcasePanel panel) =>
+      panel.shots.isEmpty ? const MediaShot() : panel.shots.first;
+
+  double _naturalWidthOf(ShowcasePanel panel) =>
+      height * (_shotOf(panel).frame.isLandscape ? laptopAspectRatio : aspectRatio);
 
   @override
   Widget build(BuildContext context) {
     if (panels.isEmpty) return const SizedBox.shrink();
 
-    final naturalWidth = height * aspectRatio;
+    final naturalWidths = <double>[for (final p in panels) _naturalWidthOf(p)];
+    final totalNatural = naturalWidths.fold<double>(0, (a, b) => a + b);
     final available = maxWidth;
-    final panelWidth = available == null
-        ? naturalWidth
-        : math.min(naturalWidth, available / panels.length);
-    final totalWidth = panelWidth * panels.length;
+    // Shrinks every panel by the same factor so the whole group keeps fitting
+    // without a scrollbar — capped at 1, so a strip that already fits is
+    // never stretched wider than each frame's own natural size calls for.
+    final shrink = available == null
+        ? 1.0
+        : math.min(1.0, available / totalNatural);
+    final panelWidths = <double>[for (final w in naturalWidths) w * shrink];
+    final lefts = <double>[];
+    var cursor = 0.0;
+    for (final w in panelWidths) {
+      lefts.add(cursor);
+      cursor += w;
+    }
+    final totalWidth = cursor;
 
     final stack = SizedBox(
       width: totalWidth,
@@ -95,8 +118,8 @@ class ScreenshotsStrip extends StatelessWidget {
         children: <Widget>[
           for (var i = 0; i < panels.length; i++)
             Positioned(
-              left: i * panelWidth,
-              width: panelWidth,
+              left: lefts[i],
+              width: panelWidths[i],
               height: height,
               child: ShotBackgroundView(
                 background: panels[i].backgroundOverride ?? background,
@@ -108,8 +131,8 @@ class ScreenshotsStrip extends StatelessWidget {
           for (var i = 0; i < panels.length; i++)
             _ScreenshotFrame(
               panel: panels[i],
-              left: i * panelWidth,
-              panelWidth: panelWidth,
+              left: lefts[i],
+              panelWidth: panelWidths[i],
               panelHeight: height,
               caption: context.localized(
                 panels[i].captionEn,
